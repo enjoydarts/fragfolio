@@ -45,10 +45,10 @@ expect()->extend('toBeOne', function () {
 
 function createDefaultRoles()
 {
-    if (!\Spatie\Permission\Models\Role::where('name', 'user')->exists()) {
+    if (! \Spatie\Permission\Models\Role::where('name', 'user')->exists()) {
         \Spatie\Permission\Models\Role::create(['name' => 'user']);
     }
-    if (!\Spatie\Permission\Models\Role::where('name', 'admin')->exists()) {
+    if (! \Spatie\Permission\Models\Role::where('name', 'admin')->exists()) {
         \Spatie\Permission\Models\Role::create(['name' => 'admin']);
     }
 }

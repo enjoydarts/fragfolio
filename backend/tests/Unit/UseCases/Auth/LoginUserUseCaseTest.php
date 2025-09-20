@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Hash;
 
 describe('LoginUserUseCase', function () {
     beforeEach(function () {
-        $this->useCase = new LoginUserUseCase();
+        $this->useCase = new LoginUserUseCase;
         $this->user = User::factory()->create([
             'email' => 'test@example.com',
             'password' => Hash::make('password123'),

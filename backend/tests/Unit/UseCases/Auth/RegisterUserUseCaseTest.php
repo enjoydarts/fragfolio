@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Hash;
 
 describe('RegisterUserUseCase', function () {
     beforeEach(function () {
-        $this->useCase = new RegisterUserUseCase();
+        $this->useCase = new RegisterUserUseCase;
         createDefaultRoles();
     });
 
