@@ -137,7 +137,7 @@ jobs:
       - name: Apply database schema
         working-directory: ./backend
         run: |
-          mysqldef -h 127.0.0.1 -u ${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }} ${{ env.MYSQL_DATABASE }} --file sqldef/schema.sql
+          mysqldef -h 127.0.0.1 -u ${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }} ${{ env.MYSQL_DATABASE }} --file ../database/schema.sql
 
       - name: Run tests with coverage
         working-directory: ./backend
