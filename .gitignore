@@ -28,3 +28,14 @@ Homestead.json
 .env.production
 .phpactor.json
 auth.json
+
+# Coverage reports
+coverage/
+coverage.xml
+*.lcov
+.nyc_output
+clover.xml
+
+# Test results
+.phpunit.result.cache
+junit.xml

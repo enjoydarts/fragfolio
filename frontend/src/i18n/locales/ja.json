@@ -1,0 +1,27 @@
+{
+  "app": {
+    "title": "FragFolio",
+    "subtitle": "香水ポートフォリオを美しく管理",
+    "description": "あなたの香水コレクションを記録し、発見し、共有しましょう。"
+  },
+  "nav": {
+    "login": "ログイン",
+    "register": "新規登録",
+    "profile": "プロフィール",
+    "logout": "ログアウト"
+  },
+  "features": {
+    "collection": {
+      "title": "コレクション管理",
+      "description": "あなたの香水コレクションを整理し、詳細な情報を記録できます。"
+    },
+    "ai_search": {
+      "title": "AI検索",
+      "description": "AIを活用した高度な検索で、新しい香水を発見しましょう。"
+    },
+    "wearing_log": {
+      "title": "着用ログ",
+      "description": "着用記録を残して、香水の使用パターンを分析できます。"
+    }
+  }
+}
