@@ -1,0 +1,27 @@
+{
+  "app": {
+    "title": "FragFolio",
+    "subtitle": "Beautifully Manage Your Fragrance Portfolio",
+    "description": "Record, discover, and share your fragrance collection."
+  },
+  "nav": {
+    "login": "Login",
+    "register": "Sign Up",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "features": {
+    "collection": {
+      "title": "Collection Management",
+      "description": "Organize your fragrance collection and record detailed information."
+    },
+    "ai_search": {
+      "title": "AI Search",
+      "description": "Discover new fragrances with AI-powered advanced search."
+    },
+    "wearing_log": {
+      "title": "Wearing Log",
+      "description": "Keep wearing records and analyze your fragrance usage patterns."
+    }
+  }
+}

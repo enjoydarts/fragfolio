@@ -1,0 +1,25 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+
+parameters:
+
+    paths:
+        - app/
+
+    # Level 9 is the highest level
+    level: 4
+
+    treatPhpDocTypesAsCertain: false
+
+    ignoreErrors:
+        - '#Access to an undefined property App\\Models\\User::\$email#'
+        - '#Access to an undefined property App\\Models\\UserProfile::\$date_of_birth#'
+
+    excludePaths:
+        - ./*/*/FileToBeExcluded.php
+
+    tmpDir: /tmp/phpstan
+
+    parallel:
+        maximumNumberOfProcesses: 4
+        processTimeout: 300.0

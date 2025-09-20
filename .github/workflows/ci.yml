@@ -1,0 +1,218 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  MYSQL_ROOT_PASSWORD: rootpassword
+  MYSQL_DATABASE: fragfolio_test
+  MYSQL_USER: fragfolio
+  MYSQL_PASSWORD: password
+
+jobs:
+  backend-lint:
+    name: Backend Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, dom, fileinfo, mysql, pcov
+          coverage: pcov
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Run PHP CS Fixer (Pint)
+        working-directory: ./backend
+        run: composer lint
+
+      - name: Run Larastan
+        working-directory: ./backend
+        run: composer stan
+
+  frontend-lint:
+    name: Frontend Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Check Prettier formatting
+        working-directory: ./frontend
+        run: npm run format:check
+
+      - name: Type check
+        working-directory: ./frontend
+        run: npx tsc --noEmit
+
+  backend-test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ env.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, dom, fileinfo, mysql, pcov
+          coverage: pcov
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Setup sqldef
+        run: |
+          curl -L https://github.com/k0kubun/sqldef/releases/latest/download/mysqldef_linux_amd64.tar.gz | tar xz
+          sudo mv mysqldef /usr/local/bin/
+
+      - name: Create test environment file
+        working-directory: ./backend
+        run: |
+          cp .env.example .env.testing
+          echo "APP_ENV=testing" >> .env.testing
+          echo "DB_CONNECTION=mysql" >> .env.testing
+          echo "DB_HOST=127.0.0.1" >> .env.testing
+          echo "DB_PORT=3306" >> .env.testing
+          echo "DB_DATABASE=${{ env.MYSQL_DATABASE }}" >> .env.testing
+          echo "DB_USERNAME=${{ env.MYSQL_USER }}" >> .env.testing
+          echo "DB_PASSWORD=${{ env.MYSQL_PASSWORD }}" >> .env.testing
+          echo "APP_KEY=base64:HHcXhdGoQ62ZOvGq2Hu4jFp5YqfO57O861yLZ6fMyLw=" >> .env.testing
+
+      - name: Apply database schema
+        working-directory: ./backend
+        run: |
+          mysqldef -h 127.0.0.1 -u ${{ env.MYSQL_USER }} -p${{ env.MYSQL_PASSWORD }} ${{ env.MYSQL_DATABASE }} --file ../database/schema.sql
+
+      - name: Run tests with coverage
+        working-directory: ./backend
+        run: |
+          # CI環境用のphpunit.xml設定を上書き
+          sed -i 's/<env name="DB_HOST" value="mysql"\/>/<env name="DB_HOST" value="127.0.0.1"\/>/g' phpunit.xml
+          php artisan config:clear
+          composer test-coverage
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./backend/coverage.xml
+          flags: backend
+          name: backend-coverage
+          fail_ci_if_error: false
+
+  frontend-test:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run tests with coverage
+        working-directory: ./frontend
+        run: npm run test:coverage
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./frontend/coverage/lcov.info
+          flags: frontend
+          name: frontend-coverage
+          fail_ci_if_error: false
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [backend-lint, frontend-lint, backend-test, frontend-test]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/dist/
+          retention-days: 7
