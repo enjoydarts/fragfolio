@@ -13,7 +13,6 @@ class UserProfile extends Model
     /**
      * Model properties from database
      */
-
     protected $fillable = [
         'user_id',
         'display_name',
