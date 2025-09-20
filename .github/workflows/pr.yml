@@ -67,7 +67,14 @@ jobs:
 
       - name: Check PHP syntax
         working-directory: ./backend
-        run: find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \; | grep -v "No syntax errors"
+        run: |
+          syntax_errors=$(find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \; | grep -v "No syntax errors" || true)
+          if [ ! -z "$syntax_errors" ]; then
+            echo "PHP syntax errors found:"
+            echo "$syntax_errors"
+            exit 1
+          fi
+          echo "✅ No PHP syntax errors found"
 
       - name: Run PHP CS Fixer (dry-run)
         working-directory: ./backend
