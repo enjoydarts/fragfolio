@@ -15,6 +15,7 @@ class UserFragrance extends Model
      * Model properties from database
      */
     public ?float $volume_ml = null;
+
     public ?float $current_volume_ml = null;
 
     protected $fillable = [

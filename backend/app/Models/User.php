@@ -20,6 +20,7 @@ class User extends Authenticatable
      * Model properties from database
      */
     public ?string $role = null;
+
     public ?string $email = null;
 
     /**

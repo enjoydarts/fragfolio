@@ -14,8 +14,11 @@ class FragranceNote extends Model
      * Model properties from database
      */
     public ?string $name_en = null;
+
     public ?string $name_ja = null;
+
     public ?string $description_en = null;
+
     public ?string $description_ja = null;
 
     protected $fillable = [
