@@ -1,0 +1,36 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 5%
+    patch:
+      default:
+        target: 80%
+        threshold: 5%
+
+flags:
+  backend:
+    paths:
+      - backend/
+  frontend:
+    paths:
+      - frontend/
+
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+  require_changes: false
+
+ignore:
+  - "backend/tests/"
+  - "frontend/tests/"
+  - "backend/database/migrations/"
+  - "backend/database/seeders/"
+  - "backend/config/"
+  - "backend/bootstrap/"
+  - "backend/storage/"
+  - "backend/resources/views/"
+  - "frontend/src/test/"
+  - "frontend/dist/"
+  - "frontend/coverage/"
