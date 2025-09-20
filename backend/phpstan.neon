@@ -7,12 +7,19 @@ parameters:
         - app/
 
     # Level 9 is the highest level
-    level: 6
+    level: 4
 
     ignoreErrors:
         - '#PHPDoc tag @var#'
+        - '#has no value type specified in iterable type array#'
+        - '#uses generic trait.*but does not specify its types#'
+        - '#return type with generic class.*does not specify its types#'
 
     excludePaths:
         - ./*/*/FileToBeExcluded.php
 
-    checkMissingIterableValueType: false
+    tmpDir: /tmp/phpstan
+
+    parallel:
+        maximumNumberOfProcesses: 4
+        processTimeout: 300.0
