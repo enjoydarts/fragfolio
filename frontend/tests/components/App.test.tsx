@@ -63,8 +63,14 @@ describe('App', () => {
   it('メインコンテンツエリアが表示される', () => {
     render(<App />);
 
-    expect(screen.getByText('香水ポートフォリオを美しく管理')).toBeInTheDocument();
-    expect(screen.getByText('あなたの香水コレクションを記録し、発見し、共有しましょう。')).toBeInTheDocument();
+    expect(
+      screen.getByText('香水ポートフォリオを美しく管理')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'あなたの香水コレクションを記録し、発見し、共有しましょう。'
+      )
+    ).toBeInTheDocument();
   });
 
   it('正しいCSSクラスが適用されている', () => {
@@ -73,7 +79,9 @@ describe('App', () => {
     const header = screen.getByText('FragFolio').closest('header');
     expect(header).toHaveClass('bg-white', 'shadow');
 
-    const mainContent = screen.getByText('香水ポートフォリオを美しく管理').closest('main');
+    const mainContent = screen
+      .getByText('香水ポートフォリオを美しく管理')
+      .closest('main');
     expect(mainContent).toHaveClass('max-w-7xl', 'mx-auto');
   });
 });

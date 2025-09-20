@@ -23,13 +23,14 @@ export interface AuthResponse {
   errors?: Record<string, string[]>;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8002';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8002';
 
 export class AuthAPI {
   private static getHeaders(token?: string): HeadersInit {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      Accept: 'application/json',
     };
 
     if (token) {
@@ -90,15 +91,18 @@ export class AuthAPI {
     return response.json();
   }
 
-  static async updateProfile(token: string, data: {
-    name?: string;
-    bio?: string;
-    language?: string;
-    timezone?: string;
-    date_of_birth?: string;
-    gender?: string;
-    country?: string;
-  }): Promise<AuthResponse> {
+  static async updateProfile(
+    token: string,
+    data: {
+      name?: string;
+      bio?: string;
+      language?: string;
+      timezone?: string;
+      date_of_birth?: string;
+      gender?: string;
+      country?: string;
+    }
+  ): Promise<AuthResponse> {
     const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
       method: 'PUT',
       headers: this.getHeaders(token),
