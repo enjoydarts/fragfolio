@@ -21,8 +21,6 @@ class User extends Authenticatable
      */
     public ?string $role = null;
 
-    public ?string $email = null;
-
     /**
      * The attributes that are mass assignable.
      *
