@@ -1,10 +1,33 @@
 import { http, HttpResponse } from 'msw';
 
+interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+  language?: string;
+  timezone?: string;
+}
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+interface ProfileUpdateRequest {
+  name: string;
+  language: string;
+  timezone: string;
+  bio?: string;
+  date_of_birth?: string;
+  gender?: string;
+  country?: string;
+}
+
 // バックエンドAPIのモックハンドラー
 export const handlers = [
   // 認証関連API
   http.post('http://localhost:8002/api/auth/register', async ({ request }) => {
-    const body = await request.json();
+    const body = (await request.json()) as RegisterRequest;
 
     // バリデーションエラーのモック
     if (body.email === 'existing@example.com') {
@@ -45,7 +68,7 @@ export const handlers = [
   }),
 
   http.post('http://localhost:8002/api/auth/login', async ({ request }) => {
-    const body = await request.json();
+    const body = (await request.json()) as LoginRequest;
 
     // モック用の認証失敗パターン
     if (
@@ -138,7 +161,7 @@ export const handlers = [
       );
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as ProfileUpdateRequest;
 
     return HttpResponse.json({
       success: true,
