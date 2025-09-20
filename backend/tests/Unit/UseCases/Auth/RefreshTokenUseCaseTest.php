@@ -6,7 +6,7 @@ use Laravel\Sanctum\Sanctum;
 
 describe('RefreshTokenUseCase', function () {
     beforeEach(function () {
-        $this->useCase = new RefreshTokenUseCase();
+        $this->useCase = new RefreshTokenUseCase;
         $this->user = User::factory()->create();
     });
 

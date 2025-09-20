@@ -5,7 +5,7 @@ use App\UseCases\Auth\UpdateUserProfileUseCase;
 
 describe('UpdateUserProfileUseCase', function () {
     beforeEach(function () {
-        $this->useCase = new UpdateUserProfileUseCase();
+        $this->useCase = new UpdateUserProfileUseCase;
         $this->user = User::factory()->create([
             'name' => '元の名前',
         ]);
