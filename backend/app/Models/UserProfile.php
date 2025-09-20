@@ -10,6 +10,11 @@ class UserProfile extends Model
 {
     use HasFactory;
 
+    /**
+     * Model properties from database
+     */
+    public ?string $date_of_birth = null;
+
     protected $fillable = [
         'user_id',
         'display_name',
@@ -38,6 +43,6 @@ class UserProfile extends Model
 
     public function getAgeAttribute(): ?int
     {
-        return $this->date_of_birth ? $this->date_of_birth->age : null;
+        return $this->date_of_birth ? \Carbon\Carbon::parse($this->date_of_birth)->age : null;
     }
 }

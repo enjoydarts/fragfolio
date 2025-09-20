@@ -39,9 +39,9 @@ class WebAuthnController extends Controller
                     'id' => parse_url(config('app.url'), PHP_URL_HOST),
                 ],
                 'user' => [
-                    'id' => base64url_encode($user->id),
-                    'name' => $user->email,
-                    'displayName' => $user->name ?? $user->email,
+                    'id' => base64url_encode($user instanceof \App\Models\User ? $user->id : $user->first()?->id),
+                    'name' => $user instanceof \App\Models\User ? $user->email : $user->first()?->email,
+                    'displayName' => $user instanceof \App\Models\User ? ($user->name ?? $user->email) : ($user->first()->name ?? $user->first()->email),
                 ],
                 'challenge' => base64url_encode($challenge),
                 'pubKeyCredParams' => [

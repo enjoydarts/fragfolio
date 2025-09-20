@@ -17,6 +17,12 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     /**
+     * Model properties from database
+     */
+    public ?string $role = null;
+    public ?string $email = null;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
