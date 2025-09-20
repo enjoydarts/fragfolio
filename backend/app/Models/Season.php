@@ -10,6 +10,12 @@ class Season extends Model
 {
     use HasFactory;
 
+    /**
+     * Model properties from database
+     */
+    public ?string $name_en = null;
+    public ?string $name_ja = null;
+
     protected $fillable = [
         'name_ja',
         'name_en',

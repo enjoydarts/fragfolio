@@ -9,11 +9,9 @@ parameters:
     # Level 9 is the highest level
     level: 4
 
-    ignoreErrors:
-        - '#PHPDoc tag @var#'
-        - '#has no value type specified in iterable type array#'
-        - '#uses generic trait.*but does not specify its types#'
-        - '#return type with generic class.*does not specify its types#'
+    treatPhpDocTypesAsCertain: false
+
+    ignoreErrors: []
 
     excludePaths:
         - ./*/*/FileToBeExcluded.php
