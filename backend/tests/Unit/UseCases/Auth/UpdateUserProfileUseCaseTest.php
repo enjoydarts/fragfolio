@@ -36,6 +36,7 @@ describe('UpdateUserProfileUseCase', function () {
         expect($updatedUser->profile->bio)->toBe('新しい自己紹介');
         expect($updatedUser->profile->language)->toBe('en');
         expect($updatedUser->profile->timezone)->toBe('America/New_York');
+        expect($updatedUser->profile->date_of_birth)->not->toBeNull();
         expect($updatedUser->profile->date_of_birth->format('Y-m-d'))->toBe('1990-01-01');
         expect($updatedUser->profile->gender)->toBe('female');
         expect($updatedUser->profile->country)->toBe('US');

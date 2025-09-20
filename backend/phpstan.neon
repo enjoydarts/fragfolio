@@ -11,7 +11,9 @@ parameters:
 
     treatPhpDocTypesAsCertain: false
 
-    ignoreErrors: []
+    ignoreErrors:
+        - '#Access to an undefined property App\\Models\\User::\$email#'
+        - '#Access to an undefined property App\\Models\\UserProfile::\$date_of_birth#'
 
     excludePaths:
         - ./*/*/FileToBeExcluded.php

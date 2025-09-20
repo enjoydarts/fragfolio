@@ -13,7 +13,6 @@ class UserProfile extends Model
     /**
      * Model properties from database
      */
-    public ?string $date_of_birth = null;
 
     protected $fillable = [
         'user_id',
@@ -43,6 +42,6 @@ class UserProfile extends Model
 
     public function getAgeAttribute(): ?int
     {
-        return $this->date_of_birth ? \Carbon\Carbon::parse($this->date_of_birth)->age : null;
+        return $this->date_of_birth?->age;
     }
 }
