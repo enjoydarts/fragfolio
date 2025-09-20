@@ -1,0 +1,98 @@
+
+services:
+  # MySQL 8.4
+  mysql:
+    image: mysql:8.4
+    container_name: fragfolio_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: fragfolio
+      MYSQL_USER: fragfolio
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database:/docker-entrypoint-initdb.d
+    command: --mysql-native-password=ON
+    networks:
+      - fragfolio
+
+  # Laravel Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fragfolio_backend
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    ports:
+      - "8002:80"
+    volumes:
+      - ./backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
+      - ./database:/var/www/html/sqldef
+    environment:
+      DB_HOST: mysql
+      DB_DATABASE: fragfolio
+      DB_USERNAME: fragfolio
+      DB_PASSWORD: password
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+    networks:
+      - fragfolio
+
+  # React Frontend (Development)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fragfolio_frontend
+    restart: unless-stopped
+    ports:
+      - "3002:5173"
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    environment:
+      REACT_APP_API_URL: http://localhost:8002/api
+    networks:
+      - fragfolio
+
+  # phpMyAdmin (development only)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: fragfolio_phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    ports:
+      - "8082:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    networks:
+      - fragfolio
+
+  # Mailpit (development email testing)
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: fragfolio_mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025"  # SMTP port
+      - "8025:8025"  # Web UI port
+    networks:
+      - fragfolio
+
+volumes:
+  mysql_data:
+  backend_vendor:
+  frontend_node_modules:
+
+networks:
+  fragfolio:
+    driver: bridge

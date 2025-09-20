@@ -1,0 +1,187 @@
+name: Pull Request
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      ci: ${{ steps.filter.outputs.ci }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - 'sqldef/**'
+              - 'docker-compose.yml'
+              - 'backend.Dockerfile'
+            frontend:
+              - 'frontend/**'
+              - 'frontend.Dockerfile'
+            ci:
+              - '.github/**'
+              - 'Makefile'
+
+  backend-checks:
+    name: Backend Code Quality
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, dom, fileinfo, mysql, pcov
+          coverage: pcov
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: backend/vendor
+          key: composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Check PHP syntax
+        working-directory: ./backend
+        run: find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \; | grep -v "No syntax errors"
+
+      - name: Run PHP CS Fixer (dry-run)
+        working-directory: ./backend
+        run: composer lint
+
+      - name: Run Larastan
+        working-directory: ./backend
+        run: composer stan
+
+      - name: Check for security vulnerabilities
+        working-directory: ./backend
+        run: composer audit
+
+  frontend-checks:
+    name: Frontend Code Quality
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Check Prettier formatting
+        working-directory: ./frontend
+        run: npm run format:check
+
+      - name: Type check
+        working-directory: ./frontend
+        run: npx tsc --noEmit
+
+      - name: Check for security vulnerabilities
+        working-directory: ./frontend
+        run: npm audit --audit-level=high
+
+      - name: Check bundle size
+        working-directory: ./frontend
+        run: |
+          npm run build
+          ls -la dist/
+          echo "Build completed successfully"
+
+  pr-summary:
+    name: PR Summary
+    runs-on: ubuntu-latest
+    needs: [changes, backend-checks, frontend-checks]
+    if: always()
+
+    steps:
+      - name: Comment PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' && comment.body.includes('## 🚀 PR Summary')
+            );
+
+            const backendStatus = '${{ needs.backend-checks.result }}';
+            const frontendStatus = '${{ needs.frontend-checks.result }}';
+            const backendChanged = '${{ needs.changes.outputs.backend }}';
+            const frontendChanged = '${{ needs.changes.outputs.frontend }}';
+
+            let summary = `## 🚀 PR Summary\n\n`;
+            summary += `### Changes Detected\n`;
+            summary += `- Backend: ${backendChanged === 'true' ? '✅ Changed' : '⚪ No changes'}\n`;
+            summary += `- Frontend: ${frontendChanged === 'true' ? '✅ Changed' : '⚪ No changes'}\n\n`;
+
+            summary += `### Code Quality Checks\n`;
+
+            if (backendChanged === 'true') {
+              const backendIcon = backendStatus === 'success' ? '✅' : backendStatus === 'failure' ? '❌' : '⏸️';
+              summary += `- Backend: ${backendIcon} ${backendStatus}\n`;
+            }
+
+            if (frontendChanged === 'true') {
+              const frontendIcon = frontendStatus === 'success' ? '✅' : frontendStatus === 'failure' ? '❌' : '⏸️';
+              summary += `- Frontend: ${frontendIcon} ${frontendStatus}\n`;
+            }
+
+            summary += `\n---\n*Updated: ${new Date().toISOString()}*`;
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: summary
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: summary
+              });
+            }
