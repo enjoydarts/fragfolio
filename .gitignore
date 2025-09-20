@@ -39,3 +39,6 @@ clover.xml
 # Test results
 .phpunit.result.cache
 junit.xml
+
+# Claude Code settings
+.claude/
