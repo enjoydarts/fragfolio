@@ -141,9 +141,9 @@ jobs:
 
       - name: Run tests with coverage
         working-directory: ./backend
-        env:
-          DB_HOST: 127.0.0.1
         run: |
+          # CI環境用のphpunit.xml設定を上書き
+          sed -i 's/<env name="DB_HOST" value="mysql"\/>/<env name="DB_HOST" value="127.0.0.1"\/>/g' phpunit.xml
           php artisan config:clear
           composer test-coverage
 
