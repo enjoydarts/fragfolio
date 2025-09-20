@@ -141,6 +141,8 @@ jobs:
 
       - name: Run tests with coverage
         working-directory: ./backend
+        env:
+          DB_HOST: 127.0.0.1
         run: |
           php artisan config:clear
           composer test-coverage
