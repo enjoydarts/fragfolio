@@ -27,7 +27,9 @@ describe('AuthAPI', () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.errors?.email).toContain('The email has already been taken.');
+      expect(result.errors?.email).toContain(
+        'The email has already been taken.'
+      );
     });
   });
 
@@ -50,7 +52,9 @@ describe('AuthAPI', () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.message).toBe('メールアドレスまたはパスワードが正しくありません');
+      expect(result.message).toBe(
+        'メールアドレスまたはパスワードが正しくありません'
+      );
     });
   });
 

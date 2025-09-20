@@ -8,45 +8,57 @@ export const handlers = [
 
     // バリデーションエラーのモック
     if (body.email === 'existing@example.com') {
-      return HttpResponse.json({
-        success: false,
-        message: 'バリデーションエラー',
-        errors: {
-          email: ['The email has already been taken.'],
+      return HttpResponse.json(
+        {
+          success: false,
+          message: 'バリデーションエラー',
+          errors: {
+            email: ['The email has already been taken.'],
+          },
         },
-      }, { status: 422 });
+        { status: 422 }
+      );
     }
 
-    return HttpResponse.json({
-      success: true,
-      message: 'ユーザー登録が完了しました',
-      user: {
-        id: 1,
-        name: body.name,
-        email: body.email,
-        profile: {
-          language: body.language || 'ja',
-          timezone: body.timezone || 'Asia/Tokyo',
-          bio: null,
-          date_of_birth: null,
-          gender: null,
-          country: null,
+    return HttpResponse.json(
+      {
+        success: true,
+        message: 'ユーザー登録が完了しました',
+        user: {
+          id: 1,
+          name: body.name,
+          email: body.email,
+          profile: {
+            language: body.language || 'ja',
+            timezone: body.timezone || 'Asia/Tokyo',
+            bio: null,
+            date_of_birth: null,
+            gender: null,
+            country: null,
+          },
+          roles: ['user'],
         },
-        roles: ['user'],
+        token: 'mock-jwt-token',
       },
-      token: 'mock-jwt-token',
-    }, { status: 201 });
+      { status: 201 }
+    );
   }),
 
   http.post('http://localhost:8002/api/auth/login', async ({ request }) => {
     const body = await request.json();
 
     // モック用の認証失敗パターン
-    if (body.email === 'invalid@example.com' || body.password === 'wrong-password') {
-      return HttpResponse.json({
-        success: false,
-        message: 'メールアドレスまたはパスワードが正しくありません',
-      }, { status: 401 });
+    if (
+      body.email === 'invalid@example.com' ||
+      body.password === 'wrong-password'
+    ) {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: 'メールアドレスまたはパスワードが正しくありません',
+        },
+        { status: 401 }
+      );
     }
 
     return HttpResponse.json({
@@ -80,11 +92,18 @@ export const handlers = [
   http.get('http://localhost:8002/api/auth/me', ({ request }) => {
     const authHeader = request.headers.get('Authorization');
 
-    if (!authHeader || !authHeader.startsWith('Bearer ') || authHeader.includes('invalid-token')) {
-      return HttpResponse.json({
-        success: false,
-        message: '認証が必要です',
-      }, { status: 401 });
+    if (
+      !authHeader ||
+      !authHeader.startsWith('Bearer ') ||
+      authHeader.includes('invalid-token')
+    ) {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: '認証が必要です',
+        },
+        { status: 401 }
+      );
     }
 
     return HttpResponse.json({
@@ -110,10 +129,13 @@ export const handlers = [
     const authHeader = request.headers.get('Authorization');
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return HttpResponse.json({
-        success: false,
-        message: '認証が必要です',
-      }, { status: 401 });
+      return HttpResponse.json(
+        {
+          success: false,
+          message: '認証が必要です',
+        },
+        { status: 401 }
+      );
     }
 
     const body = await request.json();
@@ -141,11 +163,18 @@ export const handlers = [
   http.post('http://localhost:8002/api/auth/refresh', ({ request }) => {
     const authHeader = request.headers.get('Authorization');
 
-    if (!authHeader || !authHeader.startsWith('Bearer ') || authHeader.includes('invalid-token')) {
-      return HttpResponse.json({
-        success: false,
-        message: '認証が必要です',
-      }, { status: 401 });
+    if (
+      !authHeader ||
+      !authHeader.startsWith('Bearer ') ||
+      authHeader.includes('invalid-token')
+    ) {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: '認証が必要です',
+        },
+        { status: 401 }
+      );
     }
 
     return HttpResponse.json({

@@ -13,9 +13,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <BrowserRouter>
-      <I18nextProvider i18n={i18n}>
-        {children}
-      </I18nextProvider>
+      <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
     </BrowserRouter>
   );
 };

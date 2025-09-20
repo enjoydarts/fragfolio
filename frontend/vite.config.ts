@@ -10,7 +10,10 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: true,
-    include: ['tests/**/*.{test,spec}.{js,ts,tsx}', 'src/**/*.{test,spec}.{js,ts,tsx}'],
+    include: [
+      'tests/**/*.{test,spec}.{js,ts,tsx}',
+      'src/**/*.{test,spec}.{js,ts,tsx}',
+    ],
     typecheck: {
       tsconfig: './tsconfig.test.json',
     },
