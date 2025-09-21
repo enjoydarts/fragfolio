@@ -7,6 +7,18 @@ import { LoginForm } from '../../../src/components/auth/LoginForm';
 import { AuthContext } from '../../../src/contexts/context';
 import type { User } from '../../../src/types';
 
+// 環境変数をモック
+vi.mock('vite', () => ({
+  defineConfig: vi.fn(),
+}));
+
+Object.defineProperty(import.meta, 'env', {
+  value: {
+    VITE_TURNSTILE_SITE_KEY: 'test-site-key',
+  },
+  writable: true,
+});
+
 // TurnstileWidgetをモック
 vi.mock('../../../src/components/auth/TurnstileWidget', () => ({
   TurnstileWidget: ({ onVerify }: { onVerify: (token: string) => void }) => {
