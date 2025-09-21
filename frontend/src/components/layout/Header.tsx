@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
+import logoSvg from '../../assets/logo.svg';
 
 export const Header: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -23,14 +24,7 @@ export const Header: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">F</span>
-              </div>
-              <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                {t('app.title')}
-              </h1>
-            </div>
+            <img src={logoSvg} alt="fragfolio" className="h-10" />
           </div>
           <div className="flex items-center space-x-4">
             <button

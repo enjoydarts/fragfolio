@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <!-- 香りのウェーブアイコン -->
+  <g id="fragrance-wave">
+    <!-- ベースドロップ（香水の一滴） -->
+    <path d="M18 40 Q10 30 18 20 Q26 30 18 40 Z"
+          fill="#ea580c"/>
+
+    <!-- 香りの波紋（拡散） -->
+    <path d="M18 20 Q28 15 38 20"
+          stroke="#f97316"
+          stroke-width="2"
+          fill="none"
+          opacity="0.8"/>
+
+    <path d="M18 18 Q30 10 42 18"
+          stroke="#fb923c"
+          stroke-width="1.5"
+          fill="none"
+          opacity="0.6"/>
+
+    <path d="M18 16 Q32 5 46 16"
+          stroke="#fdba74"
+          stroke-width="1"
+          fill="none"
+          opacity="0.4"/>
+  </g>
+
+  <!-- テキスト部分 -->
+  <g id="logo-text">
+    <!-- メインテキスト "fragfolio" -->
+    <text x="40" y="35"
+          font-family="system-ui, -apple-system, sans-serif"
+          font-size="24"
+          font-weight="600"
+          fill="#1f2937"
+          class="logo-text">
+      fragfolio
+    </text>
+
+    <!-- サブテキスト -->
+    <text x="40" y="48"
+          font-family="system-ui, -apple-system, sans-serif"
+          font-size="10"
+          font-weight="400"
+          fill="#6b7280"
+          class="logo-subtext">
+      fragrance portfolio
+    </text>
+  </g>
+
+  <!-- ダークモード対応のスタイル -->
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .logo-text {
+        fill: #f9fafb;
+      }
+      .logo-subtext {
+        fill: #9ca3af;
+      }
+    }
+  </style>
+</svg>
