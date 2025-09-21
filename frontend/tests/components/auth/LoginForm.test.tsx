@@ -241,11 +241,8 @@ describe('LoginForm', () => {
       renderWithAuth();
 
       // モックされたTurnstileウィジェットが表示される
-      const turnstileContainer = document.querySelector(
-        '[data-testid="turnstile-widget"]'
-      );
-      expect(turnstileContainer).toBeInTheDocument();
-      expect(turnstileContainer).toHaveTextContent('Mocked Turnstile');
+      expect(screen.getByTestId('turnstile-widget')).toBeInTheDocument();
+      expect(screen.getByTestId('turnstile-widget')).toHaveTextContent('Mocked Turnstile');
     });
   });
 });
