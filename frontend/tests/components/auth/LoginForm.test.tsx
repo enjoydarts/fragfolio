@@ -57,6 +57,14 @@ describe('LoginForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
+    // 環境変数を確実に設定
+    Object.defineProperty(import.meta, 'env', {
+      value: {
+        VITE_TURNSTILE_SITE_KEY: 'test-site-key',
+      },
+      writable: true,
+      configurable: true,
+    });
   });
 
   describe('基本表示', () => {
