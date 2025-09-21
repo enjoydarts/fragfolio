@@ -147,6 +147,7 @@ REACT_APP_TURNSTILE_SITE_KEY=your_turnstile_site_key
 - セキュアな認証システム
 - 香りノート管理システム
 - 着用ログ追跡
+- 他言語対応（日本語・英語）
 
 ## 開発フロー
 
@@ -164,3 +165,25 @@ REACT_APP_TURNSTILE_SITE_KEY=your_turnstile_site_key
 - **phpMyAdmin**: http://localhost:8082
 - **Mailpit (メールテスト)**: http://localhost:8025
 - **MySQL**: localhost:3308
+
+## 開発規約（必須遵守）
+
+### コーディング規約
+- **他言語対応**: 全てのユーザー向けテキストは翻訳キー（t()）を使用。ハードコーディング禁止
+- **UseCase分離**: ビジネスロジックは必ずUseCaseクラスに分離。Controllerに直接記述禁止
+- **use文**: 可読性のため全てのインポート文を明示。省略禁止
+- **設定外部化**: URL等の設定値はconfig/envから取得。ハードコーディング禁止
+
+### 開発環境規約
+- **Docker使用**: 開発環境はDocker Compose使用。ローカルコマンド実行禁止
+- **コンテナ実行**: `docker-compose exec backend`、`docker-compose exec frontend`でコマンド実行
+
+### アーキテクチャ規約
+- **クリーンアーキテクチャ**: ビジネスロジックはUseCaseに集約
+- **責任分離**: Controller → UseCase → Repository の流れを厳守
+- **依存性注入**: コンストラクタインジェクションを使用
+
+### 品質管理
+- **テスト必須**: 新機能は必ずテストコード作成
+- **静的解析**: PHPStan、ESLintの警告解消必須
+- **コード整形**: Pint、Prettierでのフォーマット必須

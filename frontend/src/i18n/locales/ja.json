@@ -23,5 +23,85 @@
       "title": "着用ログ",
       "description": "着用記録を残して、香水の使用パターンを分析できます。"
     }
+  },
+  "auth": {
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "name": "名前",
+    "confirm_password": "パスワード確認",
+    "language": "言語",
+    "remember_me": "ログイン状態を保持",
+    "login": {
+      "title": "ログイン",
+      "submit": "ログイン",
+      "link": "既にアカウントをお持ちですか？ログインする"
+    },
+    "register": {
+      "title": "新規登録",
+      "submit": "アカウント作成",
+      "link": "アカウントをお持ちでない方はこちら"
+    },
+    "logging_in": "ログイン中...",
+    "registering": "登録中...",
+    "errors": {
+      "validation": "入力内容を確認してください",
+      "registration_failed": "ユーザー登録に失敗しました",
+      "login_failed": "ログインに失敗しました",
+      "password_mismatch": "パスワードが一致しません",
+      "turnstile_required": "認証を完了してください",
+      "turnstile_failed": "認証に失敗しました",
+      "email_required": "メールアドレスは必須です",
+      "email_invalid": "正しいメールアドレスを入力してください",
+      "email_exists": "このメールアドレスは既に使用されています",
+      "password_min": "パスワードは8文字以上で入力してください",
+      "name_required": "名前は必須です",
+      "name_max": "名前は255文字以内で入力してください"
+    }
+  },
+  "email_verification": {
+    "title": "メールアドレスの認証",
+    "subtitle": "登録を完了するには、送信された認証メールのリンクをクリックしてください",
+    "sent_to": "認証メールを {email} に送信しました。",
+    "check_spam": "メールが見つからない場合は、迷惑メールフォルダもご確認ください。",
+    "check_status": "認証状況を確認",
+    "resend": "認証メールを再送信",
+    "resending": "送信中...",
+    "back_to_login": "ログイン画面に戻る",
+    "success": "認証メールを再送信しました",
+    "already_verified": "メールアドレスは既に認証済みです"
+  },
+  "password_reset": {
+    "forgot_title": "パスワードを忘れた場合",
+    "forgot_subtitle": "登録したメールアドレスを入力してください。パスワードリセット用のリンクをお送りします。",
+    "reset_title": "パスワードをリセット",
+    "reset_subtitle": "新しいパスワードを設定してください",
+    "email_label": "メールアドレス",
+    "new_password": "新しいパスワード",
+    "confirm_new_password": "新しいパスワード（確認）",
+    "send_reset_link": "リセットリンクを送信",
+    "reset_password": "パスワードをリセット",
+    "sending": "送信中...",
+    "resetting": "リセット中...",
+    "back_to_login": "ログイン画面に戻る",
+    "link_sent": "パスワードリセットメールを送信しました",
+    "password_reset_success": "パスワードをリセットしました",
+    "error_title": "リセットエラー",
+    "error_subtitle": "パスワードリセットリンクが無効です",
+    "invalid_link": "無効なリセットリンクです",
+    "redirecting_login": "5秒後にログイン画面に自動でリダイレクトします..."
+  },
+  "verification": {
+    "success": {
+      "title": "認証完了",
+      "message_default": "メールアドレスが認証されました",
+      "auto_redirect": "3秒後にログイン画面に自動でリダイレクトします...",
+      "go_to_login": "ログイン画面へ"
+    },
+    "error": {
+      "title": "認証エラー",
+      "message_default": "認証に失敗しました",
+      "resend_email": "認証メールを再送信",
+      "back_to_login": "ログイン画面に戻る"
+    }
   }
 }

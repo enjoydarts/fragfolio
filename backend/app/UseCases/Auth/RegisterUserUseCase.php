@@ -16,7 +16,7 @@ class RegisterUserUseCase
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
-                'email_verified_at' => now(), // 開発環境では自動で認証済みに
+                'email_verified_at' => null, // メール認証が必要
             ]);
 
             // ユーザープロフィールも作成
@@ -27,6 +27,9 @@ class RegisterUserUseCase
 
             // デフォルトで一般ユーザー権限を付与
             $user->assignRole('user');
+
+            // メール認証通知を送信
+            $user->sendEmailVerificationNotification();
 
             return $user->load('profile', 'roles');
         });

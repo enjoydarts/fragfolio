@@ -25,7 +25,7 @@ describe('RegisterUserUseCase', function () {
         expect($user->name)->toBe('テストユーザー');
         expect($user->email)->toBe('test@example.com');
         expect(Hash::check('password123', $user->password))->toBeTrue();
-        expect($user->email_verified_at)->not->toBeNull();
+        expect($user->email_verified_at)->toBeNull();
 
         // プロフィールが作成されることを確認
         expect($user->profile)->not->toBeNull();
@@ -77,7 +77,7 @@ describe('RegisterUserUseCase', function () {
         expect(Hash::check($plainPassword, $user->password))->toBeTrue();
     });
 
-    test('メールアドレスが自動的に認証済みになる', function () {
+    test('メールアドレスは認証待ち状態になる', function () {
         $data = [
             'name' => 'テストユーザー',
             'email' => 'test@example.com',
@@ -86,7 +86,7 @@ describe('RegisterUserUseCase', function () {
 
         $user = $this->useCase->execute($data);
 
-        expect($user->email_verified_at)->not->toBeNull();
-        expect($user->hasVerifiedEmail())->toBeTrue();
+        expect($user->email_verified_at)->toBeNull();
+        expect($user->hasVerifiedEmail())->toBeFalse();
     });
 });
