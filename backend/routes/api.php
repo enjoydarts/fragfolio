@@ -28,8 +28,6 @@ Route::prefix('auth')->group(function () {
         ->name('verification.verify');
 
     // Password reset route
-    Route::get('/password/reset/{token}', [AuthController::class, 'showResetForm'])
-        ->name('password.reset');
 
     // WebAuthn routes
     Route::prefix('webauthn')->group(function () {

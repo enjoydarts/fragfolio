@@ -84,7 +84,11 @@
     "resetting": "リセット中...",
     "back_to_login": "ログイン画面に戻る",
     "link_sent": "パスワードリセットメールを送信しました",
-    "password_reset_success": "パスワードをリセットしました"
+    "password_reset_success": "パスワードをリセットしました",
+    "error_title": "リセットエラー",
+    "error_subtitle": "パスワードリセットリンクが無効です",
+    "invalid_link": "無効なリセットリンクです",
+    "redirecting_login": "5秒後にログイン画面に自動でリダイレクトします..."
   },
   "verification": {
     "success": {

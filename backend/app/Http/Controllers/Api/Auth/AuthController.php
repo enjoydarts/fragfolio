@@ -258,13 +258,16 @@ class AuthController extends Controller
         }
     }
 
-    public function showResetForm(Request $request, $token): JsonResponse
+    public function showResetForm(Request $request, $token)
     {
-        return response()->json([
-            'success' => true,
-            'token' => $token,
-            'email' => $request->email,
-        ]);
+        $frontendUrl = config('app.frontend_url');
+        $email = $request->email;
+
+        if (! $email || ! $token) {
+            return redirect($frontendUrl.'/password-reset-error?message='.urlencode('無効なリセットリンクです'));
+        }
+
+        return redirect($frontendUrl.'/reset-password?token='.urlencode($token).'&email='.urlencode($email));
     }
 
     public function refresh(Request $request): JsonResponse

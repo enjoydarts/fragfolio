@@ -12,8 +12,11 @@ import { LoadingSpinner } from './components/layout/LoadingSpinner';
 import { HomePage } from './pages/HomePage';
 import { AuthPage } from './pages/AuthPage';
 import { EmailVerification } from './pages/EmailVerification';
+import { EmailVerificationSuccess } from './pages/EmailVerificationSuccess';
+import { EmailVerificationError } from './pages/EmailVerificationError';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
+import { PasswordResetError } from './pages/PasswordResetError';
 import { Test } from './Test';
 
 const AppContent: React.FC = () => {
@@ -30,8 +33,11 @@ const AppContent: React.FC = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/email-verification" element={<EmailVerification />} />
+        <Route path="/email-verification-success" element={<EmailVerificationSuccess />} />
+        <Route path="/email-verification-error" element={<EmailVerificationError />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/password-reset-error" element={<PasswordResetError />} />
         <Route path="/test" element={<Test />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

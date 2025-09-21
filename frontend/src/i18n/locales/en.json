@@ -84,7 +84,11 @@
     "resetting": "Resetting...",
     "back_to_login": "Back to login",
     "link_sent": "Password reset email has been sent",
-    "password_reset_success": "Password has been reset successfully"
+    "password_reset_success": "Password has been reset successfully",
+    "error_title": "Reset Error",
+    "error_subtitle": "Password reset link is invalid",
+    "invalid_link": "Invalid reset link",
+    "redirecting_login": "Redirecting to login in 5 seconds..."
   },
   "verification": {
     "success": {
