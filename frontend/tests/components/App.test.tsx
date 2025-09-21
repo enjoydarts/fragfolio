@@ -77,7 +77,7 @@ describe('App', () => {
     render(<App />);
 
     const header = screen.getByText('FragFolio').closest('header');
-    expect(header).toHaveClass('bg-white', 'shadow');
+    expect(header).toHaveClass('header-nav', 'sticky', 'top-0', 'z-50');
 
     const mainContent = screen
       .getByText('香水ポートフォリオを美しく管理')
