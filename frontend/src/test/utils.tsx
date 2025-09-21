@@ -15,7 +15,11 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 };
 
 // Router込みのプロバイダー（useNavigateを使うコンポーネント用）
-const AllTheProvidersWithRouter = ({ children }: { children: React.ReactNode }) => {
+const AllTheProvidersWithRouter = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   // テスト時に言語を日本語に固定
   if (!i18n.isInitialized) {
     i18n.changeLanguage('ja');

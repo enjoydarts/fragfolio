@@ -16,7 +16,7 @@ vi.mock('../../../src/components/auth/TurnstileWidget', () => ({
     }, [onVerify]);
 
     return <div data-testid="turnstile-widget">Mocked Turnstile</div>;
-  }
+  },
 }));
 
 // AuthContextのモック
@@ -74,9 +74,7 @@ describe('LoginForm', () => {
     it('記憶するオプションのチェックボックスが表示される', () => {
       renderWithAuth();
 
-      expect(
-        screen.getByLabelText('ログイン状態を保持')
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText('ログイン状態を保持')).toBeInTheDocument();
       expect(screen.getByLabelText('ログイン状態を保持')).toHaveAttribute(
         'type',
         'checkbox'
@@ -154,7 +152,9 @@ describe('LoginForm', () => {
     it('ローディング中はボタンが無効になる', () => {
       renderWithAuth({ loading: true });
 
-      const submitButton = screen.getByRole('button', { name: 'ログイン中...' });
+      const submitButton = screen.getByRole('button', {
+        name: 'ログイン中...',
+      });
       expect(submitButton).toBeDisabled();
     });
 
@@ -176,7 +176,9 @@ describe('LoginForm', () => {
   describe('エラー表示', () => {
     it('ログインエラー時にエラーメッセージが表示される', async () => {
       const user = userEvent.setup();
-      const mockLogin = vi.fn().mockRejectedValue(new Error('認証に失敗しました'));
+      const mockLogin = vi
+        .fn()
+        .mockRejectedValue(new Error('認証に失敗しました'));
       renderWithAuth({ login: mockLogin });
 
       await user.type(
@@ -207,9 +209,7 @@ describe('LoginForm', () => {
 
       expect(screen.getByLabelText('メールアドレス')).toBeInTheDocument();
       expect(screen.getByLabelText('パスワード')).toBeInTheDocument();
-      expect(
-        screen.getByLabelText('ログイン状態を保持')
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText('ログイン状態を保持')).toBeInTheDocument();
     });
 
     it('フォームがキーボードで操作可能', async () => {

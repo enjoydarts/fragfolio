@@ -15,7 +15,7 @@ vi.mock('../../src/components/auth/TurnstileWidget', () => ({
     }, [onVerify]);
 
     return <div data-testid="turnstile-widget">Mocked Turnstile</div>;
-  }
+  },
 }));
 
 // AuthContextのモック
@@ -52,7 +52,9 @@ describe('AuthPage', () => {
 
       expect(screen.getByLabelText('メールアドレス')).toBeInTheDocument();
       expect(screen.getByLabelText('パスワード')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'ログイン' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'ログイン' })
+      ).toBeInTheDocument();
     });
 
     it('アカウントをお持ちでない方はこちらモードに切り替えられる', async () => {
@@ -60,13 +62,16 @@ describe('AuthPage', () => {
       renderWithAuth();
 
       // アカウントをお持ちでない方はこちらリンクをクリック（実際のコンポーネントに応じて調整が必要）
-      const registerLink = screen.getByText('アカウントをお持ちでない方はこちら');
+      const registerLink =
+        screen.getByText('アカウントをお持ちでない方はこちら');
       await user.click(registerLink);
 
       // アカウントをお持ちでない方はこちらフォームの要素が表示される
       expect(screen.getByLabelText('名前')).toBeInTheDocument();
       expect(screen.getByLabelText('パスワード確認')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'アカウント作成' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'アカウント作成' })
+      ).toBeInTheDocument();
     });
 
     it('ログインモードに戻ることができる', async () => {
@@ -74,15 +79,20 @@ describe('AuthPage', () => {
       renderWithAuth();
 
       // アカウントをお持ちでない方はこちらモードに切り替え
-      const registerLink = screen.getByText('アカウントをお持ちでない方はこちら');
+      const registerLink =
+        screen.getByText('アカウントをお持ちでない方はこちら');
       await user.click(registerLink);
 
       // ログインリンクをクリック
-      const loginLink = screen.getByText('既にアカウントをお持ちですか？ログインする');
+      const loginLink = screen.getByText(
+        '既にアカウントをお持ちですか？ログインする'
+      );
       await user.click(loginLink);
 
       // ログインフォームに戻る
-      expect(screen.getByRole('button', { name: 'ログイン' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'ログイン' })
+      ).toBeInTheDocument();
     });
   });
 
@@ -93,7 +103,10 @@ describe('AuthPage', () => {
 
       renderWithAuth({ login: mockLogin });
 
-      await user.type(screen.getByLabelText('メールアドレス'), 'test@example.com');
+      await user.type(
+        screen.getByLabelText('メールアドレス'),
+        'test@example.com'
+      );
       await user.type(screen.getByLabelText('パスワード'), 'password123');
       await user.click(screen.getByRole('button', { name: 'ログイン' }));
 
@@ -110,13 +123,16 @@ describe('AuthPage', () => {
       renderWithAuth();
 
       // アカウントをお持ちでない方はこちらモードに切り替え
-      const registerLink = screen.getByText('アカウントをお持ちでない方はこちら');
+      const registerLink =
+        screen.getByText('アカウントをお持ちでない方はこちら');
       await user.click(registerLink);
 
       // 新規登録フォームが表示される
       expect(screen.getByLabelText('名前')).toBeInTheDocument();
       expect(screen.getByLabelText('パスワード確認')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'アカウント作成' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'アカウント作成' })
+      ).toBeInTheDocument();
     });
   });
 
