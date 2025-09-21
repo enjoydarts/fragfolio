@@ -160,14 +160,13 @@ describe('AuthPage', () => {
   });
 
   describe('セキュリティ機能', () => {
-    it('Turnstileウィジェットがモックで表示される', () => {
+    it('Turnstileウィジェットがモックで表示される', async () => {
       renderWithAuth();
 
-      // モックされたTurnstileウィジェットが表示される
-      expect(screen.getByTestId('turnstile-widget')).toBeInTheDocument();
-      expect(screen.getByTestId('turnstile-widget')).toHaveTextContent(
-        'Mocked Turnstile'
-      );
+      // 非同期でウィジェットが表示されるのを待つ
+      const turnstileWidget = await screen.findByTestId('turnstile-widget');
+      expect(turnstileWidget).toBeInTheDocument();
+      expect(turnstileWidget).toHaveTextContent('Mocked Turnstile');
     });
   });
 });
