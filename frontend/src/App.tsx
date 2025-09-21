@@ -11,6 +11,7 @@ import { Header } from './components/layout/Header';
 import { LoadingSpinner } from './components/layout/LoadingSpinner';
 import { HomePage } from './pages/HomePage';
 import { AuthPage } from './pages/AuthPage';
+import { AccountSettings } from './pages/AccountSettings';
 import { EmailVerification } from './pages/EmailVerification';
 import { EmailVerificationSuccess } from './pages/EmailVerificationSuccess';
 import { EmailVerificationError } from './pages/EmailVerificationError';
@@ -32,6 +33,7 @@ const AppContent: React.FC = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/settings" element={<AccountSettings />} />
         <Route path="/email-verification" element={<EmailVerification />} />
         <Route
           path="/email-verification-success"

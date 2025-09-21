@@ -46,6 +46,12 @@ export const Header: React.FC = () => {
                     {user.name}
                   </span>
                 </div>
+                <a
+                  href="/settings"
+                  className="text-gray-600 hover:text-orange-600 text-sm font-medium transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-orange-50"
+                >
+                  {t('nav.settings', '設定')}
+                </a>
                 <button
                   onClick={handleLogout}
                   disabled={loading}
