@@ -24,7 +24,10 @@ vi.mock('../../../src/components/auth/TurnstileWidget', () => ({
   TurnstileWidget: ({ onVerify }: { onVerify: (token: string) => void }) => {
     // テスト用にTurnstileトークンを自動生成
     React.useEffect(() => {
-      onVerify('test-turnstile-token');
+      // 非同期でトークンを設定してより確実にする
+      setTimeout(() => {
+        onVerify('test-turnstile-token');
+      }, 0);
     }, [onVerify]);
 
     return <div data-testid="turnstile-widget">Mocked Turnstile</div>;
@@ -57,7 +60,9 @@ describe('LoginForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    // 環境変数を確実に設定
+    // Vitest環境変数モック
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', 'test-site-key');
+    // 環境変数を確実に設定（フォールバック）
     Object.defineProperty(import.meta, 'env', {
       value: {
         VITE_TURNSTILE_SITE_KEY: 'test-site-key',
@@ -65,6 +70,10 @@ describe('LoginForm', () => {
       writable: true,
       configurable: true,
     });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   describe('基本表示', () => {
