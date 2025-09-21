@@ -55,10 +55,7 @@ export const PasswordResetError: React.FC = () => {
             <p className="text-sm text-gray-600 mb-4">
               {t('password_reset.redirecting_login')}
             </p>
-            <button
-              onClick={() => navigate('/auth')}
-              className="btn-primary"
-            >
+            <button onClick={() => navigate('/auth')} className="btn-primary">
               {t('password_reset.back_to_login')}
             </button>
           </div>
