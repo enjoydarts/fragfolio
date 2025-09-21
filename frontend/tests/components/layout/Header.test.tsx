@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { render } from '../../src/test/utils';
+import { render } from '../../../src/test/utils';
 import { Header } from '../../../src/components/layout/Header';
-import { AuthContext } from '../../../src/contexts/AuthContext';
+import { AuthContext } from '../../../src/contexts/context';
 import type { User } from '../../../src/types';
 
 // AuthContextのモック

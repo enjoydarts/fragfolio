@@ -36,14 +36,12 @@ describe('User Model', function () {
     describe('relationships', function () {
         test('profileリレーションシップが正しく動作する', function () {
             $user = User::factory()->create();
-            $profile = $user->profile()->create([
-                'language' => 'ja',
-                'timezone' => 'Asia/Tokyo',
-            ]);
 
+            // ファクトリーで自動作成されたプロフィールを確認
             $user->refresh(); // リレーションをリフレッシュ
             expect($user->profile)->toBeInstanceOf(UserProfile::class);
-            expect($user->profile->id)->toBe($profile->id);
+            expect($user->profile->language)->toBe('ja');
+            expect($user->profile->timezone)->toBe('Asia/Tokyo');
         });
 
         test('profileは1対1の関係である', function () {

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAuth } from '../../src/hooks/useAuth';
-import { AuthContext } from '../../src/contexts/AuthContext';
+import { AuthContext } from '../../src/contexts/context';
 import type { User } from '../../src/types';
 import React from 'react';
 
