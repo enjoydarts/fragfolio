@@ -64,7 +64,7 @@ export const TOTPSettings: React.FC = () => {
           loading: false
         }));
       }
-    } catch (error) {
+    } catch {
       setState(prev => ({
         ...prev,
         error: '2FAの有効化に失敗しました',
@@ -96,7 +96,7 @@ export const TOTPSettings: React.FC = () => {
           loading: false
         }));
       }
-    } catch (error) {
+    } catch {
       setState(prev => ({
         ...prev,
         error: '認証に失敗しました',
@@ -136,7 +136,7 @@ export const TOTPSettings: React.FC = () => {
           loading: false
         }));
       }
-    } catch (error) {
+    } catch {
       setState(prev => ({
         ...prev,
         error: '2FAの無効化に失敗しました',
@@ -158,7 +158,7 @@ export const TOTPSettings: React.FC = () => {
         showRecoveryCodes: true,
         loading: false
       }));
-    } catch (error) {
+    } catch {
       setState(prev => ({
         ...prev,
         error: 'リカバリコードの取得に失敗しました',
@@ -186,7 +186,7 @@ export const TOTPSettings: React.FC = () => {
         showRecoveryCodes: true,
         loading: false
       }));
-    } catch (error) {
+    } catch {
       setState(prev => ({
         ...prev,
         error: 'リカバリコードの再生成に失敗しました',

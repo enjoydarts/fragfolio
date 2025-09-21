@@ -43,7 +43,7 @@ class CreateNewUser implements CreatesNewUsers
         }
 
         // Turnstile検証
-        if (!$this->turnstileService->verify($input['cf-turnstile-response'], request()->ip())) {
+        if (! $this->turnstileService->verify($input['cf-turnstile-response'], request()->ip())) {
             throw ValidationException::withMessages([
                 'cf-turnstile-response' => ['認証に失敗しました。'],
             ]);

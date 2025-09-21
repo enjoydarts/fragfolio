@@ -385,20 +385,27 @@ CREATE TABLE reaction_logs (
     INDEX idx_reaction_logs_reaction_type (reaction_type)
 );
 
--- WebAuthn credentials for FIDO2 authentication
+-- WebAuthn credentials for FIDO2 authentication (Laragear/WebAuthn)
 CREATE TABLE webauthn_credentials (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    id VARCHAR(510) NOT NULL,
+    authenticatable_type VARCHAR(255) NOT NULL,
+    authenticatable_id BIGINT UNSIGNED NOT NULL,
     user_id BIGINT UNSIGNED NOT NULL,
-    credential_id VARCHAR(255) NOT NULL UNIQUE,
+    alias VARCHAR(255) NULL,
+    counter BIGINT UNSIGNED NULL,
+    rp_id VARCHAR(255) NOT NULL,
+    origin VARCHAR(255) NOT NULL,
+    transports JSON NULL,
+    aaguid CHAR(36) NULL,
     public_key TEXT NOT NULL,
-    counter BIGINT UNSIGNED NOT NULL DEFAULT 0,
-    device_name VARCHAR(255) NULL,
-    last_used_at TIMESTAMP NULL,
+    attestation_format VARCHAR(255) NOT NULL DEFAULT 'none',
+    certificates JSON NULL,
+    disabled_at TIMESTAMP NULL,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
     PRIMARY KEY (id),
     CONSTRAINT fk_webauthn_credentials_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_webauthn_credentials_user_id (user_id)
+    INDEX webauthn_user_index (authenticatable_type, authenticatable_id)
 );
 
 -- AI normalization logs

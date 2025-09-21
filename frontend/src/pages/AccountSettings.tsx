@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { TOTPSettings } from '../components/security/TOTPSettings';
+import { WebAuthnSettings } from '../components/security/WebAuthnSettings';
 
 interface AccountSettingsState {
   activeTab: 'profile' | 'security' | 'sessions';
@@ -213,29 +214,7 @@ const SecuritySettings: React.FC = () => {
       <TOTPSettings />
 
       {/* WebAuthn設定 */}
-      <div className="border border-gray-200 rounded-lg p-6">
-        <h4 className="text-base font-medium text-gray-900 mb-4">
-          {t('settings.security.webauthn.title', 'WebAuthn / FIDO2')}
-        </h4>
-        <p className="text-sm text-gray-600 mb-4">
-          {t('settings.security.webauthn.description', 'セキュリティキーや生体認証でパスワードレス認証')}
-        </p>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <h5 className="font-medium text-gray-900">
-                {t('settings.security.webauthn.register', '認証器の登録')}
-              </h5>
-              <p className="text-sm text-gray-600">
-                {t('settings.security.webauthn.register_desc', 'セキュリティキーまたは生体認証を追加')}
-              </p>
-            </div>
-            <button className="btn-secondary">
-              {t('settings.security.webauthn.add', '追加')}
-            </button>
-          </div>
-        </div>
-      </div>
+      <WebAuthnSettings />
     </div>
   );
 };

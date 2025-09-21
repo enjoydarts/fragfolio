@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\Api\Auth\WebAuthnController;
+use App\Http\Controllers\Api\Auth\WebAuthnManagementController;
 use App\Http\Controllers\Api\FragranceNormalizationController;
 use App\Http\Controllers\Api\TurnstileController;
+use App\Http\Controllers\WebAuthn\WebAuthnLoginController;
+use App\Http\Controllers\WebAuthn\WebAuthnRegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,12 +22,12 @@ Route::prefix('auth')->group(function () {
         ->middleware(['signed'])
         ->name('verification.verify');
 
-    // WebAuthn routes
+    // WebAuthn routes (Laragear/WebAuthn)
     Route::prefix('webauthn')->group(function () {
-        Route::post('/register/begin', [WebAuthnController::class, 'registerBegin']);
-        Route::post('/register/complete', [WebAuthnController::class, 'registerComplete']);
-        Route::post('/authenticate/begin', [WebAuthnController::class, 'authenticateBegin']);
-        Route::post('/authenticate/complete', [WebAuthnController::class, 'authenticateComplete']);
+        Route::post('/register/options', [WebAuthnRegisterController::class, 'options']);
+        Route::post('/register', [WebAuthnRegisterController::class, 'register']);
+        Route::post('/login/options', [WebAuthnLoginController::class, 'options']);
+        Route::post('/login', [WebAuthnLoginController::class, 'login']);
     });
 });
 
@@ -52,6 +54,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/profile', [AuthController::class, 'updateProfile']);
         Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
         Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail']);
+
+        // WebAuthn management for authenticated users
+        Route::prefix('webauthn')->group(function () {
+            Route::post('/register/options', [WebAuthnRegisterController::class, 'options']);
+            Route::post('/register', [WebAuthnRegisterController::class, 'register']);
+            Route::get('/credentials', [WebAuthnManagementController::class, 'index']);
+            Route::delete('/credentials/{credentialId}', [WebAuthnManagementController::class, 'disable']);
+            Route::put('/credentials/{credentialId}', [WebAuthnManagementController::class, 'updateAlias']);
+        });
     });
 
     // AI normalization history

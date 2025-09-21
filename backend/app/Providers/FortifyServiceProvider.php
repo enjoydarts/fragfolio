@@ -44,7 +44,7 @@ class FortifyServiceProvider extends ServiceProvider
             $turnstileService = app(TurnstileService::class);
 
             // Turnstile検証
-            if (!$turnstileService->verify($request->input('cf-turnstile-response'), $request->ip())) {
+            if (! $turnstileService->verify($request->input('cf-turnstile-response'), $request->ip())) {
                 throw ValidationException::withMessages([
                     'cf-turnstile-response' => ['認証に失敗しました。'],
                 ]);
