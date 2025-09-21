@@ -7,12 +7,13 @@ use App\Http\Controllers\Api\TurnstileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Public routes
+// Public routes - 既存認証を段階的にFortifyに移行
 Route::prefix('auth')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    // Fortifyに移行済み - 以下のルートは無効化
+    // Route::post('/register', [AuthController::class, 'register']);
+    // Route::post('/login', [AuthController::class, 'login']);
+    // Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    // Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
     // Email verification route
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmailFromLink'])

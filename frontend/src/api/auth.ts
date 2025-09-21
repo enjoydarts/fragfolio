@@ -52,8 +52,9 @@ export class AuthAPI {
     const requestData = {
       ...data,
       password_confirmation: data.password,
+      'cf-turnstile-response': data.turnstile_token,
     };
-    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+    const response = await fetch(`${API_BASE_URL}/api/register`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify(requestData),
@@ -68,17 +69,21 @@ export class AuthAPI {
     remember?: boolean;
     turnstile_token?: string | null;
   }): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    const requestData = {
+      ...data,
+      'cf-turnstile-response': data.turnstile_token,
+    };
+    const response = await fetch(`${API_BASE_URL}/api/login`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify(data),
+      body: JSON.stringify(requestData),
     });
 
     return response.json();
   }
 
   static async logout(token: string): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+    const response = await fetch(`${API_BASE_URL}/api/logout`, {
       method: 'POST',
       headers: this.getHeaders(token),
     });
@@ -144,7 +149,7 @@ export class AuthAPI {
   }
 
   static async forgotPassword(email: string): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+    const response = await fetch(`${API_BASE_URL}/api/forgot-password`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({ email }),
@@ -159,7 +164,7 @@ export class AuthAPI {
     password: string;
     password_confirmation: string;
   }): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+    const response = await fetch(`${API_BASE_URL}/api/reset-password`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify(data),
