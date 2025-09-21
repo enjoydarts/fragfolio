@@ -22,6 +22,15 @@ Route::prefix('auth')->group(function () {
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
+    // Email verification route
+    Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmailFromLink'])
+        ->middleware(['signed'])
+        ->name('verification.verify');
+
+    // Password reset route
+    Route::get('/password/reset/{token}', [AuthController::class, 'showResetForm'])
+        ->name('password.reset');
+
     // WebAuthn routes
     Route::prefix('webauthn')->group(function () {
         Route::post('/register/begin', [WebAuthnController::class, 'registerBegin']);
@@ -64,6 +73,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/refresh', [AuthController::class, 'refresh']);
         Route::get('/me', [AuthController::class, 'me']);
         Route::put('/profile', [AuthController::class, 'updateProfile']);
+        Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
+        Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail']);
     });
 
     // User fragrance collection

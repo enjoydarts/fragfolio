@@ -4,6 +4,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  email_verified_at: string | null;
   profile: {
     language: string;
     timezone: string;
@@ -44,15 +45,18 @@ export class AuthAPI {
     name: string;
     email: string;
     password: string;
-    password_confirmation: string;
     language?: string;
     timezone?: string;
-    turnstile_token?: string;
+    turnstile_token?: string | null;
   }): Promise<AuthResponse> {
+    const requestData = {
+      ...data,
+      password_confirmation: data.password,
+    };
     const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify(data),
+      body: JSON.stringify(requestData),
     });
 
     return response.json();
@@ -62,7 +66,7 @@ export class AuthAPI {
     email: string;
     password: string;
     remember?: boolean;
-    turnstile_token?: string;
+    turnstile_token?: string | null;
   }): Promise<AuthResponse> {
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
@@ -116,6 +120,49 @@ export class AuthAPI {
     const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
       method: 'POST',
       headers: this.getHeaders(token),
+    });
+
+    return response.json();
+  }
+
+  static async verifyEmail(token: string): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/email/verify`, {
+      method: 'POST',
+      headers: this.getHeaders(token),
+    });
+
+    return response.json();
+  }
+
+  static async resendVerificationEmail(token: string): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/email/resend`, {
+      method: 'POST',
+      headers: this.getHeaders(token),
+    });
+
+    return response.json();
+  }
+
+  static async forgotPassword(email: string): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify({ email }),
+    });
+
+    return response.json();
+  }
+
+  static async resetPassword(data: {
+    token: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+  }): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: this.getHeaders(),
+      body: JSON.stringify(data),
     });
 
     return response.json();

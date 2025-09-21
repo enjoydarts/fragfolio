@@ -23,5 +23,81 @@
       "title": "Wearing Log",
       "description": "Keep wearing records and analyze your fragrance usage patterns."
     }
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "confirm_password": "Confirm Password",
+    "language": "Language",
+    "remember_me": "Remember me",
+    "login": {
+      "title": "Sign In",
+      "submit": "Sign In",
+      "link": "Already have an account? Sign in"
+    },
+    "register": {
+      "title": "Sign Up",
+      "submit": "Create Account",
+      "link": "Don't have an account? Sign up"
+    },
+    "logging_in": "Signing in...",
+    "registering": "Creating account...",
+    "errors": {
+      "validation": "Please check your input",
+      "registration_failed": "Registration failed",
+      "login_failed": "Login failed",
+      "password_mismatch": "Passwords do not match",
+      "turnstile_required": "Please complete verification",
+      "turnstile_failed": "Verification failed",
+      "email_required": "Email is required",
+      "email_invalid": "Please enter a valid email address",
+      "email_exists": "This email address is already in use",
+      "password_min": "Password must be at least 8 characters",
+      "name_required": "Name is required",
+      "name_max": "Name must be within 255 characters"
+    }
+  },
+  "email_verification": {
+    "title": "Email Verification",
+    "subtitle": "To complete registration, please click the link in the verification email we sent you",
+    "sent_to": "We sent a verification email to {email}.",
+    "check_spam": "If you don't see the email, please check your spam folder.",
+    "check_status": "Check verification status",
+    "resend": "Resend verification email",
+    "resending": "Sending...",
+    "back_to_login": "Back to login",
+    "success": "Verification email has been resent",
+    "already_verified": "Email address is already verified"
+  },
+  "password_reset": {
+    "forgot_title": "Forgot Password",
+    "forgot_subtitle": "Enter your registered email address. We'll send you a password reset link.",
+    "reset_title": "Reset Password",
+    "reset_subtitle": "Set your new password",
+    "email_label": "Email Address",
+    "new_password": "New Password",
+    "confirm_new_password": "Confirm New Password",
+    "send_reset_link": "Send Reset Link",
+    "reset_password": "Reset Password",
+    "sending": "Sending...",
+    "resetting": "Resetting...",
+    "back_to_login": "Back to login",
+    "link_sent": "Password reset email has been sent",
+    "password_reset_success": "Password has been reset successfully"
+  },
+  "verification": {
+    "success": {
+      "title": "Verification Complete",
+      "message_default": "Your email address has been verified",
+      "auto_redirect": "You will be automatically redirected to the login page in 3 seconds...",
+      "go_to_login": "Go to Login"
+    },
+    "error": {
+      "title": "Verification Error",
+      "message_default": "Verification failed",
+      "resend_email": "Resend verification email",
+      "back_to_login": "Back to login"
+    }
   }
 }
