@@ -242,7 +242,9 @@ describe('LoginForm', () => {
 
       // モックされたTurnstileウィジェットが表示される
       expect(screen.getByTestId('turnstile-widget')).toBeInTheDocument();
-      expect(screen.getByTestId('turnstile-widget')).toHaveTextContent('Mocked Turnstile');
+      expect(screen.getByTestId('turnstile-widget')).toHaveTextContent(
+        'Mocked Turnstile'
+      );
     });
   });
 });
