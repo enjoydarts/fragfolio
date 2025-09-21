@@ -85,7 +85,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         'errors' in error.response.data
       ) {
         // バリデーションエラーの詳細を表示
-        const errorMessages = Object.values(error.response.data.errors as Record<string, string[]>).flat();
+        const errorMessages = Object.values(
+          error.response.data.errors as Record<string, string[]>
+        ).flat();
         setError(errorMessages.join(', '));
       } else if (
         error &&
@@ -100,7 +102,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         typeof error.response.data.message === 'string'
       ) {
         setError(error.response.data.message);
-      } else if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
+      } else if (
+        error &&
+        typeof error === 'object' &&
+        'message' in error &&
+        typeof error.message === 'string'
+      ) {
         setError(error.message);
       } else {
         setError(t('auth.errors.registration_failed'));
