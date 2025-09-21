@@ -61,6 +61,7 @@ describe('AuthPage', () => {
     Object.defineProperty(import.meta, 'env', {
       value: {
         VITE_TURNSTILE_SITE_KEY: 'test-site-key',
+        ...import.meta.env,
       },
       writable: true,
       configurable: true,
