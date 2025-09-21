@@ -1,7 +1,7 @@
 -- fragfolio Database Schema
 -- Created with sqldef for Laravel 12 project
 
--- Users table with roles
+-- Users table with roles and 2FA support
 CREATE TABLE users (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -9,6 +9,9 @@ CREATE TABLE users (
     email_verified_at TIMESTAMP NULL,
     password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
+    two_factor_secret TEXT NULL,
+    two_factor_recovery_codes TEXT NULL,
+    two_factor_confirmed_at TIMESTAMP NULL,
     remember_token VARCHAR(100) NULL,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
