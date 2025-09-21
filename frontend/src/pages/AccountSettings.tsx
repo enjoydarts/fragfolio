@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { TOTPSettings } from '../components/security/TOTPSettings';
 
 interface AccountSettingsState {
   activeTab: 'profile' | 'security' | 'sessions';
@@ -209,29 +210,7 @@ const SecuritySettings: React.FC = () => {
       </div>
 
       {/* 2FA設定 */}
-      <div className="border border-gray-200 rounded-lg p-6">
-        <h4 className="text-base font-medium text-gray-900 mb-4">
-          {t('settings.security.twofa.title', '二要素認証 (2FA)')}
-        </h4>
-        <p className="text-sm text-gray-600 mb-4">
-          {t('settings.security.twofa.description', 'TOTPアプリを使用してアカウントのセキュリティを強化します')}
-        </p>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <h5 className="font-medium text-gray-900">
-                {t('settings.security.twofa.totp', 'TOTP認証')}
-              </h5>
-              <p className="text-sm text-gray-600">
-                {t('settings.security.twofa.totp_desc', '認証アプリを使用した時間ベースワンタイムパスワード')}
-              </p>
-            </div>
-            <button className="btn-secondary">
-              {t('settings.security.twofa.setup', '設定')}
-            </button>
-          </div>
-        </div>
-      </div>
+      <TOTPSettings />
 
       {/* WebAuthn設定 */}
       <div className="border border-gray-200 rounded-lg p-6">
