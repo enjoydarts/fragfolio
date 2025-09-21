@@ -12,8 +12,6 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
 {
-    use PasswordValidationRules;
-
     public function __construct(
         private TurnstileService $turnstileService
     ) {}
@@ -34,7 +32,7 @@ class CreateNewUser implements CreatesNewUsers
                 'max:255',
                 Rule::unique(User::class),
             ],
-            'password' => $this->passwordRules(),
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'cf-turnstile-response' => ['required', 'string'],
         ]);
 
@@ -49,11 +47,19 @@ class CreateNewUser implements CreatesNewUsers
             ]);
         }
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
             'role' => 'user',
         ]);
+
+        // プロフィール作成
+        $user->profile()->create([
+            'language' => $input['language'] ?? 'ja',
+            'timezone' => $input['timezone'] ?? 'Asia/Tokyo',
+        ]);
+
+        return $user;
     }
 }
