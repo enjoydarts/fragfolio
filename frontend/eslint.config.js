@@ -23,8 +23,8 @@ export default defineConfig([
   {
     files: [
       '**/*.test.{ts,tsx}',
-      '**/test/**/*.{ts,tsx}',
       '**/tests/**/*.{ts,tsx}',
+      '**/src/test/**/*.{ts,tsx}',
     ],
     rules: {
       'react-refresh/only-export-components': 'off',
