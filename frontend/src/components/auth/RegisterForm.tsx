@@ -71,16 +71,39 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       onSuccess?.();
     } catch (error: unknown) {
       console.error('Registration error:', error);
-      if (error.response?.data?.errors) {
+
+      // 型ガードでエラーオブジェクトの構造を確認
+      if (
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'data' in error.response &&
+        error.response.data &&
+        typeof error.response.data === 'object' &&
+        'errors' in error.response.data
+      ) {
         // バリデーションエラーの詳細を表示
-        const errorMessages = Object.values(error.response.data.errors).flat();
+        const errorMessages = Object.values(error.response.data.errors as Record<string, string[]>).flat();
         setError(errorMessages.join(', '));
+      } else if (
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'data' in error.response &&
+        error.response.data &&
+        typeof error.response.data === 'object' &&
+        'message' in error.response.data &&
+        typeof error.response.data.message === 'string'
+      ) {
+        setError(error.response.data.message);
+      } else if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
+        setError(error.message);
       } else {
-        setError(
-          error.response?.data?.message ||
-            error.message ||
-            t('auth.errors.registration_failed')
-        );
+        setError(t('auth.errors.registration_failed'));
       }
     }
   };
