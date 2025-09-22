@@ -23,6 +23,8 @@ export interface AuthResponse {
   user?: User;
   token?: string;
   errors?: Record<string, string[]>;
+  requires_two_factor?: boolean;
+  temp_token?: string;
 }
 
 const API_BASE_URL =
@@ -38,6 +40,10 @@ export class AuthAPI {
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
+
+    // i18nの言語設定をヘッダーに追加
+    const currentLanguage = localStorage.getItem('i18nextLng') || 'ja';
+    headers['Accept-Language'] = currentLanguage;
 
     return headers;
   }
@@ -168,6 +174,54 @@ export class AuthAPI {
     const response = await fetch(`${API_BASE_URL}/api/reset-password`, {
       method: 'POST',
       headers: this.getHeaders(),
+      body: JSON.stringify(data),
+    });
+
+    return response.json();
+  }
+
+  static async changePassword(
+    token: string,
+    data: {
+      current_password: string;
+      password: string;
+      password_confirmation: string;
+    }
+  ): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/password`, {
+      method: 'PUT',
+      headers: this.getHeaders(token),
+      body: JSON.stringify(data),
+    });
+
+    return response.json();
+  }
+
+  static async logoutOtherSessions(token: string): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/sessions/logout-others`, {
+      method: 'POST',
+      headers: this.getHeaders(token),
+    });
+
+    return response.json();
+  }
+
+  static async getSessions(token: string): Promise<AuthResponse & { sessions?: any[] }> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/sessions`, {
+      method: 'GET',
+      headers: this.getHeaders(token),
+    });
+
+    return response.json();
+  }
+
+  static async requestEmailChange(
+    token: string,
+    data: { new_email: string }
+  ): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/email/change-request`, {
+      method: 'POST',
+      headers: this.getHeaders(token),
       body: JSON.stringify(data),
     });
 

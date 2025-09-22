@@ -3,7 +3,6 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
-use App\Services\TurnstileService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -12,9 +11,6 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
 {
-    public function __construct(
-        private TurnstileService $turnstileService
-    ) {}
 
     /**
      * 新規ユーザーのバリデーションと作成
@@ -40,12 +36,7 @@ class CreateNewUser implements CreatesNewUsers
             throw new ValidationException($validator);
         }
 
-        // Turnstile検証
-        if (! $this->turnstileService->verify($input['cf-turnstile-response'], request()->ip())) {
-            throw ValidationException::withMessages([
-                'cf-turnstile-response' => ['認証に失敗しました。'],
-            ]);
-        }
+        // Turnstile検証はMiddlewareで実行済み
 
         $user = User::create([
             'name' => $input['name'],

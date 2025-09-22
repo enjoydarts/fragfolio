@@ -7,6 +7,7 @@ interface TurnstileWidgetProps {
   onExpire?: () => void;
   theme?: 'light' | 'dark' | 'auto';
   size?: 'normal' | 'compact';
+  reset?: number;
 }
 
 interface TurnstileOptions {
@@ -42,6 +43,7 @@ export const TurnstileWidget: React.FC<TurnstileWidgetProps> = ({
   onExpire,
   theme = 'auto',
   size = 'normal',
+  reset = 0,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
@@ -134,6 +136,18 @@ export const TurnstileWidget: React.FC<TurnstileWidgetProps> = ({
       }
     };
   }, [renderTurnstile]);
+
+  // Reset widget when reset prop changes
+  useEffect(() => {
+    if (reset > 0 && widgetIdRef.current && window.turnstile) {
+      try {
+        console.log('Resetting Turnstile widget:', widgetIdRef.current);
+        window.turnstile.reset(widgetIdRef.current);
+      } catch (error) {
+        console.error('Error resetting Turnstile widget:', error);
+      }
+    }
+  }, [reset]);
 
   return <div ref={containerRef} />;
 };

@@ -19,6 +19,8 @@ use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\RegisterResponse;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\Http\Requests\LoginRequest;
+use Laravel\Fortify\Http\Requests\RegisterRequest;
+use Illuminate\Support\Facades\Route;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -37,28 +39,21 @@ class FortifyServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // アクションの登録
-        Fortify::createUsersUsing(CreateNewUser::class);
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
-        // カスタム認証ロジック（Turnstile統合を含む）
+        // 通常の認証ロジック（TurnstileはMiddlewareで検証済み）
         Fortify::authenticateUsing(function (LoginRequest $request) {
-            $turnstileService = app(TurnstileService::class);
-
-            // Turnstile検証
-            if (! $turnstileService->verify($request->input('cf-turnstile-response'), $request->ip())) {
-                throw ValidationException::withMessages([
-                    'cf-turnstile-response' => ['認証に失敗しました。'],
-                ]);
-            }
-
             $user = User::where('email', $request->email)->first();
 
             if ($user && Hash::check($request->password, $user->password)) {
                 return $user;
             }
         });
+
+        // 登録時のカスタムユーザー作成
+        Fortify::createUsersUsing(CreateNewUser::class);
 
         // レート制限の設定
         RateLimiter::for('login', function (Request $request) {

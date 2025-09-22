@@ -17,7 +17,7 @@ class PasswordResetUseCase
         if (! $user) {
             return [
                 'success' => false,
-                'message' => '指定されたメールアドレスのユーザーが見つかりません',
+                'message' => __('auth.user_not_found'),
             ];
         }
 
@@ -26,12 +26,12 @@ class PasswordResetUseCase
         if ($status === Password::RESET_LINK_SENT) {
             return [
                 'success' => true,
-                'message' => 'パスワードリセットメールを送信しました',
+                'message' => __('auth.reset_link_sent'),
             ];
         } else {
             return [
                 'success' => false,
-                'message' => 'パスワードリセットメールの送信に失敗しました',
+                'message' => __('auth.reset_link_failed'),
             ];
         }
     }
@@ -54,12 +54,12 @@ class PasswordResetUseCase
         if ($status === Password::PASSWORD_RESET) {
             return [
                 'success' => true,
-                'message' => 'パスワードをリセットしました',
+                'message' => __('auth.password_reset_success'),
             ];
         } else {
             return [
                 'success' => false,
-                'message' => 'パスワードリセットに失敗しました',
+                'message' => __('auth.password_reset_failed'),
             ];
         }
     }

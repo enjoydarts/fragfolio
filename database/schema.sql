@@ -57,6 +57,23 @@ CREATE TABLE sessions (
     INDEX idx_sessions_last_activity (last_activity)
 );
 
+-- Email change requests for secure email address changes
+CREATE TABLE email_change_requests (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NOT NULL,
+    new_email VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    verified BOOLEAN NOT NULL DEFAULT FALSE,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_email_change_requests_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_email_change_requests_token (token),
+    INDEX idx_email_change_requests_user_id (user_id),
+    INDEX idx_email_change_requests_expires_at (expires_at)
+);
+
 -- Personal Access Tokens
 CREATE TABLE personal_access_tokens (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -390,7 +407,7 @@ CREATE TABLE webauthn_credentials (
     id VARCHAR(510) NOT NULL,
     authenticatable_type VARCHAR(255) NOT NULL,
     authenticatable_id BIGINT UNSIGNED NOT NULL,
-    user_id BIGINT UNSIGNED NOT NULL,
+    user_id VARCHAR(255) NOT NULL,
     alias VARCHAR(255) NULL,
     counter BIGINT UNSIGNED NULL,
     rp_id VARCHAR(255) NOT NULL,
@@ -404,7 +421,6 @@ CREATE TABLE webauthn_credentials (
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
     PRIMARY KEY (id),
-    CONSTRAINT fk_webauthn_credentials_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX webauthn_user_index (authenticatable_type, authenticatable_id)
 );
 

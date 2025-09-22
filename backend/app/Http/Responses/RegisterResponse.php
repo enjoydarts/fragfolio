@@ -19,7 +19,7 @@ class RegisterResponse implements RegisterResponseContract, Responsable
 
         return response()->json([
             'success' => true,
-            'message' => 'アカウントの登録が完了しました',
+            'message' => __('auth.registration_success'),
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,

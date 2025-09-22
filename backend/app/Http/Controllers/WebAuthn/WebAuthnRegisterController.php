@@ -7,8 +7,6 @@ use Illuminate\Http\Response;
 use Laragear\WebAuthn\Http\Requests\AttestationRequest;
 use Laragear\WebAuthn\Http\Requests\AttestedRequest;
 
-use function response;
-
 class WebAuthnRegisterController
 {
     /**
@@ -18,8 +16,6 @@ class WebAuthnRegisterController
     {
         return $request
             ->fastRegistration()
-//            ->userless()
-//            ->allowDuplicates()
             ->toCreate();
     }
 

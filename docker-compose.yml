@@ -39,8 +39,10 @@ services:
       DB_DATABASE: fragfolio
       DB_USERNAME: fragfolio
       DB_PASSWORD: password
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
       MAIL_HOST: mailpit
-      MAIL_PORT: 1025
+      MAIL_PORT: "1025"
     networks:
       - fragfolio
 
@@ -83,15 +85,53 @@ services:
     container_name: fragfolio_mailpit
     restart: unless-stopped
     ports:
-      - "1025:1025"  # SMTP port
-      - "8025:8025"  # Web UI port
+      - "1026:1025"  # SMTP port
+      - "8026:8025"  # Web UI port
     networks:
       - fragfolio
+
+  # Redis (for queues and caching)
+  redis:
+    image: redis:7-alpine
+    container_name: fragfolio_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - fragfolio
+
+  # Queue Worker
+  queue-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fragfolio_queue_worker
+    restart: unless-stopped
+    depends_on:
+      - redis
+    volumes:
+      - ./backend:/var/www/html
+      - backend_vendor:/var/www/html/vendor
+    environment:
+      CACHE_STORE: redis
+      QUEUE_CONNECTION: redis
+      SESSION_DRIVER: redis
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      MAIL_HOST: mailpit
+      MAIL_PORT: "1025"
+    command: php artisan queue:work --verbose --tries=3 --timeout=90 --queue=emails,default
+    networks:
+      - fragfolio
+
 
 volumes:
   mysql_data:
   backend_vendor:
   frontend_node_modules:
+  redis_data:
 
 networks:
   fragfolio:

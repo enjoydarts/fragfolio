@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Auth\TwoFactorLoginController;
 use App\Http\Controllers\Api\Auth\WebAuthnManagementController;
 use App\Http\Controllers\Api\FragranceNormalizationController;
 use App\Http\Controllers\Api\TurnstileController;
@@ -22,10 +23,16 @@ Route::prefix('auth')->group(function () {
         ->middleware(['signed'])
         ->name('verification.verify');
 
-    // WebAuthn routes (Laragear/WebAuthn)
+    // Email change verification route (public access)
+    Route::get('/email/verify-change/{token}', [AuthController::class, 'verifyEmailChange']);
+
+    // 2FA login verification (public access - session based)
+    Route::post('/two-factor-challenge', [TwoFactorLoginController::class, 'verify']);
+    Route::post('/two-factor-webauthn', [TwoFactorLoginController::class, 'verifyWithWebAuthn']);
+    Route::post('/two-factor-webauthn/complete', [TwoFactorLoginController::class, 'completeWebAuthnTwoFactor']);
+
+    // WebAuthn login routes (public access)
     Route::prefix('webauthn')->group(function () {
-        Route::post('/register/options', [WebAuthnRegisterController::class, 'options']);
-        Route::post('/register', [WebAuthnRegisterController::class, 'register']);
         Route::post('/login/options', [WebAuthnLoginController::class, 'options']);
         Route::post('/login', [WebAuthnLoginController::class, 'login']);
     });
@@ -56,12 +63,27 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
         Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail']);
 
+        // Email change request routes
+        Route::post('/email/change-request', [AuthController::class, 'requestEmailChange']);
+
+        // Custom 2FA routes with Sanctum authentication
+        Route::get('/two-factor-status', [\App\Http\Controllers\Api\TwoFactorAuthController::class, 'status']);
+        Route::post('/two-factor-authentication', [\App\Http\Controllers\Api\TwoFactorAuthController::class, 'enable']);
+        Route::delete('/two-factor-authentication', [\App\Http\Controllers\Api\TwoFactorAuthController::class, 'disable']);
+        Route::post('/confirmed-two-factor-authentication', [\App\Http\Controllers\Api\TwoFactorAuthController::class, 'confirm']);
+        Route::get('/two-factor-qr-code', [\App\Http\Controllers\Api\TwoFactorAuthController::class, 'qrCode']);
+        Route::get('/two-factor-secret-key', [\App\Http\Controllers\Api\TwoFactorAuthController::class, 'secretKey']);
+        Route::get('/two-factor-recovery-codes', [\App\Http\Controllers\Api\TwoFactorAuthController::class, 'recoveryCodes']);
+        Route::post('/two-factor-recovery-codes', [\App\Http\Controllers\Api\TwoFactorAuthController::class, 'regenerateRecoveryCodes']);
+
         // WebAuthn management for authenticated users
         Route::prefix('webauthn')->group(function () {
             Route::post('/register/options', [WebAuthnRegisterController::class, 'options']);
             Route::post('/register', [WebAuthnRegisterController::class, 'register']);
             Route::get('/credentials', [WebAuthnManagementController::class, 'index']);
             Route::delete('/credentials/{credentialId}', [WebAuthnManagementController::class, 'disable']);
+            Route::delete('/credentials/{credentialId}/destroy', [WebAuthnManagementController::class, 'destroy']);
+            Route::post('/credentials/{credentialId}/enable', [WebAuthnManagementController::class, 'enable']);
             Route::put('/credentials/{credentialId}', [WebAuthnManagementController::class, 'updateAlias']);
         });
     });

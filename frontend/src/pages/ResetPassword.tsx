@@ -28,7 +28,7 @@ export const ResetPassword: React.FC = () => {
     }));
 
     if (!token || !email) {
-      setError('無効なリセットリンクです');
+      setError(t('password_reset.invalid_link'));
     }
   }, [searchParams]);
 

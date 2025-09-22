@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laragear\WebAuthn\Contracts\WebAuthnAuthenticatable;
 use Laragear\WebAuthn\WebAuthnAuthentication;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, WebAuthnAuthenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable, WebAuthnAuthentication;
@@ -87,5 +88,21 @@ class User extends Authenticatable implements MustVerifyEmail
     public function scopeRegularUsers($query)
     {
         return $query->where('role', 'user');
+    }
+
+    /**
+     * キュー対応のパスワードリセット通知を送信
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\QueuedResetPasswordWithLocale($token));
+    }
+
+    /**
+     * キュー対応のメール認証通知を送信
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new \App\Notifications\QueuedVerifyEmail());
     }
 }

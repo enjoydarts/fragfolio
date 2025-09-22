@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { WebAuthnAPI, WebAuthnUtils, type WebAuthnCredential } from '../../api/webauthn';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 
 interface WebAuthnSettingsState {
   credentials: WebAuthnCredential[];
@@ -11,6 +13,12 @@ interface WebAuthnSettingsState {
   loading: boolean;
   error: string | null;
   newCredentialAlias: string;
+  confirmDialog: {
+    isOpen: boolean;
+    credentialId: string;
+    credentialName: string;
+    action: 'disable' | 'delete';
+  };
 }
 
 export const WebAuthnSettings: React.FC = () => {
@@ -24,6 +32,12 @@ export const WebAuthnSettings: React.FC = () => {
     loading: false,
     error: null,
     newCredentialAlias: '',
+    confirmDialog: {
+      isOpen: false,
+      credentialId: '',
+      credentialName: '',
+      action: 'disable',
+    },
   });
 
   useEffect(() => {
@@ -41,7 +55,7 @@ export const WebAuthnSettings: React.FC = () => {
         } catch {
           setState(prev => ({
             ...prev,
-            error: 'WebAuthn認証器の取得に失敗しました',
+            error: t('settings.security.webauthn.fetch_failed'),
             loading: false,
           }));
         }
@@ -80,7 +94,7 @@ export const WebAuthnSettings: React.FC = () => {
     } catch {
       setState(prev => ({
         ...prev,
-        error: 'WebAuthn認証器の取得に失敗しました',
+        error: t('settings.security.webauthn.fetch_failed'),
         loading: false,
       }));
     }
@@ -104,7 +118,7 @@ export const WebAuthnSettings: React.FC = () => {
       }) as PublicKeyCredential;
 
       if (!credential) {
-        throw new Error('認証器の登録がキャンセルされました');
+        throw new Error(t('settings.security.webauthn.registration_cancelled'));
       }
 
       // 4. サーバー送信用に変換
@@ -127,48 +141,133 @@ export const WebAuthnSettings: React.FC = () => {
       } else {
         setState(prev => ({
           ...prev,
-          error: response.message || 'WebAuthn認証器の登録に失敗しました',
+          error: response.message || t('settings.security.webauthn.registration_failed'),
           isRegistering: false,
         }));
       }
     } catch (error: unknown) {
       setState(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'WebAuthn認証器の登録に失敗しました',
+        error: error instanceof Error ? error.message : t('settings.security.webauthn.registration_failed'),
         isRegistering: false,
       }));
     }
   };
 
-  const handleDisable = async (credentialId: string) => {
+  const handleDisable = (credentialId: string) => {
+    const credential = state.credentials.find(c => c.id === credentialId);
+    const credentialName = credential?.alias || t('settings.security.webauthn.unnamed_credential', '名前なし認証器');
+
+    setState(prev => ({
+      ...prev,
+      confirmDialog: {
+        isOpen: true,
+        credentialId,
+        credentialName,
+        action: 'disable',
+      },
+    }));
+  };
+
+  const handleDelete = (credentialId: string) => {
+    const credential = state.credentials.find(c => c.id === credentialId);
+    const credentialName = credential?.alias || t('settings.security.webauthn.unnamed_credential', '名前なし認証器');
+
+    setState(prev => ({
+      ...prev,
+      confirmDialog: {
+        isOpen: true,
+        credentialId,
+        credentialName,
+        action: 'delete',
+      },
+    }));
+  };
+
+  const handleEnable = async (credentialId: string) => {
     if (!token) return;
-
-    const confirmed = window.confirm(
-      t('settings.security.webauthn.disable_confirm', 'この認証器を無効化しますか？')
-    );
-
-    if (!confirmed) return;
 
     setState(prev => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await WebAuthnAPI.disableCredential(token, credentialId);
+      const response = await WebAuthnAPI.enableCredential(token, credentialId);
       if (response.success) {
         await loadCredentials();
       } else {
         setState(prev => ({
           ...prev,
-          error: response.message || '認証器の無効化に失敗しました',
+          error: response.message || t('settings.security.webauthn.enable_failed', 'WebAuthn認証器の有効化に失敗しました'),
           loading: false,
         }));
       }
     } catch {
       setState(prev => ({
         ...prev,
-        error: '認証器の無効化に失敗しました',
+        error: t('settings.security.webauthn.enable_failed', 'WebAuthn認証器の有効化に失敗しました'),
         loading: false,
       }));
     }
+  };
+
+  const handleConfirmAction = async () => {
+    if (!token || !state.confirmDialog.credentialId) return;
+
+    const { credentialId, action } = state.confirmDialog;
+
+    setState(prev => ({
+      ...prev,
+      loading: true,
+      error: null,
+      confirmDialog: {
+        isOpen: false,
+        credentialId: '',
+        credentialName: '',
+        action: 'disable',
+      },
+    }));
+
+    try {
+      let response;
+      if (action === 'delete') {
+        response = await WebAuthnAPI.deleteCredential(token, credentialId);
+      } else {
+        response = await WebAuthnAPI.disableCredential(token, credentialId);
+      }
+
+      if (response.success) {
+        await loadCredentials();
+      } else {
+        const errorKey = action === 'delete'
+          ? 'settings.security.webauthn.delete_failed'
+          : 'settings.security.webauthn.disable_failed';
+        setState(prev => ({
+          ...prev,
+          error: response.message || t(errorKey),
+          loading: false,
+        }));
+      }
+    } catch {
+      const errorKey = action === 'delete'
+        ? 'settings.security.webauthn.delete_failed'
+        : 'settings.security.webauthn.disable_failed';
+      setState(prev => ({
+        ...prev,
+        error: t(errorKey),
+        loading: false,
+      }));
+    }
+  };
+
+  const handleCancelAction = () => {
+    setState(prev => ({
+      ...prev,
+      confirmDialog: {
+        isOpen: false,
+        credentialId: '',
+        credentialName: '',
+        action: 'disable',
+      },
+    }));
   };
 
   const handleUpdateAlias = async (credentialId: string, newAlias: string) => {
@@ -183,14 +282,14 @@ export const WebAuthnSettings: React.FC = () => {
       } else {
         setState(prev => ({
           ...prev,
-          error: response.message || 'エイリアスの更新に失敗しました',
+          error: response.message || t('settings.security.webauthn.alias_update_failed'),
           loading: false,
         }));
       }
     } catch {
       setState(prev => ({
         ...prev,
-        error: 'エイリアスの更新に失敗しました',
+        error: t('settings.security.webauthn.alias_update_failed'),
         loading: false,
       }));
     }
@@ -286,6 +385,8 @@ export const WebAuthnSettings: React.FC = () => {
                 key={credential.id}
                 credential={credential}
                 onDisable={handleDisable}
+                onEnable={handleEnable}
+                onDelete={handleDelete}
                 onUpdateAlias={handleUpdateAlias}
                 disabled={state.loading}
               />
@@ -293,14 +394,49 @@ export const WebAuthnSettings: React.FC = () => {
           </div>
         )}
       </div>
+
+      {state.confirmDialog.isOpen && createPortal(
+        <ConfirmDialog
+          isOpen={state.confirmDialog.isOpen}
+          title={state.confirmDialog.action === 'delete'
+            ? t('settings.security.webauthn.delete_confirm_title', '認証器の削除')
+            : t('settings.security.webauthn.disable_confirm_title', '認証器の無効化')
+          }
+          message={state.confirmDialog.action === 'delete'
+            ? t('settings.security.webauthn.delete_confirm_message', '「{{credentialName}}」を完全に削除しますか？この操作は取り消せません。', {
+                credentialName: state.confirmDialog.credentialName
+              })
+            : t('settings.security.webauthn.disable_confirm_message', '「{{credentialName}}」を無効化しますか？この操作は元に戻せません。', {
+                credentialName: state.confirmDialog.credentialName
+              })
+          }
+          confirmText={state.loading
+            ? (state.confirmDialog.action === 'delete'
+                ? t('settings.security.webauthn.deleting', '削除中...')
+                : t('settings.security.webauthn.disabling', '無効化中...')
+              )
+            : (state.confirmDialog.action === 'delete'
+                ? t('settings.security.webauthn.delete', '削除')
+                : t('settings.security.webauthn.disable', '無効化')
+              )
+          }
+          cancelText={t('common.cancel', 'キャンセル')}
+          confirmVariant="danger"
+          onConfirm={handleConfirmAction}
+          onCancel={handleCancelAction}
+        />,
+        document.body
+      )}
     </div>
   );
 };
 
-// 個別の認証器アイテムコンポーネント
+// 認証器アイテムコンポーネント
 interface CredentialItemProps {
   credential: WebAuthnCredential;
   onDisable: (credentialId: string) => void;
+  onEnable: (credentialId: string) => void;
+  onDelete: (credentialId: string) => void;
   onUpdateAlias: (credentialId: string, alias: string) => void;
   disabled: boolean;
 }
@@ -308,18 +444,22 @@ interface CredentialItemProps {
 const CredentialItem: React.FC<CredentialItemProps> = ({
   credential,
   onDisable,
+  onEnable,
+  onDelete,
   onUpdateAlias,
-  disabled,
+  disabled
 }) => {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [editAlias, setEditAlias] = useState(credential.alias || '');
 
-  const handleSaveAlias = () => {
-    if (editAlias !== credential.alias) {
-      onUpdateAlias(credential.id, editAlias);
+  const handleSaveAlias = async () => {
+    try {
+      await onUpdateAlias(credential.id, editAlias);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to update alias:', error);
     }
-    setIsEditing(false);
   };
 
   const handleCancelEdit = () => {
@@ -327,74 +467,110 @@ const CredentialItem: React.FC<CredentialItemProps> = ({
     setIsEditing(false);
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('ja-JP');
+  };
+
+  const isDisabled = !!credential.disabled_at;
+
   return (
-    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+    <div className={`flex items-center justify-between p-4 border rounded-lg ${
+      isDisabled ? 'border-red-200 bg-red-50' : 'border-gray-200'
+    }`}>
       <div className="flex-1">
-        {isEditing ? (
-          <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2 mb-1">
+          <div className={`w-3 h-3 rounded-full ${
+            isDisabled ? 'bg-red-400' : 'bg-green-400'
+          }`}></div>
+          {isEditing ? (
             <input
               type="text"
               value={editAlias}
               onChange={(e) => setEditAlias(e.target.value)}
-              placeholder={t('settings.security.webauthn.alias_placeholder', '認証器名')}
-              className="flex-1 p-1 border border-gray-300 rounded text-sm"
-              autoFocus
+              placeholder={t('settings.security.webauthn.alias_placeholder', '例: iPhone Touch ID、YubiKey')}
+              className="flex-1 text-sm font-medium text-gray-900 border border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500"
+              disabled={disabled}
             />
+          ) : (
+            <h6 className="text-sm font-medium text-gray-900">
+              {credential.alias || t('settings.security.webauthn.unnamed_credential', '名前なし認証器')}
+            </h6>
+          )}
+        </div>
+        <div className="text-xs text-gray-500">
+          {t('settings.security.webauthn.registered_on', '登録日')}: {formatDate(credential.created_at)}
+        </div>
+        {isDisabled && (
+          <div className="text-xs text-red-500">
+            {t('settings.security.webauthn.disabled_on', '無効化日')}: {formatDate(credential.disabled_at)}
+          </div>
+        )}
+        <div className="text-xs text-gray-500">
+          ID: {credential.id.substring(0, 16)}...
+        </div>
+        {isDisabled && (
+          <div className="text-xs text-red-600 font-medium">
+            {t('settings.security.webauthn.disabled_status', '無効化済み')}
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center gap-2 ml-4">
+        {isEditing ? (
+          <>
             <button
               onClick={handleSaveAlias}
               disabled={disabled}
-              className="text-xs bg-orange-500 text-white px-2 py-1 rounded hover:bg-orange-600 disabled:opacity-50"
+              className="text-xs text-blue-600 hover:text-blue-700 disabled:opacity-50"
             >
               {t('common.save', '保存')}
             </button>
             <button
               onClick={handleCancelEdit}
               disabled={disabled}
-              className="text-xs bg-gray-500 text-white px-2 py-1 rounded hover:bg-gray-600 disabled:opacity-50"
+              className="text-xs text-gray-600 hover:text-gray-700 disabled:opacity-50"
             >
               {t('common.cancel', 'キャンセル')}
             </button>
-          </div>
+          </>
         ) : (
-          <div>
-            <div className="flex items-center space-x-2">
-              <h6 className="font-medium text-gray-900">
-                {credential.alias || t('settings.security.webauthn.unnamed_credential', '名前なし認証器')}
-              </h6>
-              {!credential.disabled_at && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  {t('settings.security.webauthn.active', 'アクティブ')}
-                </span>
-              )}
-            </div>
-            <p className="text-sm text-gray-600">
-              {t('settings.security.webauthn.registered_at', '登録日')}: {new Date(credential.created_at).toLocaleDateString()}
-            </p>
-            <p className="text-xs text-gray-500 font-mono">
-              ID: {credential.id.substring(0, 20)}...
-            </p>
-          </div>
+          <>
+            {!isDisabled && (
+              <button
+                onClick={() => setIsEditing(true)}
+                disabled={disabled}
+                className="text-xs text-blue-600 hover:text-blue-700 disabled:opacity-50"
+              >
+                {t('common.edit', '編集')}
+              </button>
+            )}
+            {isDisabled && (
+              <button
+                onClick={() => onEnable(credential.id)}
+                disabled={disabled}
+                className="text-xs text-green-600 hover:text-green-700 disabled:opacity-50"
+              >
+                {t('settings.security.webauthn.enable', '有効化')}
+              </button>
+            )}
+            <button
+              onClick={() => onDisable(credential.id)}
+              disabled={disabled}
+              className="text-xs text-red-600 hover:text-red-700 disabled:opacity-50"
+            >
+              {t('settings.security.webauthn.disable', '無効化')}
+            </button>
+            <button
+              onClick={() => onDelete(credential.id)}
+              disabled={disabled}
+              className="text-xs text-red-600 hover:text-red-700 disabled:opacity-50"
+            >
+              {t('settings.security.webauthn.delete', '削除')}
+            </button>
+          </>
         )}
       </div>
-
-      {!isEditing && (
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setIsEditing(true)}
-            disabled={disabled}
-            className="text-sm text-blue-600 hover:text-blue-800 disabled:opacity-50"
-          >
-            {t('common.edit', '編集')}
-          </button>
-          <button
-            onClick={() => onDisable(credential.id)}
-            disabled={disabled}
-            className="text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
-          >
-            {t('settings.security.webauthn.disable', '無効化')}
-          </button>
-        </div>
-      )}
     </div>
   );
 };
+

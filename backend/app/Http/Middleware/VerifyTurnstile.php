@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Services\TurnstileService;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class VerifyTurnstile
@@ -15,27 +16,29 @@ class VerifyTurnstile
 
     public function handle(Request $request, Closure $next): Response
     {
-        // 開発環境でTurnstileが設定されていない場合はスキップ
-        if (! $this->turnstileService->isConfigured()) {
+        // Turnstile設定がない場合はスキップ
+        if (!config('services.turnstile.site_key')) {
             return $next($request);
         }
 
-        $token = $request->input('turnstile_token') ?? $request->header('X-Turnstile-Token');
-
-        if (! $token) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Turnstileトークンが必要です',
-            ], 422);
+        // cf-turnstile-responseがない場合はエラー
+        if (!$request->has('cf-turnstile-response')) {
+            throw ValidationException::withMessages([
+                'cf-turnstile-response' => [__('turnstile.missing_input_response')],
+            ]);
         }
 
-        $remoteIp = $request->ip();
+        // Turnstile検証
+        $verificationResult = $this->turnstileService->verify(
+            $request->input('cf-turnstile-response'),
+            $request->ip()
+        );
 
-        if (! $this->turnstileService->verify($token, $remoteIp)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Turnstile検証に失敗しました',
-            ], 422);
+        if ($verificationResult !== true) {
+            $errorKey = is_string($verificationResult) ? $verificationResult : 'verification_failed';
+            throw ValidationException::withMessages([
+                'cf-turnstile-response' => [__("turnstile.{$errorKey}")],
+            ]);
         }
 
         return $next($request);

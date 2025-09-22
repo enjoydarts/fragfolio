@@ -10,7 +10,7 @@ class LoginUserUseCase
     public function execute(array $credentials, bool $remember = false): array
     {
         if (! Auth::attempt($credentials)) {
-            throw new AuthenticationException('認証情報が正しくありません');
+            throw new AuthenticationException(__('auth.invalid_credentials'));
         }
 
         $user = Auth::user();

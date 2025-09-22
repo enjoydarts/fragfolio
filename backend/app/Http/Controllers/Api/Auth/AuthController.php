@@ -8,7 +8,9 @@ use App\UseCases\Auth\LoginUserUseCase;
 use App\UseCases\Auth\PasswordResetUseCase;
 use App\UseCases\Auth\RefreshTokenUseCase;
 use App\UseCases\Auth\RegisterUserUseCase;
+use App\UseCases\Auth\RequestEmailChangeUseCase;
 use App\UseCases\Auth\UpdateUserProfileUseCase;
+use App\UseCases\Auth\VerifyEmailChangeUseCase;
 use App\UseCases\Auth\VerifyEmailUseCase;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
@@ -26,7 +28,9 @@ class AuthController extends Controller
         private UpdateUserProfileUseCase $updateUserProfileUseCase,
         private RefreshTokenUseCase $refreshTokenUseCase,
         private VerifyEmailUseCase $verifyEmailUseCase,
-        private PasswordResetUseCase $passwordResetUseCase
+        private PasswordResetUseCase $passwordResetUseCase,
+        private RequestEmailChangeUseCase $requestEmailChangeUseCase,
+        private VerifyEmailChangeUseCase $verifyEmailChangeUseCase
     ) {}
 
     public function register(Request $request): JsonResponse
@@ -37,7 +41,7 @@ class AuthController extends Controller
             if (! $turnstileToken || ! $this->turnstileService->verify($turnstileToken, $request->ip())) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Turnstile検証に失敗しました',
+                    'message' => __('auth.turnstile_verification_failed'),
                 ], 422);
             }
         }
@@ -51,7 +55,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'バリデーションエラー',
+                'message' => __('auth.validation_error'),
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -68,7 +72,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'ユーザー登録が完了しました',
+                'message' => __('auth.registration_success'),
                 'user' => $user,
                 'token' => $token,
             ], 201);
@@ -82,7 +86,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'ユーザー登録に失敗しました',
+                'message' => __('auth.registration_failed'),
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -96,7 +100,7 @@ class AuthController extends Controller
             if (! $turnstileToken || ! $this->turnstileService->verify($turnstileToken, $request->ip())) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Turnstile検証に失敗しました',
+                    'message' => __('auth.turnstile_verification_failed'),
                 ], 422);
             }
         }
@@ -110,7 +114,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'バリデーションエラー',
+                'message' => __('auth.validation_error'),
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -123,7 +127,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'ログインしました',
+                'message' => __('auth.login_success'),
                 'user' => $result['user'],
                 'token' => $result['token'],
             ]);
@@ -131,7 +135,7 @@ class AuthController extends Controller
         } catch (AuthenticationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'メールアドレスまたはパスワードが正しくありません',
+                'message' => __('auth.invalid_credentials'),
             ], 401);
         }
     }
@@ -142,7 +146,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'ログアウトしました',
+            'message' => __('auth.logout_success'),
         ]);
     }
 
@@ -170,7 +174,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'バリデーションエラー',
+                'message' => __('auth.validation_error'),
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -184,14 +188,14 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'プロフィールを更新しました',
+                'message' => __('auth.profile_update_success'),
                 'user' => $user,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'プロフィール更新に失敗しました',
+                'message' => __('auth.profile_update_failed'),
             ], 500);
         }
     }
@@ -205,7 +209,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'バリデーションエラー',
+                'message' => __('auth.validation_error'),
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -220,7 +224,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'パスワードリセットメールの送信に失敗しました',
+                'message' => __('auth.reset_link_failed'),
             ], 500);
         }
     }
@@ -236,7 +240,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'バリデーションエラー',
+                'message' => __('auth.validation_error'),
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -253,7 +257,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'パスワードリセットに失敗しました',
+                'message' => __('auth.password_reset_failed'),
             ], 500);
         }
     }
@@ -264,7 +268,7 @@ class AuthController extends Controller
         $email = $request->email;
 
         if (! $email || ! $token) {
-            return redirect($frontendUrl.'/password-reset-error?message='.urlencode('無効なリセットリンクです'));
+            return redirect($frontendUrl.'/password-reset-error?message='.urlencode(__('auth.invalid_reset_link')));
         }
 
         return redirect($frontendUrl.'/reset-password?token='.urlencode($token).'&email='.urlencode($email));
@@ -276,7 +280,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'トークンを更新しました',
+            'message' => __('auth.token_refresh_success'),
             'token' => $result['token'],
             'user' => $result['user'],
         ]);
@@ -310,6 +314,70 @@ class AuthController extends Controller
             return redirect($frontendUrl.'/email-verification-success?message='.urlencode($result['message']));
         } else {
             return redirect($frontendUrl.'/email-verification-error?message='.urlencode($result['message']));
+        }
+    }
+
+    public function requestEmailChange(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'new_email' => 'required|string|email|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('auth.validation_error'),
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        try {
+            $emailChangeRequest = $this->requestEmailChangeUseCase->execute(
+                $request->user(),
+                $request->input('new_email')
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => __('auth.email_change_request_sent'),
+                'data' => [
+                    'current_email' => $request->user()->email,
+                    'new_email' => $emailChangeRequest->new_email,
+                    'expires_at' => $emailChangeRequest->expires_at,
+                ],
+            ]);
+
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+
+        } catch (\Exception $e) {
+            Log::error('Email change request failed', [
+                'user_id' => $request->user()->id,
+                'new_email' => $request->input('new_email'),
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => __('auth.email_change_request_failed'),
+            ], 500);
+        }
+    }
+
+    public function verifyEmailChange(Request $request, $token)
+    {
+        try {
+            $this->verifyEmailChangeUseCase->verifyEmailChange($token);
+
+            $frontendUrl = config('app.frontend_url');
+            return redirect($frontendUrl.'/settings?message='.urlencode(__('auth.email_change_completed')));
+
+        } catch (\Exception $e) {
+            $frontendUrl = config('app.frontend_url');
+            return redirect($frontendUrl.'/settings?error='.urlencode(__('auth.invalid_verification_link')));
         }
     }
 }

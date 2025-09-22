@@ -12,10 +12,10 @@ export const HomePage: React.FC = () => {
         {user ? (
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              ようこそ、{user.name}さん
+              {t('home.welcome', 'ようこそ、{{name}}さん', { name: user.name })}
             </h2>
             <p className="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
-              あなたの香水コレクションを管理しましょう
+              {t('home.subtitle', 'あなたの香水コレクションを管理しましょう')}
             </p>
           </div>
         ) : (

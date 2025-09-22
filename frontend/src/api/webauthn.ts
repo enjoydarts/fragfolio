@@ -12,10 +12,21 @@ export interface WebAuthnResponse {
   message?: string;
   credentials?: WebAuthnCredential[];
   errors?: Record<string, string[]>;
+  requires_two_factor?: boolean;
+  temp_token?: string;
+  token?: string;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+    email_verified_at: string | null;
+    two_factor_enabled: boolean;
+  };
 }
 
 export interface WebAuthnRegistrationOptions {
   challenge: string;
+  challenge_key: string;
   rp: {
     name: string;
     id: string;
@@ -88,14 +99,20 @@ export class WebAuthnAPI {
     credential: Record<string, unknown>,
     alias?: string
   ): Promise<WebAuthnResponse> {
+    const body = { ...credential };
+    if (alias) {
+      (body as any).alias = alias;
+    }
+
     const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/register`, {
       method: 'POST',
       headers: this.getHeaders(token),
-      body: JSON.stringify({
-        ...credential,
-        alias,
-      }),
+      body: JSON.stringify(body),
     });
+
+    if (response.status === 204) {
+      return { success: true };
+    }
 
     return response.json();
   }
@@ -153,6 +170,30 @@ export class WebAuthnAPI {
   static async disableCredential(token: string, credentialId: string): Promise<WebAuthnResponse> {
     const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/credentials/${credentialId}`, {
       method: 'DELETE',
+      headers: this.getHeaders(token),
+    });
+
+    return response.json();
+  }
+
+  /**
+   * WebAuthn認証器を物理削除
+   */
+  static async deleteCredential(token: string, credentialId: string): Promise<WebAuthnResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/credentials/${credentialId}/destroy`, {
+      method: 'DELETE',
+      headers: this.getHeaders(token),
+    });
+
+    return response.json();
+  }
+
+  /**
+   * WebAuthn認証器を有効化
+   */
+  static async enableCredential(token: string, credentialId: string): Promise<WebAuthnResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/credentials/${credentialId}/enable`, {
+      method: 'POST',
       headers: this.getHeaders(token),
     });
 
