@@ -31,14 +31,31 @@ const TestPasswordChangeForm = () => {
 
     try {
       setLoading(true);
-      await AuthAPI.changePassword('test-token', {
+      const response = await AuthAPI.changePassword('test-token', {
         current_password: formData.currentPassword,
         new_password: formData.newPassword,
         new_password_confirmation: formData.confirmPassword,
       });
-      setMessage(t('settings.security.password.success'));
+
+      if (response.success) {
+        setMessage(t('settings.security.password.success'));
+      } else {
+        // サーバーからのメッセージではなく、フロントエンドの翻訳キーを使用
+        if (response.message && response.message.includes('incorrect')) {
+          setMessage(t('settings.security.password.current_incorrect'));
+        } else if (response.errors?.new_password) {
+          setMessage(t('auth.errors.password_min'));
+        } else {
+          setMessage(t('settings.security.password.error'));
+        }
+      }
     } catch (error: unknown) {
-      setMessage((error as Error).message || t('settings.security.password.error'));
+      // エラーメッセージから適切な翻訳キーを選択
+      if (error instanceof Error && error.message.includes('現在のパスワードが正しくありません')) {
+        setMessage(t('settings.security.password.current_incorrect'));
+      } else {
+        setMessage(t('settings.security.password.error'));
+      }
     } finally {
       setLoading(false);
     }

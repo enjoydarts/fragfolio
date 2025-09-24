@@ -263,6 +263,7 @@
         "updating": "変更中...",
         "success": "パスワードが正常に変更されました",
         "error": "パスワード変更に失敗しました",
+        "current_incorrect": "現在のパスワードが正しくありません",
         "current_password_placeholder": "現在のパスワードを入力",
         "new_password_placeholder": "8文字以上（英数大小文字・記号含む）",
         "confirm_password_placeholder": "新しいパスワードを再入力"

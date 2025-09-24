@@ -263,6 +263,7 @@
         "updating": "Updating...",
         "success": "Password has been successfully changed",
         "error": "Failed to change password",
+        "current_incorrect": "Current password is incorrect",
         "current_password_placeholder": "Enter current password",
         "new_password_placeholder": "8+ chars (upper, lower, number, symbol)",
         "confirm_password_placeholder": "Re-enter new password"
