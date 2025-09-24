@@ -184,8 +184,8 @@ export class AuthAPI {
     token: string,
     data: {
       current_password: string;
-      password: string;
-      password_confirmation: string;
+      new_password: string;
+      new_password_confirmation: string;
     }
   ): Promise<AuthResponse> {
     const response = await fetch(`${API_BASE_URL}/api/auth/password`, {

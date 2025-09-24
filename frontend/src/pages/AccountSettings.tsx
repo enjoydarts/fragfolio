@@ -7,7 +7,7 @@ import { TOTPSettings } from '../components/security/TOTPSettings';
 import { WebAuthnSettings } from '../components/security/WebAuthnSettings';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { AuthAPI } from '../api/auth';
-import { useToastContext } from '../contexts/ToastContext';
+import { useToastContext } from '../hooks/useToastContext';
 import { useConfirm } from '../hooks/useConfirm';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
@@ -1324,6 +1324,44 @@ const SecuritySettings: React.FC = () => {
     confirmPassword: '',
   });
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+
+  const togglePasswordVisibility = (field: 'current' | 'new' | 'confirm') => {
+    setShowPassword(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  // パスワード強度検証関数
+  const validatePasswordStrength = (password: string): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+
+    if (password.length < 8) {
+      errors.push(t('auth.password.min_length', '8文字以上必要です'));
+    }
+    if (!/(?=.*[a-z])/.test(password)) {
+      errors.push(t('auth.password.lowercase', '小文字を含む必要があります'));
+    }
+    if (!/(?=.*[A-Z])/.test(password)) {
+      errors.push(t('auth.password.uppercase', '大文字を含む必要があります'));
+    }
+    if (!/(?=.*\d)/.test(password)) {
+      errors.push(t('auth.password.number', '数字を含む必要があります'));
+    }
+    if (!/(?=.*[^A-Za-z\d])/.test(password)) {
+      errors.push(t('auth.password.symbol', '記号を含む必要があります'));
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1340,10 +1378,12 @@ const SecuritySettings: React.FC = () => {
       return;
     }
 
-    if (passwordForm.newPassword.length < 8) {
+    // パスワード強度検証
+    const passwordValidation = validatePasswordStrength(passwordForm.newPassword);
+    if (!passwordValidation.isValid) {
       toast.error(
-        t('auth.password_min', 'パスワードは8文字以上で入力してください'),
-        t('auth.password_min_desc', 'より強固なパスワードを設定してください')
+        t('auth.password.weak_password', 'パスワードが要件を満たしていません'),
+        passwordValidation.errors.join('\n')
       );
       return;
     }
@@ -1353,8 +1393,8 @@ const SecuritySettings: React.FC = () => {
     try {
       const response = await AuthAPI.changePassword(token, {
         current_password: passwordForm.currentPassword,
-        password: passwordForm.newPassword,
-        password_confirmation: passwordForm.confirmPassword,
+        new_password: passwordForm.newPassword,
+        new_password_confirmation: passwordForm.confirmPassword,
       });
 
       if (response.success) {
@@ -1423,36 +1463,31 @@ const SecuritySettings: React.FC = () => {
               </label>
               <div className="relative">
                 <input
-                  type="password"
+                  type={showPassword.current ? "text" : "password"}
                   value={passwordForm.currentPassword}
                   onChange={(e) =>
                     handlePasswordChange('currentPassword', e.target.value)
                   }
-                  className="w-full px-4 py-4 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-400 font-light"
-                  placeholder="現在のパスワードを入力"
+                  className="w-full px-4 py-4 pr-12 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-400 font-light"
+                  placeholder={t('settings.security.password.current_password_placeholder', '現在のパスワードを入力')}
                   required
                 />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-4">
-                  <svg
-                    className="w-5 h-5 text-gray-400 group-focus-within:text-amber-500 transition-colors"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility('current')}
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword.current ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
               </div>
             </div>
 
@@ -1463,37 +1498,32 @@ const SecuritySettings: React.FC = () => {
               </label>
               <div className="relative">
                 <input
-                  type="password"
+                  type={showPassword.new ? "text" : "password"}
                   value={passwordForm.newPassword}
                   onChange={(e) =>
                     handlePasswordChange('newPassword', e.target.value)
                   }
-                  className="w-full px-4 py-4 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-400 font-light"
-                  placeholder="8文字以上の新しいパスワード"
+                  className="w-full px-4 py-4 pr-12 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-400 font-light"
+                  placeholder={t('settings.security.password.new_password_placeholder', '8文字以上の新しいパスワード')}
                   minLength={8}
                   required
                 />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-4">
-                  <svg
-                    className="w-5 h-5 text-gray-400 group-focus-within:text-amber-500 transition-colors"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility('new')}
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword.new ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
               </div>
             </div>
 
@@ -1504,37 +1534,32 @@ const SecuritySettings: React.FC = () => {
               </label>
               <div className="relative">
                 <input
-                  type="password"
+                  type={showPassword.confirm ? "text" : "password"}
                   value={passwordForm.confirmPassword}
                   onChange={(e) =>
                     handlePasswordChange('confirmPassword', e.target.value)
                   }
-                  className="w-full px-4 py-4 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-400 font-light"
-                  placeholder="新しいパスワードを再入力"
+                  className="w-full px-4 py-4 pr-12 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-400 font-light"
+                  placeholder={t('settings.security.password.confirm_password_placeholder', '新しいパスワードを再入力')}
                   minLength={8}
                   required
                 />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-4">
-                  <svg
-                    className="w-5 h-5 text-gray-400 group-focus-within:text-amber-500 transition-colors"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility('confirm')}
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword.confirm ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
               </div>
             </div>
           </div>

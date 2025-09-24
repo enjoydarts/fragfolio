@@ -2,7 +2,7 @@ import React, { createContext } from 'react';
 import { useToast } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/ToastContainer';
 
-const ToastContext = createContext<ReturnType<typeof useToast> | undefined>(
+export const ToastContext = createContext<ReturnType<typeof useToast> | undefined>(
   undefined
 );
 

@@ -101,6 +101,14 @@
       "auth_token_missing": "Authentication token is missing",
       "token_refresh_failed": "Token refresh failed",
       "profile_update_failed": "Profile update failed"
+    },
+    "password": {
+      "weak_password": "Password does not meet requirements",
+      "min_length": "Minimum 8 characters required",
+      "lowercase": "Must include lowercase letters",
+      "uppercase": "Must include uppercase letters",
+      "number": "Must include numbers",
+      "symbol": "Must include symbols"
     }
   },
   "email_verification": {
@@ -251,7 +259,10 @@
         "current": "Current Password",
         "new": "New Password",
         "confirm": "Confirm Password",
-        "update": "Update Password"
+        "update": "Update Password",
+        "current_password_placeholder": "Enter current password",
+        "new_password_placeholder": "8+ chars (upper, lower, number, symbol)",
+        "confirm_password_placeholder": "Re-enter new password"
       }
     },
     "profile": {

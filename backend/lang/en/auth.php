@@ -56,6 +56,8 @@ return [
     'email_change_completed' => 'Email address change has been completed',
     'email_change_current_verified' => 'Current email address verification completed',
     'email_change_new_verified' => 'New email address verification completed',
+    'current_password_incorrect' => 'Current password is incorrect',
+    'password_change_success' => 'Password changed successfully',
 
     // Email verification subjects and content
     'verify_current_email_subject' => '[Important] Email Address Change Verification (Current Email)',

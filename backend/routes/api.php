@@ -63,6 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/email/verify', [AuthController::class, 'verifyEmail']);
         Route::post('/email/resend', [AuthController::class, 'resendVerificationEmail']);
 
+        // Password change route
+        Route::put('/password', [AuthController::class, 'changePassword']);
+
         // Email change request routes
         Route::post('/email/change-request', [AuthController::class, 'requestEmailChange']);
 

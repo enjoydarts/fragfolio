@@ -44,23 +44,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     setWebAuthnSupported(isSupported);
   }, []);
 
-  // WebAuthn方式が選択された時に自動でWebAuthn認証を開始
-  useEffect(() => {
-    if (
-      requiresTwoFactor &&
-      twoFactorMethod === 'webauthn' &&
-      !twoFactorWebAuthnLoading &&
-      tempToken
-    ) {
-      handleTwoFactorWebAuthn();
-    }
-  }, [
-    requiresTwoFactor,
-    twoFactorMethod,
-    twoFactorWebAuthnLoading,
-    tempToken,
-    handleTwoFactorWebAuthn,
-  ]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -274,6 +257,24 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       setTwoFactorWebAuthnLoading(false);
     }
   }, [webAuthnSupported, tempToken, t, onSuccess]);
+
+  // WebAuthn方式が選択された時に自動でWebAuthn認証を開始
+  useEffect(() => {
+    if (
+      requiresTwoFactor &&
+      twoFactorMethod === 'webauthn' &&
+      !twoFactorWebAuthnLoading &&
+      tempToken
+    ) {
+      handleTwoFactorWebAuthn();
+    }
+  }, [
+    requiresTwoFactor,
+    twoFactorMethod,
+    twoFactorWebAuthnLoading,
+    tempToken,
+    handleTwoFactorWebAuthn,
+  ]);
 
   return (
     <div className="w-full max-w-md mx-auto mb-8">

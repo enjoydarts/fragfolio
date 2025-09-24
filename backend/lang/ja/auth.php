@@ -57,6 +57,8 @@ return [
     'token_refresh_success' => 'トークンを更新しました',
     'email_already_verified' => 'メールアドレスは既に認証済みです',
     'email_verified' => 'メールアドレスが認証されました',
+    'current_password_incorrect' => '現在のパスワードが正しくありません',
+    'password_change_success' => 'パスワードを変更しました',
     'verification_email_resent' => '認証メールを再送信しました',
     'invalid_verification_link' => '無効な認証リンクです',
     'webauthn_credential_not_found' => '指定された認証器が見つかりません',

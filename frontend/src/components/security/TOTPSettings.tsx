@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { TwoFactorAPI } from '../../api/twoFactor';
-import { useToastContext } from '../../contexts/ToastContext';
+import { useToastContext } from '../../hooks/useToastContext';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
@@ -47,15 +47,6 @@ export const TOTPSettings: React.FC = () => {
     type: null,
   });
 
-  useEffect(() => {
-    // ユーザーの2FA状態を確認
-    if (user?.two_factor_confirmed_at) {
-      setState((prev) => ({ ...prev, enabled: true }));
-    } else {
-      // 2FA状態をAPIで確認
-      checkTwoFactorStatus();
-    }
-  }, [user, checkTwoFactorStatus]);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -129,6 +120,16 @@ export const TOTPSettings: React.FC = () => {
       setState((prev) => ({ ...prev, step: 'initial' }));
     }
   }, [token]);
+
+  useEffect(() => {
+    // ユーザーの2FA状態を確認
+    if (user?.two_factor_confirmed_at) {
+      setState((prev) => ({ ...prev, enabled: true }));
+    } else {
+      // 2FA状態をAPIで確認
+      checkTwoFactorStatus();
+    }
+  }, [user, checkTwoFactorStatus]);
 
   const handleEnable = async () => {
     if (!token) return;
