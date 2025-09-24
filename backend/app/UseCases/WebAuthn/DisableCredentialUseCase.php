@@ -35,8 +35,7 @@ class DisableCredentialUseCase
         }
 
         try {
-            $credential->disabled_at = now();
-            $credential->save();
+            $credential->update(['disabled_at' => now()]);
             Log::info('Credential disabled successfully');
         } catch (\Exception $e) {
             Log::error('Failed to disable credential', [

@@ -10,6 +10,9 @@ class EmailChangeRequest extends Model
 {
     use HasFactory;
 
+    public string $new_email;
+    public string $expires_at;
+
     protected $fillable = [
         'user_id',
         'new_email',

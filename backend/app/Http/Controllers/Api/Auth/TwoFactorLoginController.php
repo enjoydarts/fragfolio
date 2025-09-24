@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\UseCases\TwoFactor\VerifyTwoFactorLoginUseCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Laragear\WebAuthn\Assertion\Validator\AssertionValidation;
 use Laragear\WebAuthn\Assertion\Validator\AssertionValidator;
@@ -62,7 +64,7 @@ class TwoFactorLoginController extends Controller
 
         try {
             // temp_tokenからユーザー情報を取得
-            $tempData = \Illuminate\Support\Facades\Cache::get("two_factor_pending:{$request->temp_token}");
+            $tempData = Cache::get("two_factor_pending:{$request->temp_token}");
 
             if (! $tempData) {
                 return response()->json([
@@ -71,9 +73,9 @@ class TwoFactorLoginController extends Controller
                 ], 401);
             }
 
-            $user = \App\Models\User::find($tempData['user_id']);
-            if (! $user) {
-                \Illuminate\Support\Facades\Cache::forget("two_factor_pending:{$request->temp_token}");
+            $user = User::find($tempData['user_id']);
+            if (! $user instanceof User) {
+                Cache::forget("two_factor_pending:{$request->temp_token}");
 
                 return response()->json([
                     'success' => false,
@@ -109,7 +111,7 @@ class TwoFactorLoginController extends Controller
 
         try {
             // temp_tokenからユーザー情報を取得
-            $tempData = \Illuminate\Support\Facades\Cache::get("two_factor_pending:{$request->temp_token}");
+            $tempData = Cache::get("two_factor_pending:{$request->temp_token}");
 
             if (! $tempData) {
                 return response()->json([
@@ -118,9 +120,9 @@ class TwoFactorLoginController extends Controller
                 ], 401);
             }
 
-            $user = \App\Models\User::find($tempData['user_id']);
-            if (! $user) {
-                \Illuminate\Support\Facades\Cache::forget("two_factor_pending:{$request->temp_token}");
+            $user = User::find($tempData['user_id']);
+            if (! $user instanceof User) {
+                Cache::forget("two_factor_pending:{$request->temp_token}");
 
                 return response()->json([
                     'success' => false,
@@ -162,7 +164,7 @@ class TwoFactorLoginController extends Controller
             }
 
             // 2FA完了処理
-            \Illuminate\Support\Facades\Cache::forget("two_factor_pending:{$request->temp_token}");
+            Cache::forget("two_factor_pending:{$request->temp_token}");
 
             // Sanctumトークンを生成
             $token = $user->createToken('auth-token')->plainTextToken;

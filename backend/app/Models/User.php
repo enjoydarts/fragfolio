@@ -23,6 +23,10 @@ class User extends Authenticatable implements MustVerifyEmail, WebAuthnAuthentic
      * Model properties from database
      */
     public ?string $role = null;
+    public string $name;
+    public string $email;
+    public ?string $email_verified_at = null;
+    public ?string $two_factor_secret = null;
 
     /**
      * The attributes that are mass assignable.
