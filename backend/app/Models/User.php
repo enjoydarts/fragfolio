@@ -32,6 +32,12 @@ class User extends Authenticatable implements MustVerifyEmail, WebAuthnAuthentic
 
     public ?string $two_factor_secret = null;
 
+    public ?string $two_factor_confirmed_at = null;
+
+    public ?string $two_factor_recovery_codes = null;
+
+    public string $password;
+
     /**
      * The attributes that are mass assignable.
      *

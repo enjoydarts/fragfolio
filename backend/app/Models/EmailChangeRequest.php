@@ -12,6 +12,10 @@ class EmailChangeRequest extends Model
 
     public string $new_email;
 
+    public string $token;
+
+    public bool $verified;
+
     public string $expires_at;
 
     protected $fillable = [
@@ -37,7 +41,7 @@ class EmailChangeRequest extends Model
 
     public function isExpired(): bool
     {
-        return $this->expires_at->isPast();
+        return $this->expires_at < now();
     }
 
     public function canComplete(): bool
