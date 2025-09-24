@@ -99,7 +99,7 @@ export const Header: React.FC = () => {
                       onClick={() => setIsUserMenuOpen(false)}
                     >
                       <Cog6ToothIcon className="w-4 h-4 mr-3" />
-                      {t('nav.settings', '設定')}
+                      {t('nav.settings')}
                     </a>
                     <button
                       onClick={handleLogout}
@@ -167,7 +167,7 @@ export const Header: React.FC = () => {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Cog6ToothIcon className="w-5 h-5 mr-3" />
-                    {t('nav.settings', '設定')}
+                    {t('nav.settings')}
                   </a>
                   <button
                     onClick={handleLogout}

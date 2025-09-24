@@ -64,7 +64,8 @@ describe('WebAuthn API', () => {
 
             return HttpResponse.json({
               success: true,
-              message: 'WebAuthnキーを登録しました',
+              message: 'WebAuthn key registered successfully',
+              messageKey: 'settings.security.webauthn.register_success',
             });
           }
         )
@@ -73,7 +74,8 @@ describe('WebAuthn API', () => {
       const result = await registerCredential(mockCredential);
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('WebAuthnキーを登録しました');
+      expect(result.message).toBe('WebAuthn key registered successfully');
+      expect(result.messageKey).toBe('settings.security.webauthn.register_success');
     });
   });
 
@@ -152,7 +154,8 @@ describe('WebAuthn API', () => {
                 created_at: '2024-01-01T00:00:00Z',
                 disabled_at: null,
               },
-              message: 'エイリアスを更新しました',
+              message: 'Alias updated successfully',
+              messageKey: 'settings.security.webauthn.alias_update_success',
             });
           }
         )
@@ -162,7 +165,8 @@ describe('WebAuthn API', () => {
 
       expect(result.success).toBe(true);
       expect(result.credential.alias).toBe(newAlias);
-      expect(result.message).toBe('エイリアスを更新しました');
+      expect(result.message).toBe('Alias updated successfully');
+      expect(result.messageKey).toBe('settings.security.webauthn.alias_update_success');
     });
 
     it('空のエイリアスでバリデーションエラー', async () => {
@@ -175,9 +179,10 @@ describe('WebAuthn API', () => {
             return HttpResponse.json(
               {
                 success: false,
-                message: 'エイリアスは必須です',
+                message: 'Alias is required',
+                messageKey: 'settings.security.webauthn.alias_required',
                 errors: {
-                  alias: ['エイリアスは必須です'],
+                  alias: ['Alias is required'],
                 },
               },
               { status: 422 }
@@ -189,7 +194,8 @@ describe('WebAuthn API', () => {
       const result = await updateCredentialAlias(credentialId, '');
 
       expect(result.success).toBe(false);
-      expect(result.message).toBe('エイリアスは必須です');
+      expect(result.message).toBe('Alias is required');
+      expect(result.messageKey).toBe('settings.security.webauthn.alias_required');
     });
   });
 
@@ -215,7 +221,8 @@ describe('WebAuthn API', () => {
           () => {
             return HttpResponse.json({
               success: true,
-              message: 'WebAuthnキーを有効化しました',
+              message: 'WebAuthn key enabled successfully',
+              messageKey: 'settings.security.webauthn.enable_success',
             });
           }
         )
@@ -224,7 +231,8 @@ describe('WebAuthn API', () => {
       const result = await enableCredential(credentialId);
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('WebAuthnキーを有効化しました');
+      expect(result.message).toBe('WebAuthn key enabled successfully');
+      expect(result.messageKey).toBe('settings.security.webauthn.enable_success');
     });
   });
 
@@ -260,7 +268,7 @@ describe('WebAuthn API', () => {
       );
 
       await expect(getCredentials()).rejects.toThrow(
-        'WebAuthn認証器一覧の取得に失敗しました'
+        'Failed to get WebAuthn credentials list'
       );
     });
 
@@ -268,7 +276,7 @@ describe('WebAuthn API', () => {
       localStorage.removeItem('auth_token');
 
       await expect(getCredentials()).rejects.toThrow(
-        '認証トークンが設定されていません'
+        'Authentication token is not set'
       );
     });
   });

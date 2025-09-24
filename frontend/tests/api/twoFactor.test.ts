@@ -32,7 +32,7 @@ describe('TwoFactor API', () => {
             const authHeader = request.headers.get('Authorization');
             if (authHeader !== `Bearer ${mockToken}`) {
               return HttpResponse.json(
-                { success: false, message: '認証が必要です' },
+                { success: false, message: 'Authentication required', messageKey: 'auth.errors.auth_token_missing' },
                 { status: 401 }
               );
             }
@@ -42,7 +42,8 @@ describe('TwoFactor API', () => {
               secret_key: 'ABCDEFGHIJKLMNOP',
               qr_code:
                 'otpauth://totp/fragfolio:test@example.com?secret=ABCDEFGHIJKLMNOP&issuer=fragfolio',
-              message: '2段階認証を有効にしました',
+              message: '2FA enabled successfully',
+              messageKey: 'auth.two_factor.enable_success',
             });
           }
         )
@@ -59,7 +60,7 @@ describe('TwoFactor API', () => {
       localStorage.removeItem('auth_token');
 
       await expect(enableTwoFactor()).rejects.toThrow(
-        '認証トークンが設定されていません'
+'Authentication token is not set'
       );
     });
   });
@@ -76,14 +77,16 @@ describe('TwoFactor API', () => {
               return HttpResponse.json({
                 success: true,
                 recovery_codes: ['code1', 'code2', 'code3'],
-                message: '2段階認証を確認しました',
+                message: '2FA confirmed successfully',
+                messageKey: 'auth.two_factor.confirm_success',
               });
             }
 
             return HttpResponse.json(
               {
                 success: false,
-                message: '認証コードが無効です',
+                message: 'Invalid verification code',
+                messageKey: 'auth.errors.two_factor_invalid',
               },
               { status: 422 }
             );
@@ -105,7 +108,8 @@ describe('TwoFactor API', () => {
             return HttpResponse.json(
               {
                 success: false,
-                message: '認証コードが無効です',
+                message: 'Invalid verification code',
+                messageKey: 'auth.errors.two_factor_invalid',
               },
               { status: 422 }
             );
@@ -116,7 +120,8 @@ describe('TwoFactor API', () => {
       const result = await confirmTwoFactor('000000');
 
       expect(result.success).toBe(false);
-      expect(result.message).toBe('認証コードが無効です');
+      expect(result.message).toBe('Invalid verification code');
+      expect(result.messageKey).toBe('auth.errors.two_factor_invalid');
     });
   });
 
@@ -128,7 +133,8 @@ describe('TwoFactor API', () => {
           () => {
             return HttpResponse.json({
               success: true,
-              message: '2段階認証を無効にしました',
+              message: '2FA disabled successfully',
+              messageKey: 'auth.two_factor.disable_success',
             });
           }
         )
@@ -137,7 +143,8 @@ describe('TwoFactor API', () => {
       const result = await disableTwoFactor();
 
       expect(result.success).toBe(true);
-      expect(result.message).toBe('2段階認証を無効にしました');
+      expect(result.message).toBe('2FA disabled successfully');
+      expect(result.messageKey).toBe('auth.two_factor.disable_success');
     });
   });
 
@@ -167,7 +174,7 @@ describe('TwoFactor API', () => {
           return HttpResponse.json(
             {
               success: false,
-              message: '2段階認証が有効化されていません',
+              message: '2FA is not enabled',
             },
             { status: 422 }
           );
@@ -177,7 +184,8 @@ describe('TwoFactor API', () => {
       const result = await getQrCode();
 
       expect(result.success).toBe(false);
-      expect(result.message).toBe('QRコードの取得に失敗しました');
+      expect(result.message).toBe('Failed to get QR code');
+      expect(result.messageKey).toBe('auth.two_factor.not_enabled');
     });
   });
 
@@ -218,7 +226,8 @@ describe('TwoFactor API', () => {
 
       expect(result.success).toBe(true);
       expect(result.recovery_codes).toEqual(['new1', 'new2', 'new3']);
-      expect(result.message).toBe('リカバリーコードを再生成しました');
+      expect(result.message).toBe('Recovery codes regenerated successfully');
+      expect(result.messageKey).toBe('auth.two_factor.recovery_codes_regenerate_success');
     });
   });
 
@@ -258,7 +267,7 @@ describe('TwoFactor API', () => {
       localStorage.removeItem('auth_token');
 
       await expect(enableTwoFactor()).rejects.toThrow(
-        '認証トークンが設定されていません'
+'Authentication token is not set'
       );
     });
   });

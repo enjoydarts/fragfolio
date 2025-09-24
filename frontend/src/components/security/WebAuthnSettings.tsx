@@ -202,7 +202,7 @@ export const WebAuthnSettings: React.FC = () => {
     const credential = state.credentials.find((c) => c.id === credentialId);
     const credentialName =
       credential?.alias ||
-      t('settings.security.webauthn.unnamed_credential', '名前なし認証器');
+      t('settings.security.webauthn.unnamed_credential');
 
     setState((prev) => ({
       ...prev,
@@ -219,7 +219,7 @@ export const WebAuthnSettings: React.FC = () => {
     const credential = state.credentials.find((c) => c.id === credentialId);
     const credentialName =
       credential?.alias ||
-      t('settings.security.webauthn.unnamed_credential', '名前なし認証器');
+      t('settings.security.webauthn.unnamed_credential');
 
     setState((prev) => ({
       ...prev,
@@ -390,13 +390,13 @@ export const WebAuthnSettings: React.FC = () => {
       {/* 新しい認証器の登録 */}
       <div className="mb-6">
         <h5 className="font-medium text-gray-900 mb-3">
-          {t('settings.security.webauthn.register_new', '新しい認証器を登録')}
+          {t('settings.security.webauthn.register_new')}
         </h5>
 
         <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('settings.security.webauthn.alias', '認証器名 (任意)')}
+              {t('settings.security.webauthn.alias')}
             </label>
             <input
               type="text"
@@ -422,8 +422,8 @@ export const WebAuthnSettings: React.FC = () => {
             className="btn-primary"
           >
             {state.isRegistering
-              ? t('settings.security.webauthn.registering', '登録中...')
-              : t('settings.security.webauthn.register', '認証器を登録')}
+              ? t('settings.security.webauthn.registering')
+              : t('settings.security.webauthn.register')}
           </button>
 
           {state.isPlatformAvailable && (
@@ -449,7 +449,7 @@ export const WebAuthnSettings: React.FC = () => {
         {state.loading ? (
           <div className="text-center py-4">
             <div className="text-gray-500">
-              {t('common.loading', '読み込み中...')}
+              {t('common.loading')}
             </div>
           </div>
         ) : state.credentials.length === 0 ? (
@@ -511,13 +511,13 @@ export const WebAuthnSettings: React.FC = () => {
             confirmText={
               state.loading
                 ? state.confirmDialog.action === 'delete'
-                  ? t('settings.security.webauthn.deleting', '削除中...')
-                  : t('settings.security.webauthn.disabling', '無効化中...')
+                  ? t('settings.security.webauthn.deleting')
+                  : t('settings.security.webauthn.disabling')
                 : state.confirmDialog.action === 'delete'
-                  ? t('settings.security.webauthn.delete', '削除')
-                  : t('settings.security.webauthn.disable', '無効化')
+                  ? t('settings.security.webauthn.delete')
+                  : t('settings.security.webauthn.disable')
             }
-            cancelText={t('common.cancel', 'キャンセル')}
+            cancelText={t('common.cancel')}
             confirmVariant="danger"
             onConfirm={handleConfirmAction}
             onCancel={handleCancelAction}
@@ -606,12 +606,12 @@ const CredentialItem: React.FC<CredentialItemProps> = ({
           )}
         </div>
         <div className="text-xs text-gray-500">
-          {t('settings.security.webauthn.registered_on', '登録日')}:{' '}
+          {t('settings.security.webauthn.registered_on')}:{' '}
           {formatDate(credential.created_at)}
         </div>
         {isDisabled && (
           <div className="text-xs text-red-500">
-            {t('settings.security.webauthn.disabled_on', '無効化日')}:{' '}
+            {t('settings.security.webauthn.disabled_on')}:{' '}
             {formatDate(credential.disabled_at)}
           </div>
         )}
@@ -620,7 +620,7 @@ const CredentialItem: React.FC<CredentialItemProps> = ({
         </div>
         {isDisabled && (
           <div className="text-xs text-red-600 font-medium">
-            {t('settings.security.webauthn.disabled_status', '無効化済み')}
+            {t('settings.security.webauthn.disabled_status')}
           </div>
         )}
       </div>
@@ -633,14 +633,14 @@ const CredentialItem: React.FC<CredentialItemProps> = ({
               disabled={disabled}
               className="text-xs text-blue-600 hover:text-blue-700 disabled:opacity-50"
             >
-              {t('common.save', '保存')}
+              {t('common.save')}
             </button>
             <button
               onClick={handleCancelEdit}
               disabled={disabled}
               className="text-xs text-gray-600 hover:text-gray-700 disabled:opacity-50"
             >
-              {t('common.cancel', 'キャンセル')}
+              {t('common.cancel')}
             </button>
           </>
         ) : (
@@ -651,7 +651,7 @@ const CredentialItem: React.FC<CredentialItemProps> = ({
                 disabled={disabled}
                 className="text-xs text-blue-600 hover:text-blue-700 disabled:opacity-50"
               >
-                {t('common.edit', '編集')}
+                {t('common.edit')}
               </button>
             )}
             {isDisabled && (
@@ -660,7 +660,7 @@ const CredentialItem: React.FC<CredentialItemProps> = ({
                 disabled={disabled}
                 className="text-xs text-green-600 hover:text-green-700 disabled:opacity-50"
               >
-                {t('settings.security.webauthn.enable', '有効化')}
+                {t('settings.security.webauthn.enable')}
               </button>
             )}
             <button
@@ -668,14 +668,14 @@ const CredentialItem: React.FC<CredentialItemProps> = ({
               disabled={disabled}
               className="text-xs text-red-600 hover:text-red-700 disabled:opacity-50"
             >
-              {t('settings.security.webauthn.disable', '無効化')}
+              {t('settings.security.webauthn.disable')}
             </button>
             <button
               onClick={() => onDelete(credential.id)}
               disabled={disabled}
               className="text-xs text-red-600 hover:text-red-700 disabled:opacity-50"
             >
-              {t('settings.security.webauthn.delete', '削除')}
+              {t('settings.security.webauthn.delete')}
             </button>
           </>
         )}

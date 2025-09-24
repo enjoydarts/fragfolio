@@ -41,9 +41,9 @@ export const AccountSettings: React.FC = () => {
   const hasProcessedParams = useRef(false); // 一度だけ実行するためのフラグ
 
   const tabs = [
-    { id: 'profile', label: t('settings.tabs.profile', 'プロフィール') },
-    { id: 'security', label: t('settings.tabs.security', 'セキュリティ') },
-    { id: 'sessions', label: t('settings.tabs.sessions', 'セッション') },
+    { id: 'profile', label: t('settings.tabs.profile') },
+    { id: 'security', label: t('settings.tabs.security') },
+    { id: 'sessions', label: t('settings.tabs.sessions') },
   ] as const;
 
   const setActiveTab = (tabId: AccountSettingsState['activeTab']) => {
@@ -66,12 +66,12 @@ export const AccountSettings: React.FC = () => {
 
       if (message) {
         toast.success(
-          t('settings.email_change_success', 'メールアドレス変更完了'),
+          t('settings.email_change_success'),
           decodeURIComponent(message)
         );
       } else if (error) {
         toast.error(
-          t('settings.email_change_error', 'メールアドレス変更エラー'),
+          t('settings.email_change_error'),
           decodeURIComponent(error)
         );
       }
@@ -107,12 +107,12 @@ export const AccountSettings: React.FC = () => {
               className="flex items-center text-gray-600 hover:text-orange-600 transition-colors duration-200 mb-6"
             >
               <ArrowLeftIcon className="w-5 h-5 mr-2" />
-              {t('common.back_to_dashboard', 'ダッシュボードに戻る')}
+              {t('common.back_to_dashboard')}
             </button>
 
             <div className="text-center mb-8">
               <h1 className="text-3xl font-light text-gray-800 mb-2">
-                {t('settings.title', 'アカウント設定')}
+                {t('settings.title')}
               </h1>
               <p className="text-gray-500 text-sm font-light">
                 {t(
@@ -220,7 +220,7 @@ const ProfileSettings: React.FC = () => {
 
     if (newEmail === user?.email) {
       toast.error(
-        t('settings.profile.email_same_error', 'エラー'),
+        t('settings.profile.email_same_error'),
         t(
           'settings.profile.email_same_error_desc',
           '現在のメールアドレスと同じです'
@@ -262,7 +262,7 @@ const ProfileSettings: React.FC = () => {
           'settings.profile.email_change_failed',
           'メールアドレス変更リクエストに失敗しました'
         ),
-        t('auth.network_error', 'ネットワークエラーが発生しました')
+        t('auth.errors.registration_failed')
       );
     }
   };
@@ -271,7 +271,7 @@ const ProfileSettings: React.FC = () => {
     <div className="space-y-6">
       <div className="text-center">
         <h3 className="text-xl font-light text-gray-800 mb-2">
-          {t('settings.profile.title', 'プロフィール情報')}
+          {t('settings.profile.title')}
         </h3>
         <p className="text-gray-500 text-sm font-light">
           {t(
@@ -286,7 +286,7 @@ const ProfileSettings: React.FC = () => {
           {/* 名前フィールド */}
           <div className="group">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('auth.fields.name', '名前')}
+              {t('auth.fields.name')}
             </label>
             <div className="relative">
               <input
@@ -294,7 +294,7 @@ const ProfileSettings: React.FC = () => {
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 className="w-full px-4 py-4 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-300 text-gray-900 placeholder-gray-400 font-light"
-                placeholder={t('auth.placeholders.name', '田中 太郎')}
+                placeholder={t('auth.placeholders.name')}
                 required
               />
               <div className="absolute inset-y-0 right-0 flex items-center pr-4">
@@ -318,7 +318,7 @@ const ProfileSettings: React.FC = () => {
           {/* メールフィールド */}
           <div className="group">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('auth.fields.email', 'メールアドレス')}
+              {t('auth.fields.email')}
             </label>
             <div className="relative">
               <input
@@ -355,14 +355,14 @@ const ProfileSettings: React.FC = () => {
               className="mt-2 text-sm text-amber-600 hover:text-amber-700 font-medium transition-colors"
               onClick={() => setShowEmailChangeDialog(true)}
             >
-              {t('settings.profile.change_email', 'メールアドレスを変更')}
+              {t('settings.profile.change_email')}
             </button>
           </div>
 
           {/* 言語選択 */}
           <div className="group">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('settings.profile.language', '言語')}
+              {t('settings.profile.language')}
             </label>
             <div className="relative">
               <select
@@ -394,7 +394,7 @@ const ProfileSettings: React.FC = () => {
           {/* タイムゾーン */}
           <div className="group">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('settings.profile.timezone', 'タイムゾーン')}
+              {t('settings.profile.timezone')}
             </label>
             <div className="relative">
               <select
@@ -1208,7 +1208,7 @@ const ProfileSettings: React.FC = () => {
           >
             {isLoading
               ? t('common.loading')
-              : t('common.save', '保存')}
+              : t('common.save')}
           </button>
         </div>
       </form>
@@ -1227,7 +1227,7 @@ const ProfileSettings: React.FC = () => {
           >
             <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-2xl transform transition-all">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                {t('settings.profile.email_change_title', 'メールアドレス変更')}
+                {t('settings.profile.email_change_title')}
               </h3>
 
               <div className="space-y-4">
@@ -1248,7 +1248,7 @@ const ProfileSettings: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('settings.profile.new_email', '新しいメールアドレス')}
+                    {t('settings.profile.new_email')}
                   </label>
                   <input
                     type="email"
@@ -1281,7 +1281,7 @@ const ProfileSettings: React.FC = () => {
                   }}
                   className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  {t('common.cancel', 'キャンセル')}
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="button"
@@ -1289,7 +1289,7 @@ const ProfileSettings: React.FC = () => {
                   disabled={!newEmail.trim()}
                   className="flex-1 px-4 py-2 text-white bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
                 >
-                  {t('settings.profile.send_verification', '確認メール送信')}
+                  {t('settings.profile.send_verification')}
                 </button>
               </div>
             </div>
@@ -1331,19 +1331,19 @@ const SecuritySettings: React.FC = () => {
     const errors: string[] = [];
 
     if (password.length < 8) {
-      errors.push(t('auth.password.min_length', '8文字以上必要です'));
+      errors.push(t('auth.password.min_length'));
     }
     if (!/(?=.*[a-z])/.test(password)) {
-      errors.push(t('auth.password.lowercase', '小文字を含む必要があります'));
+      errors.push(t('auth.password.lowercase'));
     }
     if (!/(?=.*[A-Z])/.test(password)) {
-      errors.push(t('auth.password.uppercase', '大文字を含む必要があります'));
+      errors.push(t('auth.password.uppercase'));
     }
     if (!/(?=.*\d)/.test(password)) {
-      errors.push(t('auth.password.number', '数字を含む必要があります'));
+      errors.push(t('auth.password.number'));
     }
     if (!/(?=.*[^A-Za-z\d])/.test(password)) {
-      errors.push(t('auth.password.symbol', '記号を含む必要があります'));
+      errors.push(t('auth.password.symbol'));
     }
 
     return {
@@ -1408,7 +1408,7 @@ const SecuritySettings: React.FC = () => {
     <div className="space-y-8">
       <div className="text-center">
         <h3 className="text-xl font-light text-gray-800 mb-2">
-          {t('settings.security.title', 'セキュリティ設定')}
+          {t('settings.security.title')}
         </h3>
         <p className="text-gray-500 text-sm font-light">
           {t(
@@ -1421,7 +1421,7 @@ const SecuritySettings: React.FC = () => {
       {/* パスワード変更セクション */}
       <div className="bg-white/50 backdrop-blur-sm border border-white/30 rounded-2xl p-6 shadow-sm">
         <h4 className="text-lg font-light text-gray-800 mb-6 text-center">
-          {t('settings.security.password.title', 'パスワード変更')}
+          {t('settings.security.password.title')}
         </h4>
 
         <form onSubmit={handlePasswordSubmit} className="space-y-5">
@@ -1429,7 +1429,7 @@ const SecuritySettings: React.FC = () => {
             {/* 現在のパスワード */}
             <div className="group">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('settings.security.password.current', '現在のパスワード')}
+                {t('settings.security.password.current')}
               </label>
               <div className="relative">
                 <input
@@ -1492,7 +1492,7 @@ const SecuritySettings: React.FC = () => {
             {/* 新しいパスワード */}
             <div className="group">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('settings.security.password.new', '新しいパスワード')}
+                {t('settings.security.password.new')}
               </label>
               <div className="relative">
                 <input
@@ -1556,7 +1556,7 @@ const SecuritySettings: React.FC = () => {
             {/* パスワード確認 */}
             <div className="group">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('settings.security.password.confirm', 'パスワード確認')}
+                {t('settings.security.password.confirm')}
               </label>
               <div className="relative">
                 <input
@@ -1626,7 +1626,7 @@ const SecuritySettings: React.FC = () => {
             >
               {isPasswordLoading
                 ? t('common.loading')
-                : t('settings.security.password.update', 'パスワードを更新')}
+                : t('settings.security.password.update')}
             </button>
           </div>
         </form>
@@ -1659,8 +1659,8 @@ const SessionsSettings: React.FC = () => {
         'settings.sessions.logout_confirm_message',
         '他のすべてのデバイスからログアウトしますか？この操作により、他のデバイスでの認証が無効になります。'
       ),
-      confirmText: t('settings.sessions.logout_confirm', 'ログアウト'),
-      cancelText: t('common.cancel', 'キャンセル'),
+      confirmText: t('settings.sessions.logout_confirm'),
+      cancelText: t('common.cancel'),
       confirmVariant: 'danger',
     });
 
@@ -1699,7 +1699,7 @@ const SessionsSettings: React.FC = () => {
     <div className="space-y-8">
       <div className="text-center">
         <h3 className="text-xl font-light text-gray-800 mb-2">
-          {t('settings.sessions.title', 'アクティブセッション')}
+          {t('settings.sessions.title')}
         </h3>
         <p className="text-gray-500 text-sm font-light">
           {t(
@@ -1733,7 +1733,7 @@ const SessionsSettings: React.FC = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h4 className="text-base font-medium text-gray-900 mb-1">
-                  {t('settings.sessions.current', '現在のセッション')}
+                  {t('settings.sessions.current')}
                 </h4>
                 <p className="text-sm text-gray-600 mb-1">
                   Chrome - Tokyo, Japan
@@ -1746,7 +1746,7 @@ const SessionsSettings: React.FC = () => {
             <div className="flex-shrink-0">
               <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200">
                 <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-                {t('settings.sessions.active', 'アクティブ')}
+                {t('settings.sessions.active')}
               </span>
             </div>
           </div>

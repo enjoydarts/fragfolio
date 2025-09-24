@@ -26,7 +26,7 @@ export const ForgotPassword: React.FC = () => {
         setError(t('auth.errors.password_reset_failed'));
       }
     } catch {
-      setError(t('auth.errors.registration_failed'));
+      setError(t('auth.errors.password_reset_failed'));
     } finally {
       setIsLoading(false);
     }

@@ -94,7 +94,7 @@ export class WebAuthnAPI {
     );
 
     if (!response.ok) {
-      throw new Error('WebAuthn登録オプションの取得に失敗しました');
+      throw new Error('Failed to get WebAuthn registration options');
     }
 
     const data = await response.json();
@@ -146,7 +146,7 @@ export class WebAuthnAPI {
     );
 
     if (!response.ok) {
-      throw new Error('WebAuthnログインオプションの取得に失敗しました');
+      throw new Error('Failed to get WebAuthn login options');
     }
 
     return response.json();
@@ -180,7 +180,7 @@ export class WebAuthnAPI {
     );
 
     if (!response.ok) {
-      throw new Error('WebAuthn認証器一覧の取得に失敗しました');
+      throw new Error('Failed to get WebAuthn credentials list');
     }
 
     const data = await response.json();
@@ -421,7 +421,7 @@ export const getRegistrationOptions = async (): Promise<{
 }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
 
   try {
@@ -436,7 +436,7 @@ export const getRegistrationOptions = async (): Promise<{
     throw new Error(
       error instanceof Error
         ? error.message
-        : 'WebAuthn登録オプションの取得に失敗しました'
+        : 'Failed to get WebAuthn registration options'
     );
   }
 };
@@ -446,7 +446,7 @@ export const registerCredential = async (
 ): Promise<{ success: boolean; message?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
 
   try {
@@ -464,6 +464,7 @@ export const registerCredential = async (
     return {
       success: result.success,
       message: result.success ? 'WebAuthn key registered successfully' : 'WebAuthn key registration failed',
+      messageKey: result.success ? 'settings.security.webauthn.register_success' : 'settings.security.webauthn.register_failed',
     };
   } catch (error) {
     throw new Error(
@@ -481,7 +482,7 @@ export const getCredentials = async (): Promise<{
 }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
 
   try {
@@ -494,7 +495,7 @@ export const getCredentials = async (): Promise<{
     const message =
       error instanceof Error
         ? error.message
-        : 'WebAuthn認証器一覧の取得に失敗しました';
+        : 'Failed to get WebAuthn credentials list';
     if (message.includes('Internal Server Error')) {
       throw new Error('Internal Server Error');
     }
@@ -507,7 +508,7 @@ export const deleteCredential = async (
 ): Promise<{ success: boolean; message?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
 
   try {
@@ -517,6 +518,9 @@ export const deleteCredential = async (
       message: result.success
         ? 'WebAuthn key deleted successfully'
         : 'WebAuthn credential not found',
+      messageKey: result.success
+        ? 'settings.security.webauthn.delete_success'
+        : 'settings.security.webauthn.delete_failed',
     };
   } catch (error) {
     return {
@@ -525,6 +529,7 @@ export const deleteCredential = async (
         error instanceof Error
           ? error.message
           : 'WebAuthn key deletion failed',
+      messageKey: 'settings.security.webauthn.delete_failed',
     };
   }
 };
@@ -540,7 +545,7 @@ export const updateCredentialAlias = async (
 }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
 
   try {
@@ -562,6 +567,9 @@ export const updateCredentialAlias = async (
       message: result.success
         ? 'Alias updated successfully'
         : 'Alias is required',
+      messageKey: result.success
+        ? 'settings.security.webauthn.alias_update_success'
+        : 'settings.security.webauthn.alias_required',
       errors: result.errors,
     };
   } catch (error) {
@@ -571,6 +579,7 @@ export const updateCredentialAlias = async (
         error instanceof Error
           ? error.message
           : 'Alias update failed',
+      messageKey: 'settings.security.webauthn.alias_update_failed',
     };
   }
 };
@@ -580,7 +589,7 @@ export const disableCredential = async (
 ): Promise<{ success: boolean; message?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
 
   try {
@@ -588,6 +597,7 @@ export const disableCredential = async (
     return {
       success: result.success,
       message: result.success ? 'WebAuthn key disabled successfully' : 'WebAuthn key disable failed',
+      messageKey: result.success ? 'settings.security.webauthn.disable_success' : 'settings.security.webauthn.disable_failed',
     };
   } catch (error) {
     return {
@@ -596,6 +606,7 @@ export const disableCredential = async (
         error instanceof Error
           ? error.message
           : 'WebAuthn key disable failed',
+      messageKey: 'settings.security.webauthn.disable_failed',
     };
   }
 };
@@ -605,7 +616,7 @@ export const enableCredential = async (
 ): Promise<{ success: boolean; message?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
 
   try {
@@ -613,6 +624,7 @@ export const enableCredential = async (
     return {
       success: result.success,
       message: result.success ? 'WebAuthn key enabled successfully' : 'WebAuthn key enable failed',
+      messageKey: result.success ? 'settings.security.webauthn.enable_success' : 'settings.security.webauthn.enable_failed',
     };
   } catch (error) {
     return {
@@ -621,6 +633,7 @@ export const enableCredential = async (
         error instanceof Error
           ? error.message
           : 'WebAuthn key enable failed',
+      messageKey: 'settings.security.webauthn.enable_failed',
     };
   }
 };

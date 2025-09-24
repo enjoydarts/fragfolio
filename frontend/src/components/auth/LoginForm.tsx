@@ -274,7 +274,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         <div className="text-center mb-8">
           <h2 className="text-2xl font-light text-gray-800 mb-2">
             {requiresTwoFactor
-              ? t('auth.two_factor.title', '2要素認証')
+              ? t('auth.two_factor.title')
               : t('auth.login.title')}
           </h2>
           <p className="text-gray-500 text-sm font-light">
@@ -344,7 +344,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                             d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                           />
                         </svg>
-                        {t('auth.two_factor.totp_method', '認証アプリ（TOTP）')}
+                        {t('auth.two_factor.totp_method')}
                       </div>
                     </button>
                   )}
@@ -375,14 +375,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                       htmlFor="twoFactorCode"
                       className="block text-sm font-medium text-gray-700"
                     >
-                      {t('auth.two_factor.code_label', '認証コード')}
+                      {t('auth.two_factor.code_label')}
                     </label>
                     <button
                       type="button"
                       onClick={() => setTwoFactorMethod(null)}
                       className="text-xs text-amber-600 hover:text-amber-700 font-medium"
                     >
-                      {t('auth.two_factor.change_method', '認証方法を変更')}
+                      {t('auth.two_factor.change_method')}
                     </button>
                   </div>
                   <div className="relative">
@@ -426,14 +426,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 <div className="text-center">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-medium text-gray-800">
-                      {t('auth.two_factor.webauthn_title', '生体認証')}
+                      {t('auth.two_factor.webauthn_title')}
                     </h3>
                     <button
                       type="button"
                       onClick={() => setTwoFactorMethod(null)}
                       className="text-xs text-amber-600 hover:text-amber-700 font-medium"
                     >
-                      {t('auth.two_factor.change_method', '認証方法を変更')}
+                      {t('auth.two_factor.change_method')}
                     </button>
                   </div>
                   <div className="bg-gray-50 rounded-xl p-6 mb-4">
@@ -636,11 +636,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                   <div className="flex items-center justify-center">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                     {requiresTwoFactor
-                      ? t('auth.two_factor.verifying', '認証中...')
+                      ? t('auth.two_factor.verifying')
                       : t('auth.logging_in')}
                   </div>
                 ) : requiresTwoFactor && twoFactorMethod === 'totp' ? (
-                  t('auth.two_factor.verify_button', '認証コードを確認')
+                  t('auth.two_factor.verify_button')
                 ) : (
                   t('auth.login.button')
                 )}
@@ -658,12 +658,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 {twoFactorWebAuthnLoading ? (
                   <div className="flex items-center justify-center">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    {t('auth.webauthn.authenticating', '認証中...')}
+                    {t('auth.webauthn.authenticating')}
                   </div>
                 ) : (
                   <div className="flex items-center justify-center">
                     <FingerPrintIcon className="w-5 h-5 mr-2" />
-                    {t('auth.webauthn.authenticate_button', '生体認証で認証')}
+                    {t('auth.webauthn.authenticate_button')}
                   </div>
                 )}
               </button>
@@ -686,7 +686,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
                 }}
                 className="text-gray-600 hover:text-gray-700 font-medium transition-colors duration-200"
               >
-                {t('auth.two_factor.back_to_login', '← ログインに戻る')}
+                {t('auth.two_factor.back_to_login')}
               </button>
             ) : (
               /* 通常ステップ：新規登録リンク */

@@ -7,6 +7,7 @@ export interface TwoFactorStatus {
 export interface TwoFactorResponse {
   success: boolean;
   message?: string;
+  messageKey?: string;
   qr_code?: string;
   secret_key?: string;
   recovery_codes?: string[];
@@ -31,7 +32,7 @@ export class TwoFactorAPI {
     });
 
     if (!response.ok) {
-      throw new Error('2FA状態の取得に失敗しました');
+      throw new Error('Failed to get 2FA status');
     }
 
     return response.json();
@@ -60,7 +61,7 @@ export class TwoFactorAPI {
     if (!response.ok) {
       console.error('2FA enable failed:', response.status, response.statusText);
       if (response.status === 401) {
-        throw new Error('認証が無効です。再ログインしてください。');
+        throw new Error('Authentication is invalid. Please login again.');
       }
     }
 
@@ -90,7 +91,7 @@ export class TwoFactorAPI {
         response.statusText
       );
       if (response.status === 401) {
-        throw new Error('認証が無効です。再ログインしてください。');
+        throw new Error('Authentication is invalid. Please login again.');
       }
     }
 
@@ -125,7 +126,7 @@ export class TwoFactorAPI {
     );
 
     if (!response.ok) {
-      throw new Error('QRコードの取得に失敗しました');
+      throw new Error('Failed to get QR code');
     }
 
     return response.text(); // SVG形式のQRコード
@@ -185,7 +186,7 @@ export class TwoFactorAPI {
 export const enableTwoFactor = async (): Promise<TwoFactorResponse> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
   return TwoFactorAPI.enable(token);
 };
@@ -195,7 +196,7 @@ export const confirmTwoFactor = async (
 ): Promise<TwoFactorResponse> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
   return TwoFactorAPI.confirm(token, code);
 };
@@ -203,7 +204,7 @@ export const confirmTwoFactor = async (
 export const disableTwoFactor = async (): Promise<TwoFactorResponse> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
   return TwoFactorAPI.disable(token);
 };
@@ -213,10 +214,11 @@ export const getQrCode = async (): Promise<{
   qr_code_url?: string;
   secret?: string;
   message?: string;
+  messageKey?: string;
 }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
 
   try {
@@ -233,7 +235,8 @@ export const getQrCode = async (): Promise<{
       message:
         error instanceof Error
           ? error.message
-          : '2段階認証が有効化されていません',
+          : '2FA is not enabled',
+      messageKey: 'auth.two_factor.not_enabled',
     };
   }
 };
@@ -242,10 +245,11 @@ export const getRecoveryCodes = async (): Promise<{
   success: boolean;
   recovery_codes?: string[];
   message?: string;
+  messageKey?: string;
 }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
 
   try {
@@ -260,7 +264,8 @@ export const getRecoveryCodes = async (): Promise<{
       message:
         error instanceof Error
           ? error.message
-          : 'リカバリーコードの取得に失敗しました',
+          : 'Failed to get recovery codes',
+      messageKey: 'auth.two_factor.recovery_codes_get_failed',
     };
   }
 };
@@ -269,10 +274,11 @@ export const regenerateRecoveryCodes = async (): Promise<{
   success: boolean;
   recovery_codes?: string[];
   message?: string;
+  messageKey?: string;
 }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
-    throw new Error('認証トークンが設定されていません');
+    throw new Error('Authentication token is not set');
   }
 
   try {
@@ -280,7 +286,8 @@ export const regenerateRecoveryCodes = async (): Promise<{
     return {
       success: true,
       recovery_codes: result.recovery_codes,
-      message: 'リカバリーコードを再生成しました',
+      message: 'Recovery codes regenerated successfully',
+      messageKey: 'auth.two_factor.recovery_codes_regenerate_success',
     };
   } catch (error) {
     return {
@@ -288,7 +295,8 @@ export const regenerateRecoveryCodes = async (): Promise<{
       message:
         error instanceof Error
           ? error.message
-          : 'リカバリーコードの再生成に失敗しました',
+          : 'Failed to regenerate recovery codes',
+      messageKey: 'auth.two_factor.recovery_codes_regenerate_failed',
     };
   }
 };

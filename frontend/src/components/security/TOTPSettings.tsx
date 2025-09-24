@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
-import { TwoFactorAPI } from '../../api/twoFactor';
+import { TwoFactorAPI, getQrCode, getRecoveryCodes, regenerateRecoveryCodes } from '../../api/twoFactor';
 import { useToastContext } from '../../hooks/useToastContext';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
@@ -59,7 +59,7 @@ export const TOTPSettings: React.FC = () => {
     } catch (error) {
       console.error('Failed to copy:', error);
       toast.error(
-        t('settings.security.twofa.copy_failed', 'コピーに失敗しました')
+        t('settings.security.twofa.copy_failed')
       );
     }
   };
@@ -77,7 +77,7 @@ export const TOTPSettings: React.FC = () => {
     } catch (error) {
       console.error('Failed to copy all codes:', error);
       toast.error(
-        t('settings.security.twofa.copy_failed', 'コピーに失敗しました')
+        t('settings.security.twofa.copy_failed')
       );
     }
   };
@@ -97,16 +97,16 @@ export const TOTPSettings: React.FC = () => {
 
         // QRコードと秘密キーを取得
         try {
-          const [qrCode, secretData] = await Promise.all([
-            TwoFactorAPI.getQRCode(token),
-            TwoFactorAPI.getSecretKey(token),
-          ]);
-
-          setState((prev) => ({
-            ...prev,
-            qrCode,
-            secretKey: secretData.secret_key,
-          }));
+          const result = await getQrCode();
+          if (result.success) {
+            setState((prev) => ({
+              ...prev,
+              qrCode: result.qr_code_url || null,
+              secretKey: result.secret || null,
+            }));
+          } else {
+            console.error('Failed to load 2FA setup data:', result.message);
+          }
         } catch (error) {
           console.error('Failed to load 2FA setup data:', error);
         }
@@ -138,20 +138,26 @@ export const TOTPSettings: React.FC = () => {
     try {
       const response = await TwoFactorAPI.enable(token);
       if (response.success) {
-        const qrCode = await TwoFactorAPI.getQRCode(token);
-        const secretData = await TwoFactorAPI.getSecretKey(token);
-
-        setState((prev) => ({
-          ...prev,
-          qrCode,
-          secretKey: secretData.secret_key,
-          step: 'setup',
-          loading: false,
-        }));
+        const qrResult = await getQrCode();
+        if (qrResult.success) {
+          setState((prev) => ({
+            ...prev,
+            qrCode: qrResult.qr_code_url || null,
+            secretKey: qrResult.secret || null,
+            step: 'setup',
+            loading: false,
+          }));
+        } else {
+          setState((prev) => ({
+            ...prev,
+            error: qrResult.messageKey ? t(qrResult.messageKey) : qrResult.message || t('settings.security.twofa.enable_failed'),
+            loading: false,
+          }));
+        }
       } else {
         setState((prev) => ({
           ...prev,
-          error: t('settings.security.twofa.enable_failed'),
+          error: response.messageKey ? t(response.messageKey) : response.message || t('settings.security.twofa.enable_failed'),
           loading: false,
         }));
       }
@@ -180,18 +186,18 @@ export const TOTPSettings: React.FC = () => {
         state.verificationCode
       );
       if (response.success) {
-        const recoveryData = await TwoFactorAPI.getRecoveryCodes(token);
+        const recoveryResult = await getRecoveryCodes();
         setState((prev) => ({
           ...prev,
           enabled: true,
-          recoveryCodes: recoveryData.recovery_codes || [],
+          recoveryCodes: recoveryResult.success ? (recoveryResult.recovery_codes || []) : [],
           step: 'complete',
           loading: false,
         }));
       } else {
         setState((prev) => ({
           ...prev,
-          error: t('settings.security.twofa.invalid_code'),
+          error: response.messageKey ? t(response.messageKey) : response.message || t('settings.security.twofa.invalid_code'),
           loading: false,
         }));
       }
@@ -241,31 +247,45 @@ export const TOTPSettings: React.FC = () => {
         } else {
           setState((prev) => ({
             ...prev,
-            error: t('settings.security.twofa.disable_failed'),
+            error: response.messageKey ? t(response.messageKey) : response.message || t('settings.security.twofa.disable_failed'),
             loading: false,
           }));
         }
-      } catch {
+      } catch (error) {
         setState((prev) => ({
           ...prev,
-          error: t('settings.security.twofa.disable_failed'),
+          error: error instanceof Error ? error.message : t('settings.security.twofa.disable_failed'),
           loading: false,
         }));
       }
     } else if (actionType === 'regenerate') {
       try {
-        const recoveryData = await TwoFactorAPI.regenerateRecoveryCodes(token);
-        setState((prev) => ({
-          ...prev,
-          recoveryCodes: recoveryData.recovery_codes || [],
-          showRecoveryCodes: true,
-          loading: false,
-        }));
+        const result = await regenerateRecoveryCodes();
+        if (result.success) {
+          setState((prev) => ({
+            ...prev,
+            recoveryCodes: result.recovery_codes || [],
+            showRecoveryCodes: true,
+            loading: false,
+          }));
+          // Show success toast
+          if (result.messageKey) {
+            toast.success(t(result.messageKey));
+          } else if (result.message) {
+            toast.success(result.message);
+          }
+        } else {
+          setState((prev) => ({
+            ...prev,
+            error: result.messageKey ? t(result.messageKey) : result.message || t('settings.security.twofa.recovery_regenerate_failed'),
+            loading: false,
+          }));
+        }
       } catch (error) {
         console.error('Recovery codes regeneration error:', error);
         setState((prev) => ({
           ...prev,
-          error: t('settings.security.twofa.recovery_regenerate_failed'),
+          error: error instanceof Error ? error.message : t('settings.security.twofa.recovery_regenerate_failed'),
           loading: false,
         }));
       }
@@ -278,17 +298,25 @@ export const TOTPSettings: React.FC = () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
-      const recoveryData = await TwoFactorAPI.getRecoveryCodes(token);
+      const result = await getRecoveryCodes();
+      if (result.success) {
+        setState((prev) => ({
+          ...prev,
+          recoveryCodes: result.recovery_codes || [],
+          showRecoveryCodes: true,
+          loading: false,
+        }));
+      } else {
+        setState((prev) => ({
+          ...prev,
+          error: result.messageKey ? t(result.messageKey) : result.message || t('settings.security.twofa.recovery_fetch_failed'),
+          loading: false,
+        }));
+      }
+    } catch (error) {
       setState((prev) => ({
         ...prev,
-        recoveryCodes: recoveryData.recovery_codes || [],
-        showRecoveryCodes: true,
-        loading: false,
-      }));
-    } catch {
-      setState((prev) => ({
-        ...prev,
-        error: t('settings.security.twofa.recovery_fetch_failed'),
+        error: error instanceof Error ? error.message : t('settings.security.twofa.recovery_fetch_failed'),
         loading: false,
       }));
     }
@@ -308,7 +336,7 @@ export const TOTPSettings: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h4 className="text-base font-medium text-gray-900">
-              {t('settings.security.twofa.title', '2要素認証 (TOTP)')}
+              {t('settings.security.twofa.title')}
             </h4>
             <p className="text-sm text-gray-600">
               {t(
@@ -318,7 +346,7 @@ export const TOTPSettings: React.FC = () => {
             </p>
           </div>
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            {t('settings.security.twofa.enabled', '有効')}
+            {t('settings.security.twofa.enabled')}
           </span>
         </div>
 
@@ -335,7 +363,7 @@ export const TOTPSettings: React.FC = () => {
             className="btn-secondary w-full"
           >
             {state.loading
-              ? t('common.loading', '読み込み中...')
+              ? t('common.loading')
               : t(
                   'settings.security.twofa.show_recovery',
                   'リカバリコードを表示'
@@ -359,8 +387,8 @@ export const TOTPSettings: React.FC = () => {
             className="btn-secondary w-full text-red-600 border-red-300 hover:bg-red-50"
           >
             {state.loading
-              ? t('common.loading', '読み込み中...')
-              : t('settings.security.twofa.disable', '2要素認証を無効化')}
+              ? t('common.loading')
+              : t('settings.security.twofa.disable')}
           </button>
         </div>
 
@@ -369,7 +397,7 @@ export const TOTPSettings: React.FC = () => {
           state.recoveryCodes.length > 0 && (
             <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
               <h5 className="font-medium text-yellow-800 mb-2">
-                {t('settings.security.twofa.recovery_codes', 'リカバリコード')}
+                {t('settings.security.twofa.recovery_codes')}
               </h5>
               <div className="text-sm text-yellow-700 mb-3 space-y-2">
                 <p>
@@ -409,7 +437,7 @@ export const TOTPSettings: React.FC = () => {
                   onClick={copyAllRecoveryCodes}
                   className="px-3 py-1 text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
                 >
-                  {t('settings.security.twofa.copy_all', 'すべてコピー')}
+                  {t('settings.security.twofa.copy_all')}
                 </button>
                 <button
                   onClick={() =>
@@ -417,7 +445,7 @@ export const TOTPSettings: React.FC = () => {
                   }
                   className="text-sm text-yellow-700 hover:text-yellow-800"
                 >
-                  {t('common.close', '閉じる')}
+                  {t('common.close')}
                 </button>
               </div>
             </div>
@@ -452,10 +480,10 @@ export const TOTPSettings: React.FC = () => {
               }
               confirmText={
                 confirmDialog.type === 'disable'
-                  ? t('settings.security.twofa.disable', '無効化')
-                  : t('settings.security.twofa.regenerate', '再生成')
+                  ? t('settings.security.twofa.disable')
+                  : t('settings.security.twofa.regenerate')
               }
-              cancelText={t('common.cancel', 'キャンセル')}
+              cancelText={t('common.cancel')}
               confirmVariant={
                 confirmDialog.type === 'disable' ? 'danger' : 'primary'
               }
@@ -494,8 +522,8 @@ export const TOTPSettings: React.FC = () => {
             className="btn-primary"
           >
             {state.loading
-              ? t('common.loading', '読み込み中...')
-              : t('settings.security.twofa.enable', '2要素認証を有効化')}
+              ? t('common.loading')
+              : t('settings.security.twofa.enable')}
           </button>
         </div>
       )}
@@ -525,7 +553,7 @@ export const TOTPSettings: React.FC = () => {
           {state.secretKey && (
             <div>
               <h5 className="font-medium text-gray-900 mb-2">
-                {t('settings.security.twofa.manual_entry', '手動入力用キー')}
+                {t('settings.security.twofa.manual_entry')}
               </h5>
               <div className="flex items-center space-x-2">
                 <input
@@ -538,7 +566,7 @@ export const TOTPSettings: React.FC = () => {
                   onClick={() => copyToClipboard(state.secretKey!)}
                   className="btn-secondary"
                 >
-                  {t('common.copy', 'コピー')}
+                  {t('common.copy')}
                 </button>
               </div>
             </div>
@@ -571,8 +599,8 @@ export const TOTPSettings: React.FC = () => {
                 className="btn-primary"
               >
                 {state.loading
-                  ? t('common.loading', '読み込み中...')
-                  : t('settings.security.twofa.verify', '確認')}
+                  ? t('common.loading')
+                  : t('settings.security.twofa.verify')}
               </button>
             </div>
           </div>
@@ -585,8 +613,8 @@ export const TOTPSettings: React.FC = () => {
               className="btn-secondary w-full text-red-600 border-red-300 hover:bg-red-50"
             >
               {state.loading
-                ? t('common.loading', '読み込み中...')
-                : t('settings.security.twofa.disable', '2要素認証を無効化')}
+                ? t('common.loading')
+                : t('settings.security.twofa.disable')}
             </button>
           </div>
         </div>
@@ -652,7 +680,7 @@ export const TOTPSettings: React.FC = () => {
             onClick={() => setState((prev) => ({ ...prev, step: 'initial' }))}
             className="btn-primary w-full"
           >
-            {t('common.complete', '完了')}
+            {t('common.complete')}
           </button>
         </div>
       )}

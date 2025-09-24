@@ -68,7 +68,15 @@
       "webauthn_method": "Biometric Authentication (FIDO2)",
       "change_method": "Change authentication method",
       "webauthn_title": "Biometric Authentication",
-      "webauthn_prompt": "Touch your biometric authenticator to complete authentication"
+      "webauthn_prompt": "Touch your biometric authenticator to complete authentication",
+      "two_factor_required": "Two-factor authentication is required",
+      "not_enabled": "2FA is not enabled",
+      "recovery_codes_get_failed": "Failed to get recovery codes",
+      "recovery_codes_regenerate_success": "Recovery codes regenerated successfully",
+      "recovery_codes_regenerate_failed": "Failed to regenerate recovery codes",
+      "enable_success": "2FA enabled successfully",
+      "disable_success": "2FA disabled successfully",
+      "confirm_success": "2FA confirmed successfully"
     },
     "login": {
       "title": "Sign In",
@@ -257,7 +265,14 @@
         "disable_failed": "Failed to disable authenticator",
         "enable_failed": "Failed to enable WebAuthn authenticator",
         "delete_failed": "Failed to delete authenticator",
-        "alias_update_failed": "Failed to update alias"
+        "alias_update_failed": "Failed to update alias",
+        "register_success": "WebAuthn authenticator registered successfully",
+        "delete_success": "WebAuthn authenticator deleted successfully",
+        "enable_success": "WebAuthn authenticator enabled successfully",
+        "disable_success": "WebAuthn authenticator disabled successfully",
+        "alias_update_success": "Authenticator alias updated successfully",
+        "alias_update_failed": "Failed to update authenticator alias",
+        "alias_required": "Authenticator alias is required"
       },
       "password": {
         "title": "Change Password",
@@ -274,28 +289,34 @@
         "confirm_password_placeholder": "Re-enter new password"
       }
     },
-    "profile": {
-      "title": "Profile Information",
-      "description": "Configure your basic account information",
-      "language": "Language",
-      "timezone": "Timezone",
-      "email_change_note": "Email address changes require separate procedures for security purposes",
-      "change_email": "Change Email Address"
-    },
-    "sessions": {
-      "title": "Active Sessions",
-      "description": "Manage currently logged in devices",
-      "current": "Current Session",
-      "active": "Active",
-      "logout_all": "Log out all other sessions"
-    },
     "tabs": {
       "profile": "Profile",
       "security": "Security",
       "sessions": "Sessions"
     },
     "title": "Account Settings",
-    "description": "Manage your account information and security settings"
+    "description": "Manage your account information and security settings",
+    "email_change_success": "Email address change completed",
+    "email_change_error": "Email address change error",
+    "profile": {
+      "title": "Profile Information",
+      "description": "Configure your basic account information",
+      "language": "Language",
+      "timezone": "Timezone",
+      "email_change_note": "Email address changes require separate procedures for security purposes",
+      "change_email": "Change Email Address",
+      "email_change_title": "Change Email Address",
+      "send_verification": "Send Verification Email",
+      "email_same_error": "Error"
+    },
+    "sessions": {
+      "title": "Active Sessions",
+      "description": "Manage currently logged in devices",
+      "current": "Current Session",
+      "active": "Active",
+      "logout_all": "Log out all other sessions",
+      "logout_confirm": "Logout"
+    }
   },
   "common": {
     "loading": "Loading...",

@@ -68,7 +68,15 @@
       "webauthn_method": "生体認証（FIDO2）",
       "change_method": "認証方法を変更",
       "webauthn_title": "生体認証",
-      "webauthn_prompt": "生体認証器をタッチして認証を完了してください"
+      "webauthn_prompt": "生体認証器をタッチして認証を完了してください",
+      "two_factor_required": "2要素認証が必要です",
+      "not_enabled": "2段階認証が有効化されていません",
+      "recovery_codes_get_failed": "リカバリーコードの取得に失敗しました",
+      "recovery_codes_regenerate_success": "リカバリーコードを再生成しました",
+      "recovery_codes_regenerate_failed": "リカバリーコードの再生成に失敗しました",
+      "enable_success": "2段階認証を有効化しました",
+      "disable_success": "2段階認証を無効化しました",
+      "confirm_success": "2段階認証を確認しました"
     },
     "login": {
       "title": "ログイン",
@@ -257,7 +265,15 @@
         "delete_confirm_title": "認証器の削除",
         "delete_confirm_message": "「{{credentialName}}」を完全に削除しますか？この操作は取り消せません。",
         "deleting": "削除中...",
-        "delete_failed": "認証器の削除に失敗しました"
+        "delete_failed": "認証器の削除に失敗しました",
+        "register_success": "WebAuthn認証器を登録しました",
+        "register_failed": "WebAuthn認証器の登録に失敗しました",
+        "delete_success": "WebAuthn認証器を削除しました",
+        "enable_success": "WebAuthn認証器を有効化しました",
+        "disable_success": "WebAuthn認証器を無効化しました",
+        "alias_update_success": "認証器名を更新しました",
+        "alias_update_failed": "認証器名の更新に失敗しました",
+        "alias_required": "認証器名は必須です"
       },
       "password": {
         "title": "パスワード変更",
@@ -274,28 +290,34 @@
         "confirm_password_placeholder": "新しいパスワードを再入力"
       }
     },
-    "profile": {
-      "title": "プロフィール情報",
-      "description": "基本的なアカウント情報を設定します",
-      "language": "言語",
-      "timezone": "タイムゾーン",
-      "email_change_note": "メールアドレスの変更は安全性のため、別途お手続きが必要です",
-      "change_email": "メールアドレスを変更"
-    },
-    "sessions": {
-      "title": "アクティブセッション",
-      "description": "現在ログインしているデバイスを管理します",
-      "current": "現在のセッション",
-      "active": "アクティブ",
-      "logout_all": "他のセッションをすべてログアウト"
-    },
     "tabs": {
       "profile": "プロフィール",
       "security": "セキュリティ",
       "sessions": "セッション"
     },
     "title": "アカウント設定",
-    "description": "アカウント情報とセキュリティ設定を管理します"
+    "description": "アカウント情報とセキュリティ設定を管理します",
+    "email_change_success": "メールアドレス変更完了",
+    "email_change_error": "メールアドレス変更エラー",
+    "profile": {
+      "title": "プロフィール情報",
+      "description": "基本的なアカウント情報を設定します",
+      "language": "言語",
+      "timezone": "タイムゾーン",
+      "email_change_note": "メールアドレスの変更は安全性のため、別途お手続きが必要です",
+      "change_email": "メールアドレスを変更",
+      "email_change_title": "メールアドレス変更",
+      "send_verification": "確認メール送信",
+      "email_same_error": "エラー"
+    },
+    "sessions": {
+      "title": "アクティブセッション",
+      "description": "現在ログインしているデバイスを管理します",
+      "current": "現在のセッション",
+      "active": "アクティブ",
+      "logout_all": "他のセッションをすべてログアウト",
+      "logout_confirm": "ログアウト"
+    }
   },
   "common": {
     "loading": "読み込み中...",
