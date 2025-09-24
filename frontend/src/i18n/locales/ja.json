@@ -100,7 +100,8 @@
       "name_max": "名前は255文字以内で入力してください",
       "auth_token_missing": "認証トークンがありません",
       "token_refresh_failed": "トークンリフレッシュに失敗しました",
-      "profile_update_failed": "プロフィール更新に失敗しました"
+      "profile_update_failed": "プロフィール更新に失敗しました",
+      "profile_update_success": "プロフィールを更新しました"
     },
     "password": {
       "weak_password": "パスワードが要件を満たしていません",

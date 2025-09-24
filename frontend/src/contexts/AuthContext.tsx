@@ -71,7 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else if (response.requires_two_factor) {
         // 2FA要求エラーオブジェクトを作成
         const error = new Error(
-          response.message || '2要素認証が必要です'
+          t('auth.two_factor.two_factor_required')
         ) as Error & {
           requires_two_factor?: boolean;
           temp_token?: string;
@@ -82,7 +82,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error.available_methods = response.available_methods;
         throw error;
       } else {
-        throw new Error(response.message || t('auth.errors.login_failed'));
+        throw new Error(t('auth.errors.login_failed'));
       }
     } catch (error: unknown) {
       // 2FA要求の場合はエラーログを出さない
@@ -104,7 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else {
         // レスポンスデータをそのまま含むエラーオブジェクトを作成
         const error = new Error(
-          response.message || t('auth.errors.registration_failed')
+          t('auth.errors.registration_failed')
         ) as Error & { response?: { data: unknown } };
         error.response = { data: response };
         throw error;
@@ -165,9 +165,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.success && response.user) {
         setUser(response.user);
       } else {
-        throw new Error(
-          response.message || t('auth.errors.profile_update_failed')
-        );
+        throw new Error(t('auth.errors.profile_update_failed'));
       }
     } catch (error) {
       console.error('Profile update failed:', error);

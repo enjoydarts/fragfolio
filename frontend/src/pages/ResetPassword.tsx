@@ -56,14 +56,12 @@ export const ResetPassword: React.FC = () => {
       const response = await AuthAPI.resetPassword(formData);
 
       if (response.success) {
-        setMessage(
-          response.message || t('password_reset.password_reset_success')
-        );
+        setMessage(t('password_reset.password_reset_success'));
         setTimeout(() => {
           navigate('/auth');
         }, 2000);
       } else {
-        setError(response.message || t('auth.errors.registration_failed'));
+        setError(t('auth.errors.registration_failed'));
       }
     } catch {
       setError(t('auth.errors.registration_failed'));

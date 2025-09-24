@@ -151,7 +151,7 @@ export const TOTPSettings: React.FC = () => {
       } else {
         setState((prev) => ({
           ...prev,
-          error: response.message || t('settings.security.twofa.enable_failed'),
+          error: t('settings.security.twofa.enable_failed'),
           loading: false,
         }));
       }
@@ -191,7 +191,7 @@ export const TOTPSettings: React.FC = () => {
       } else {
         setState((prev) => ({
           ...prev,
-          error: response.message || t('settings.security.twofa.invalid_code'),
+          error: t('settings.security.twofa.invalid_code'),
           loading: false,
         }));
       }
@@ -241,8 +241,7 @@ export const TOTPSettings: React.FC = () => {
         } else {
           setState((prev) => ({
             ...prev,
-            error:
-              response.message || t('settings.security.twofa.disable_failed'),
+            error: t('settings.security.twofa.disable_failed'),
             loading: false,
           }));
         }

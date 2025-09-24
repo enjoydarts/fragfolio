@@ -146,9 +146,7 @@ export const WebAuthnSettings: React.FC = () => {
       } else {
         setState((prev) => ({
           ...prev,
-          error:
-            response.message ||
-            t('settings.security.webauthn.registration_failed'),
+          error: t('settings.security.webauthn.registration_failed'),
           isRegistering: false,
         }));
       }
@@ -246,12 +244,7 @@ export const WebAuthnSettings: React.FC = () => {
       } else {
         setState((prev) => ({
           ...prev,
-          error:
-            response.message ||
-            t(
-              'settings.security.webauthn.enable_failed',
-              'WebAuthn認証器の有効化に失敗しました'
-            ),
+          error: t('settings.security.webauthn.enable_failed'),
           loading: false,
         }));
       }
@@ -301,7 +294,7 @@ export const WebAuthnSettings: React.FC = () => {
             : 'settings.security.webauthn.disable_failed';
         setState((prev) => ({
           ...prev,
-          error: response.message || t(errorKey),
+          error: t(errorKey),
           loading: false,
         }));
       }
@@ -346,9 +339,7 @@ export const WebAuthnSettings: React.FC = () => {
       } else {
         setState((prev) => ({
           ...prev,
-          error:
-            response.message ||
-            t('settings.security.webauthn.alias_update_failed'),
+          error: t('settings.security.webauthn.alias_update_failed'),
           loading: false,
         }));
       }

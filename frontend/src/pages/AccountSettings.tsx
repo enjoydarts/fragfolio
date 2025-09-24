@@ -200,16 +200,11 @@ const ProfileSettings: React.FC = () => {
       if (response.success) {
         await refreshUser();
         toast.success(
-          t('auth.profile_update_success', 'プロフィールを更新しました'),
-          t(
-            'auth.profile_update_success_desc',
-            '変更内容が正常に保存されました'
-          )
+          t('auth.errors.profile_update_success')
         );
       } else {
         toast.error(
-          t('auth.profile_update_failed', 'プロフィール更新に失敗しました'),
-          response.message
+          t('auth.errors.profile_update_failed')
         );
       }
     } catch (error) {
@@ -265,8 +260,7 @@ const ProfileSettings: React.FC = () => {
             'settings.profile.email_change_failed',
             'メールアドレス変更リクエストに失敗しました'
           ),
-          response.message ||
-            t('auth.network_error', 'ネットワークエラーが発生しました')
+          t('auth.errors.registration_failed')
         );
       }
     } catch {
@@ -1371,11 +1365,7 @@ const SecuritySettings: React.FC = () => {
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       toast.error(
-        t('auth.password_mismatch', 'パスワードが一致しません'),
-        t(
-          'auth.password_mismatch_desc',
-          '新しいパスワードを再度確認してください'
-        )
+        t('auth.errors.password_mismatch')
       );
       return;
     }
@@ -1386,8 +1376,7 @@ const SecuritySettings: React.FC = () => {
     );
     if (!passwordValidation.isValid) {
       toast.error(
-        t('auth.password.weak_password', 'パスワードが要件を満たしていません'),
-        passwordValidation.errors.join('\n')
+        t('auth.password.weak_password')
       );
       return;
     }
@@ -1403,11 +1392,7 @@ const SecuritySettings: React.FC = () => {
 
       if (response.success) {
         toast.success(
-          t('auth.password_change_success', 'パスワードを変更しました'),
-          t(
-            'auth.password_change_success_desc',
-            'アカウントのセキュリティが向上しました'
-          )
+          t('settings.security.password.success')
         );
         setPasswordForm({
           currentPassword: '',
@@ -1416,15 +1401,13 @@ const SecuritySettings: React.FC = () => {
         });
       } else {
         toast.error(
-          t('auth.password_change_failed', 'パスワード変更に失敗しました'),
-          response.message
+          t('settings.security.password.error')
         );
       }
     } catch (error) {
       console.error('Password change failed:', error);
       toast.error(
-        t('auth.password_change_failed', 'パスワード変更に失敗しました'),
-        t('auth.network_error', 'ネットワークエラーが発生しました')
+        t('settings.security.password.error')
       );
     } finally {
       setIsPasswordLoading(false);
@@ -1720,8 +1703,7 @@ const SessionsSettings: React.FC = () => {
         );
       } else {
         toast.error(
-          t('settings.sessions.logout_failed', 'ログアウトに失敗しました'),
-          response.message
+          t('auth.errors.registration_failed')
         );
       }
     } catch (error) {

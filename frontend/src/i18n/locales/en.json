@@ -100,7 +100,8 @@
       "name_max": "Name must be within 255 characters",
       "auth_token_missing": "Authentication token is missing",
       "token_refresh_failed": "Token refresh failed",
-      "profile_update_failed": "Profile update failed"
+      "profile_update_failed": "Profile update failed",
+      "profile_update_success": "Profile updated successfully"
     },
     "password": {
       "weak_password": "Password does not meet requirements",

@@ -21,9 +21,9 @@ export const ForgotPassword: React.FC = () => {
       const response = await AuthAPI.forgotPassword(email);
 
       if (response.success) {
-        setMessage(response.message || t('password_reset.link_sent'));
+        setMessage(t('password_reset.link_sent'));
       } else {
-        setError(response.message || t('auth.errors.registration_failed'));
+        setError(t('auth.errors.registration_failed'));
       }
     } catch {
       setError(t('auth.errors.registration_failed'));
