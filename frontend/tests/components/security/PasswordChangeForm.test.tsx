@@ -51,7 +51,10 @@ const TestPasswordChangeForm = () => {
       }
     } catch (error: unknown) {
       // エラーメッセージから適切な翻訳キーを選択
-      if (error instanceof Error && error.message.includes('現在のパスワードが正しくありません')) {
+      if (
+        error instanceof Error &&
+        error.message.includes('現在のパスワードが正しくありません')
+      ) {
         setMessage(t('settings.security.password.current_incorrect'));
       } else {
         setMessage(t('settings.security.password.error'));
@@ -62,18 +65,25 @@ const TestPasswordChangeForm = () => {
   };
 
   const togglePasswordVisibility = (field: 'current' | 'new' | 'confirm') => {
-    setShowPassword(prev => ({ ...prev, [field]: !prev[field] }));
+    setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
   return (
     <form onSubmit={handleSubmit} data-testid="password-change-form">
       <div>
-        <label htmlFor="current-password">{t('settings.security.password.current')}</label>
+        <label htmlFor="current-password">
+          {t('settings.security.password.current')}
+        </label>
         <input
           id="current-password"
           type={showPassword.current ? 'text' : 'password'}
           value={formData.currentPassword}
-          onChange={(e) => setFormData(prev => ({ ...prev, currentPassword: e.target.value }))}
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              currentPassword: e.target.value,
+            }))
+          }
           required
         />
         <button
@@ -86,12 +96,16 @@ const TestPasswordChangeForm = () => {
       </div>
 
       <div>
-        <label htmlFor="new-password">{t('settings.security.password.new')}</label>
+        <label htmlFor="new-password">
+          {t('settings.security.password.new')}
+        </label>
         <input
           id="new-password"
           type={showPassword.new ? 'text' : 'password'}
           value={formData.newPassword}
-          onChange={(e) => setFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, newPassword: e.target.value }))
+          }
           required
         />
         <button
@@ -104,12 +118,19 @@ const TestPasswordChangeForm = () => {
       </div>
 
       <div>
-        <label htmlFor="confirm-password">{t('settings.security.password.confirm')}</label>
+        <label htmlFor="confirm-password">
+          {t('settings.security.password.confirm')}
+        </label>
         <input
           id="confirm-password"
           type={showPassword.confirm ? 'text' : 'password'}
           value={formData.confirmPassword}
-          onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+          onChange={(e) =>
+            setFormData((prev) => ({
+              ...prev,
+              confirmPassword: e.target.value,
+            }))
+          }
           required
         />
         <button
@@ -122,7 +143,9 @@ const TestPasswordChangeForm = () => {
       </div>
 
       <button type="submit" disabled={loading} data-testid="submit-button">
-        {loading ? t('settings.security.password.updating') : t('settings.security.password.update')}
+        {loading
+          ? t('settings.security.password.updating')
+          : t('settings.security.password.update')}
       </button>
 
       {message && <div data-testid="message">{message}</div>}
@@ -154,7 +177,9 @@ describe('PasswordChangeForm', () => {
   it('パスワード表示切り替えが動作する', async () => {
     customRender(<TestPasswordChangeForm />);
 
-    const currentPasswordInput = screen.getByLabelText('現在のパスワード') as HTMLInputElement;
+    const currentPasswordInput = screen.getByLabelText(
+      '現在のパスワード'
+    ) as HTMLInputElement;
     const toggleCurrentButton = screen.getByTestId('toggle-current-password');
 
     // 初期状態ではパスワードタイプ
@@ -201,7 +226,9 @@ describe('PasswordChangeForm', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('message')).toHaveTextContent('パスワードが正常に変更されました');
+      expect(screen.getByTestId('message')).toHaveTextContent(
+        'パスワードが正常に変更されました'
+      );
     });
   });
 
@@ -223,7 +250,9 @@ describe('PasswordChangeForm', () => {
     fireEvent.click(screen.getByTestId('submit-button'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('message')).toHaveTextContent('パスワードが一致しません');
+      expect(screen.getByTestId('message')).toHaveTextContent(
+        'パスワードが一致しません'
+      );
     });
 
     // APIが呼び出されていないことを確認
@@ -232,7 +261,9 @@ describe('PasswordChangeForm', () => {
 
   it('API呼び出し失敗時にエラーメッセージが表示される', async () => {
     const mockChangePassword = vi.mocked(AuthAPI.changePassword);
-    mockChangePassword.mockRejectedValue(new Error('現在のパスワードが正しくありません'));
+    mockChangePassword.mockRejectedValue(
+      new Error('現在のパスワードが正しくありません')
+    );
 
     customRender(<TestPasswordChangeForm />);
 
@@ -251,13 +282,17 @@ describe('PasswordChangeForm', () => {
     fireEvent.click(screen.getByTestId('submit-button'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('message')).toHaveTextContent('現在のパスワードが正しくありません');
+      expect(screen.getByTestId('message')).toHaveTextContent(
+        '現在のパスワードが正しくありません'
+      );
     });
   });
 
   it('送信中はボタンが無効になる', async () => {
     const mockChangePassword = vi.mocked(AuthAPI.changePassword);
-    mockChangePassword.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+    mockChangePassword.mockImplementation(
+      () => new Promise((resolve) => setTimeout(resolve, 100))
+    );
 
     customRender(<TestPasswordChangeForm />);
 

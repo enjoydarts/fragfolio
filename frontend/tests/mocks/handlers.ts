@@ -184,7 +184,7 @@ export const handlers = [
 
   // Password Change API
   http.put('http://localhost:8002/api/auth/password', async ({ request }) => {
-    const body = await request.json() as {
+    const body = (await request.json()) as {
       current_password: string;
       new_password: string;
       new_password_confirmation: string;
