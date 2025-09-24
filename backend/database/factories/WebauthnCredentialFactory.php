@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\WebauthnCredential;
 use App\Models\User;
+use App\Models\WebauthnCredential;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class WebauthnCredentialFactory extends Factory
@@ -18,6 +18,7 @@ class WebauthnCredentialFactory extends Factory
             'id' => $this->faker->uuid(),
             'user_id' => function (array $attributes) {
                 $user = \App\Models\User::find($attributes['authenticatable_id']);
+
                 return $user ? $user->webAuthnId()->toString() : $this->faker->uuid();
             },
             'counter' => 0,

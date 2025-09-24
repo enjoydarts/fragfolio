@@ -13,7 +13,7 @@ class DisableTwoFactorUseCase
 
     public function execute(User $user): void
     {
-        if (!$user->two_factor_secret) {
+        if (! $user->two_factor_secret) {
             throw new \InvalidArgumentException(__('auth.two_factor_already_disabled'));
         }
 

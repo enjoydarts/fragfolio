@@ -51,12 +51,12 @@ class TwoFactorAuthController extends Controller
                 'success' => true,
                 'secret' => $result['secret'],
                 'qr_code_url' => $result['qr_code_url'],
-                'message' => __('auth.two_factor_setup_started')
+                'message' => __('auth.two_factor_setup_started'),
             ]);
         } catch (\InvalidArgumentException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 422);
         }
     }
@@ -76,17 +76,17 @@ class TwoFactorAuthController extends Controller
             return response()->json([
                 'success' => true,
                 'recovery_codes' => $result['recovery_codes'],
-                'message' => __('auth.two_factor_enabled')
+                'message' => __('auth.two_factor_enabled'),
             ]);
         } catch (\InvalidArgumentException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 422);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('auth.two_factor_code_invalid')
+                'message' => __('auth.two_factor_code_invalid'),
             ], 422);
         }
     }
@@ -101,12 +101,12 @@ class TwoFactorAuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => __('auth.two_factor_disabled')
+                'message' => __('auth.two_factor_disabled'),
             ]);
         } catch (\InvalidArgumentException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 422);
         }
     }
@@ -123,7 +123,7 @@ class TwoFactorAuthController extends Controller
         } catch (\InvalidArgumentException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 422);
         }
     }
@@ -135,15 +135,15 @@ class TwoFactorAuthController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->two_factor_secret) {
+        if (! $user->two_factor_secret) {
             return response()->json([
                 'success' => false,
-                'message' => __('auth.two_factor_not_enabled')
+                'message' => __('auth.two_factor_not_enabled'),
             ], 422);
         }
 
         return response()->json([
-            'secret_key' => decrypt($user->two_factor_secret)
+            'secret_key' => decrypt($user->two_factor_secret),
         ]);
     }
 
@@ -157,12 +157,12 @@ class TwoFactorAuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'recovery_codes' => $codes
+                'recovery_codes' => $codes,
             ]);
         } catch (\InvalidArgumentException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 422);
         }
     }
@@ -178,12 +178,12 @@ class TwoFactorAuthController extends Controller
             return response()->json([
                 'success' => true,
                 'recovery_codes' => $codes,
-                'message' => __('auth.recovery_codes_regenerated')
+                'message' => __('auth.recovery_codes_regenerated'),
             ]);
         } catch (\InvalidArgumentException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 422);
         }
     }

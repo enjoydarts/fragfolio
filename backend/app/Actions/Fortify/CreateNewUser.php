@@ -11,7 +11,6 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
 {
-
     /**
      * 新規ユーザーのバリデーションと作成
      *

@@ -12,26 +12,32 @@ describe('GenerateRegistrationOptionsUseCase', function () {
         ]);
 
         // 簡単なモックレスポンス構造を作成
-        $mockResponse = new class {
+        $mockResponse = new class
+        {
             public $challenge = 'mock-challenge-data';
+
             public $json;
 
-            public function __construct() {
-                $this->json = new class {
-                    public function toArray() {
+            public function __construct()
+            {
+                $this->json = new class
+                {
+                    public function toArray()
+                    {
                         return [
                             'challenge' => 'mock-challenge-data',
                             'rp' => ['name' => 'fragfolio', 'id' => 'localhost'],
                             'user' => ['id' => 'mock-user-id', 'name' => 'Test User', 'displayName' => 'Test User'],
                             'pubKeyCredParams' => [['type' => 'public-key', 'alg' => -7]],
                             'authenticatorSelection' => ['userVerification' => 'preferred'],
-                            'attestation' => 'none'
+                            'attestation' => 'none',
                         ];
                     }
                 };
             }
 
-            public function thenReturn() {
+            public function thenReturn()
+            {
                 return $this;
             }
         };

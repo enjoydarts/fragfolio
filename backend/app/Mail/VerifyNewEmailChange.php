@@ -35,7 +35,7 @@ class VerifyNewEmailChange extends Mailable implements ShouldQueue
             with: [
                 'user' => $this->emailChangeRequest->user,
                 'currentEmail' => $this->emailChangeRequest->user->email,
-                'verificationUrl' => config('app.url') . '/api/auth/email/verify-change/' . $this->emailChangeRequest->token,
+                'verificationUrl' => config('app.url').'/api/auth/email/verify-change/'.$this->emailChangeRequest->token,
                 'frontendUrl' => config('app.frontend_url'),
             ],
         );

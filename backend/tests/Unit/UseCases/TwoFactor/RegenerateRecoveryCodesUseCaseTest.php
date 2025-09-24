@@ -26,9 +26,9 @@ describe('RegenerateRecoveryCodesUseCase', function () {
         $this->generateNewRecoveryCodes->shouldReceive('__invoke')
             ->once()
             ->with($this->user)
-            ->andReturnUsing(function($user) use ($newCodes) {
+            ->andReturnUsing(function ($user) use ($newCodes) {
                 $user->forceFill([
-                    'two_factor_recovery_codes' => encrypt(json_encode($newCodes))
+                    'two_factor_recovery_codes' => encrypt(json_encode($newCodes)),
                 ])->save();
             });
 
@@ -47,7 +47,6 @@ describe('RegenerateRecoveryCodesUseCase', function () {
             ->toThrow(\InvalidArgumentException::class);
     });
 
-
     test('生成されたリカバリーコードが正しい形式', function () {
         $newCodes = ['abc12345', 'def67890', 'ghi11111', 'jkl22222', 'mno33333', 'pqr44444', 'stu55555', 'vwx66666'];
 
@@ -60,9 +59,9 @@ describe('RegenerateRecoveryCodesUseCase', function () {
         $this->generateNewRecoveryCodes->shouldReceive('__invoke')
             ->once()
             ->with($this->user)
-            ->andReturnUsing(function($user) use ($newCodes) {
+            ->andReturnUsing(function ($user) use ($newCodes) {
                 $user->forceFill([
-                    'two_factor_recovery_codes' => encrypt(json_encode($newCodes))
+                    'two_factor_recovery_codes' => encrypt(json_encode($newCodes)),
                 ])->save();
             });
 

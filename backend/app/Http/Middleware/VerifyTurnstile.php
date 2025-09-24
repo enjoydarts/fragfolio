@@ -17,12 +17,12 @@ class VerifyTurnstile
     public function handle(Request $request, Closure $next): Response
     {
         // Turnstile設定がない場合はスキップ
-        if (!config('services.turnstile.site_key')) {
+        if (! config('services.turnstile.site_key')) {
             return $next($request);
         }
 
         // cf-turnstile-responseがない場合はエラー
-        if (!$request->has('cf-turnstile-response')) {
+        if (! $request->has('cf-turnstile-response')) {
             throw ValidationException::withMessages([
                 'cf-turnstile-response' => [__('turnstile.missing_input_response')],
             ]);

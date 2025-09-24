@@ -8,8 +8,8 @@ use PragmaRX\Google2FA\Google2FA;
 describe('VerifyTwoFactorLoginUseCase', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
-        $this->useCase = new VerifyTwoFactorLoginUseCase();
-        $this->google2fa = new Google2FA();
+        $this->useCase = new VerifyTwoFactorLoginUseCase;
+        $this->google2fa = new Google2FA;
         $this->secret = 'ABCDEFGHIJKLMNOP';
         createDefaultRoles();
 
@@ -20,7 +20,7 @@ describe('VerifyTwoFactorLoginUseCase', function () {
         ])->save();
 
         // 一時トークンを設定
-        $this->tempToken = 'temp-token-' . time();
+        $this->tempToken = 'temp-token-'.time();
         Cache::put("two_factor_pending:{$this->tempToken}", [
             'user_id' => $this->user->id,
             'remember' => false,
@@ -95,7 +95,6 @@ describe('VerifyTwoFactorLoginUseCase', function () {
         expect($result['user'])->not()->toBeNull();
         expect($result['token'])->toBeString();
     });
-
 
     test('無効なリカバリーコードでエラー', function () {
         $recoveryCodes = ['recovery1', 'recovery2'];

@@ -125,10 +125,10 @@ class AuthController extends Controller
 
             Log::info('Login attempt', [
                 'email' => $credentials['email'],
-                'has_password' => !empty($credentials['password']),
+                'has_password' => ! empty($credentials['password']),
                 'remember' => $remember,
                 'ip' => $request->ip(),
-                'user_agent' => $request->header('User-Agent')
+                'user_agent' => $request->header('User-Agent'),
             ]);
 
             $result = $this->loginUserUseCase->execute($credentials, $remember);
@@ -144,7 +144,7 @@ class AuthController extends Controller
             Log::warning('Login failed - invalid credentials', [
                 'email' => $credentials['email'] ?? 'unknown',
                 'ip' => $request->ip(),
-                'user_agent' => $request->header('User-Agent')
+                'user_agent' => $request->header('User-Agent'),
             ]);
 
             return response()->json([
@@ -175,7 +175,7 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'email_verified_at' => $user->email_verified_at,
-                'two_factor_enabled' => !is_null($user->two_factor_secret),
+                'two_factor_enabled' => ! is_null($user->two_factor_secret),
                 'profile' => $user->profile,
                 'roles' => $user->roles,
             ],
@@ -397,10 +397,12 @@ class AuthController extends Controller
             $this->verifyEmailChangeUseCase->verifyEmailChange($token);
 
             $frontendUrl = config('app.frontend_url');
+
             return redirect($frontendUrl.'/settings?message='.urlencode(__('auth.email_change_completed')));
 
         } catch (\Exception $e) {
             $frontendUrl = config('app.frontend_url');
+
             return redirect($frontendUrl.'/settings?error='.urlencode(__('auth.invalid_verification_link')));
         }
     }

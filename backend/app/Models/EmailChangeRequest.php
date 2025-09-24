@@ -38,6 +38,6 @@ class EmailChangeRequest extends Model
 
     public function canComplete(): bool
     {
-        return $this->verified && !$this->isExpired();
+        return $this->verified && ! $this->isExpired();
     }
 }

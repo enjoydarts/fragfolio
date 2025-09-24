@@ -2,16 +2,16 @@
 
 use App\Models\User;
 use App\UseCases\TwoFactor\ConfirmTwoFactorUseCase;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Actions\ConfirmTwoFactorAuthentication;
 use PragmaRX\Google2FA\Google2FA;
-use Illuminate\Validation\ValidationException;
 
 describe('ConfirmTwoFactorUseCase', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
         $this->confirmTwoFactorAction = \Mockery::mock(ConfirmTwoFactorAuthentication::class);
         $this->useCase = new ConfirmTwoFactorUseCase($this->confirmTwoFactorAction);
-        $this->google2fa = new Google2FA();
+        $this->google2fa = new Google2FA;
         $this->secret = 'ABCDEFGHIJKLMNOP';
         createDefaultRoles();
     });
@@ -30,14 +30,14 @@ describe('ConfirmTwoFactorUseCase', function () {
         $this->confirmTwoFactorAction->shouldReceive('__invoke')
             ->once()
             ->with($this->user, $validCode)
-            ->andReturnUsing(function($user, $code) {
+            ->andReturnUsing(function ($user, $code) {
                 // Fortifyの動作をシミュレート
                 $user->forceFill([
                     'two_factor_confirmed_at' => now(),
                     'two_factor_recovery_codes' => encrypt(json_encode([
                         'abc12345', 'def67890', 'ghi11111', 'jkl22222',
-                        'mno33333', 'pqr44444', 'stu55555', 'vwx66666'
-                    ]))
+                        'mno33333', 'pqr44444', 'stu55555', 'vwx66666',
+                    ])),
                 ])->save();
             });
 
@@ -103,13 +103,13 @@ describe('ConfirmTwoFactorUseCase', function () {
         $this->confirmTwoFactorAction->shouldReceive('__invoke')
             ->once()
             ->with($this->user, $validCode)
-            ->andReturnUsing(function($user, $code) {
+            ->andReturnUsing(function ($user, $code) {
                 $user->forceFill([
                     'two_factor_confirmed_at' => now(),
                     'two_factor_recovery_codes' => encrypt(json_encode([
                         'abc12345', 'def67890', 'ghi11111', 'jkl22222',
-                        'mno33333', 'pqr44444', 'stu55555', 'vwx66666'
-                    ]))
+                        'mno33333', 'pqr44444', 'stu55555', 'vwx66666',
+                    ])),
                 ])->save();
             });
 

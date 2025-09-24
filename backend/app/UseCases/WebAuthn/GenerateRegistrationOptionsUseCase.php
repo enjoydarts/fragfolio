@@ -31,7 +31,7 @@ class GenerateRegistrationOptionsUseCase
             \Log::info('WebAuthn options generated successfully', ['user_id' => $user->id]);
 
             // チャレンジをキャッシュに保存（ユーザーIDとチャレンジを関連付け）
-            $challengeKey = "webauthn_challenge:{$user->id}:" . Str::random(40);
+            $challengeKey = "webauthn_challenge:{$user->id}:".Str::random(40);
             Cache::put($challengeKey, $options->challenge, now()->addMinutes(10));
 
             \Log::info('Challenge stored in cache', ['challenge_key' => $challengeKey, 'user_id' => $user->id]);
@@ -47,7 +47,7 @@ class GenerateRegistrationOptionsUseCase
             \Log::error('Failed to generate WebAuthn registration options', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
             throw $e;
         }

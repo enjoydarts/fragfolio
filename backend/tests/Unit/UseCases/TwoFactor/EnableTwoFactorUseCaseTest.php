@@ -9,7 +9,7 @@ describe('EnableTwoFactorUseCase', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
         $this->enableTwoFactorAction = \Mockery::mock(EnableTwoFactorAuthentication::class);
-        $this->google2fa = new Google2FA();
+        $this->google2fa = new Google2FA;
         $this->useCase = new EnableTwoFactorUseCase($this->enableTwoFactorAction, $this->google2fa);
         createDefaultRoles();
     });
@@ -21,7 +21,7 @@ describe('EnableTwoFactorUseCase', function () {
         $this->enableTwoFactorAction->shouldReceive('__invoke')
             ->once()
             ->with($this->user)
-            ->andReturnUsing(function($user) use ($testSecret) {
+            ->andReturnUsing(function ($user) use ($testSecret) {
                 $user->forceFill([
                     'two_factor_secret' => encrypt($testSecret),
                     'two_factor_confirmed_at' => null,
@@ -50,7 +50,7 @@ describe('EnableTwoFactorUseCase', function () {
         $this->enableTwoFactorAction->shouldReceive('__invoke')
             ->once()
             ->with($this->user)
-            ->andReturnUsing(function($user) use ($testSecret) {
+            ->andReturnUsing(function ($user) use ($testSecret) {
                 $user->forceFill([
                     'two_factor_secret' => encrypt($testSecret),
                     'two_factor_confirmed_at' => null,
@@ -85,7 +85,7 @@ describe('EnableTwoFactorUseCase', function () {
         $this->enableTwoFactorAction->shouldReceive('__invoke')
             ->once()
             ->with($this->user)
-            ->andReturnUsing(function($user) use ($testSecret) {
+            ->andReturnUsing(function ($user) use ($testSecret) {
                 $user->forceFill([
                     'two_factor_secret' => encrypt($testSecret),
                     'two_factor_confirmed_at' => null,

@@ -10,8 +10,8 @@ describe('GenerateQrCodeUseCase', function () {
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
-        $this->useCase = new GenerateQrCodeUseCase();
-        $this->google2fa = new Google2FA();
+        $this->useCase = new GenerateQrCodeUseCase;
+        $this->google2fa = new Google2FA;
         createDefaultRoles();
     });
 

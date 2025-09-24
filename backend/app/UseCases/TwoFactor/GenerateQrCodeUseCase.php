@@ -14,7 +14,7 @@ class GenerateQrCodeUseCase
 {
     public function execute(User $user): string
     {
-        if (!$user->two_factor_secret) {
+        if (! $user->two_factor_secret) {
             throw new \InvalidArgumentException(__('auth.two_factor_not_enabled'));
         }
 
@@ -25,7 +25,7 @@ class GenerateQrCodeUseCase
         $svg = (new Writer(
             new ImageRenderer(
                 new RendererStyle(192, 0, null, null, Fill::uniformColor(new Rgb(255, 255, 255), new Rgb(45, 55, 72))),
-                new SvgImageBackEnd()
+                new SvgImageBackEnd
             )
         ))->writeString($user->twoFactorQrCodeUrl());
 

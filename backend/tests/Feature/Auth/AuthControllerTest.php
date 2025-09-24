@@ -2,8 +2,8 @@
 
 use App\Models\User;
 use App\Services\TurnstileService;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 describe('AuthController', function () {
     beforeEach(function () {

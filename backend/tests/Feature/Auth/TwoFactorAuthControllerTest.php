@@ -11,7 +11,7 @@ describe('TwoFactorAuthController', function () {
         ]);
 
         Auth::login($this->user);
-        $this->google2fa = new Google2FA();
+        $this->google2fa = new Google2FA;
     });
 
     test('2段階認証の有効化ができる', function () {

@@ -4,7 +4,6 @@ use App\Http\Middleware\VerifyTurnstile;
 use App\Services\TurnstileService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Mockery\MockInterface;
 
 describe('VerifyTurnstile', function () {
     beforeEach(function () {
@@ -32,7 +31,7 @@ describe('VerifyTurnstile', function () {
     test('cf-turnstile-responseがない場合はエラー', function () {
         config(['services.turnstile.site_key' => 'test-site-key']);
 
-        expect(fn() => $this->middleware->handle($this->request, $this->next))
+        expect(fn () => $this->middleware->handle($this->request, $this->next))
             ->toThrow(ValidationException::class);
 
         try {
@@ -73,6 +72,7 @@ describe('VerifyTurnstile', function () {
         } catch (ValidationException $e) {
             expect($e->errors())->toHaveKey('cf-turnstile-response');
             expect($e->errors()['cf-turnstile-response'][0])->toBe(__('turnstile.verification_failed'));
+
             return;
         }
 
@@ -94,6 +94,7 @@ describe('VerifyTurnstile', function () {
         } catch (ValidationException $e) {
             expect($e->errors())->toHaveKey('cf-turnstile-response');
             expect($e->errors()['cf-turnstile-response'][0])->toBe(__('turnstile.timeout_or_duplicate'));
+
             return;
         }
 

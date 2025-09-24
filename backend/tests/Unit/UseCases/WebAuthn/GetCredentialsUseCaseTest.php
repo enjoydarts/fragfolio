@@ -1,19 +1,19 @@
 <?php
 
 use App\Models\User;
-use Laragear\WebAuthn\Models\WebAuthnCredential;
 use App\UseCases\WebAuthn\GetCredentialsUseCase;
+use Laragear\WebAuthn\Models\WebAuthnCredential;
 
 describe('GetCredentialsUseCase', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
-        $this->useCase = new GetCredentialsUseCase();
+        $this->useCase = new GetCredentialsUseCase;
         createDefaultRoles();
     });
 
     test('ユーザーのWebAuthnクレデンシャル一覧を取得できる', function () {
         // アクティブなクレデンシャルを作成
-        $activeCredential = new WebAuthnCredential();
+        $activeCredential = new WebAuthnCredential;
         $activeCredential->forceFill([
             'id' => 'active-credential-id',
             'authenticatable_id' => $this->user->id,
@@ -32,7 +32,7 @@ describe('GetCredentialsUseCase', function () {
         ])->save();
 
         // 無効化されたクレデンシャルを作成
-        $disabledCredential = new WebAuthnCredential();
+        $disabledCredential = new WebAuthnCredential;
         $disabledCredential->forceFill([
             'id' => 'disabled-credential-id',
             'authenticatable_id' => $this->user->id,
@@ -52,7 +52,7 @@ describe('GetCredentialsUseCase', function () {
 
         // 他のユーザーのクレデンシャルを作成
         $otherUser = User::factory()->create();
-        $otherUserCredential = new WebAuthnCredential();
+        $otherUserCredential = new WebAuthnCredential;
         $otherUserCredential->forceFill([
             'id' => 'other-credential-id',
             'authenticatable_id' => $otherUser->id,
@@ -104,7 +104,7 @@ describe('GetCredentialsUseCase', function () {
     });
 
     test('全て無効化されたクレデンシャルの場合は無効化されたものが返される', function () {
-        $disabledCredential = new WebAuthnCredential();
+        $disabledCredential = new WebAuthnCredential;
         $disabledCredential->forceFill([
             'id' => 'disabled-only-credential-id',
             'authenticatable_id' => $this->user->id,

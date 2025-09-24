@@ -28,7 +28,7 @@ class SetLocale
         $supportedLocales = ['ja', 'en'];
 
         // デフォルトは日本語
-        if (!$locale || !in_array($locale, $supportedLocales)) {
+        if (! $locale || ! in_array($locale, $supportedLocales)) {
             $locale = 'ja';
         }
 

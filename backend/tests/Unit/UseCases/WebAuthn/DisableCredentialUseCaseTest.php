@@ -1,18 +1,18 @@
 <?php
 
 use App\Models\User;
-use Laragear\WebAuthn\Models\WebAuthnCredential;
 use App\UseCases\WebAuthn\DisableCredentialUseCase;
+use Laragear\WebAuthn\Models\WebAuthnCredential;
 
 describe('DisableCredentialUseCase', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
-        $this->useCase = new DisableCredentialUseCase();
+        $this->useCase = new DisableCredentialUseCase;
         createDefaultRoles();
     });
 
     test('WebAuthnクレデンシャルを無効化できる', function () {
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id',
             'authenticatable_id' => $this->user->id,
@@ -43,7 +43,7 @@ describe('DisableCredentialUseCase', function () {
 
     test('他のユーザーのクレデンシャルは無効化できない', function () {
         $otherUser = User::factory()->create();
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id-2',
             'authenticatable_id' => $otherUser->id,
@@ -69,7 +69,7 @@ describe('DisableCredentialUseCase', function () {
     });
 
     test('既に無効化されたクレデンシャルでエラー', function () {
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id-3',
             'authenticatable_id' => $this->user->id,

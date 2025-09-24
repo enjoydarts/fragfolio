@@ -15,30 +15,30 @@ class VerifyTwoFactorLoginUseCase
         // Cacheから一時認証情報を取得
         $tempData = Cache::get("two_factor_pending:{$tempToken}");
 
-        if (!$tempData) {
+        if (! $tempData) {
             throw new \InvalidArgumentException(__('auth.two_factor_token_expired'));
         }
 
         $user = User::find($tempData['user_id']);
 
-        if (!$user || !$user->two_factor_confirmed_at) {
+        if (! $user || ! $user->two_factor_confirmed_at) {
             Cache::forget("two_factor_pending:{$tempToken}");
             throw new \InvalidArgumentException(__('auth.unauthorized'));
         }
 
         // TOTPコードを検証
-        $google2fa = new Google2FA();
+        $google2fa = new Google2FA;
         $valid = $google2fa->verifyKey(
             decrypt($user->two_factor_secret),
             $code
         );
 
-        if (!$valid) {
+        if (! $valid) {
             // リカバリコードもチェック
             $valid = $this->validateRecoveryCode($user, $code);
         }
 
-        if (!$valid) {
+        if (! $valid) {
             throw new \InvalidArgumentException(__('auth.two_factor_failed'));
         }
 
@@ -55,7 +55,7 @@ class VerifyTwoFactorLoginUseCase
                 'name' => $user->name,
                 'email' => $user->email,
                 'email_verified_at' => $user->email_verified_at,
-                'two_factor_enabled' => !is_null($user->two_factor_secret),
+                'two_factor_enabled' => ! is_null($user->two_factor_secret),
                 'profile' => [
                     'language' => $user->profile?->language ?? 'ja',
                     'timezone' => $user->profile?->timezone ?? 'Asia/Tokyo',
@@ -84,6 +84,7 @@ class VerifyTwoFactorLoginUseCase
                 unset($recoveryCodes[$index]);
                 $user->two_factor_recovery_codes = encrypt(json_encode(array_values($recoveryCodes)));
                 $user->save();
+
                 return true;
             }
         }

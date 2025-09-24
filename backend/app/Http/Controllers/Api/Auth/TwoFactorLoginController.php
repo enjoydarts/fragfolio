@@ -7,12 +7,12 @@ use App\UseCases\TwoFactor\VerifyTwoFactorLoginUseCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Laragear\WebAuthn\Http\Requests\AssertionRequest;
-use Laragear\WebAuthn\Http\Requests\AssertedRequest;
-use Laragear\WebAuthn\Assertion\Validator\AssertionValidator;
 use Laragear\WebAuthn\Assertion\Validator\AssertionValidation;
-use Laragear\WebAuthn\JsonTransport;
+use Laragear\WebAuthn\Assertion\Validator\AssertionValidator;
 use Laragear\WebAuthn\Exceptions\AssertionException;
+use Laragear\WebAuthn\Http\Requests\AssertedRequest;
+use Laragear\WebAuthn\Http\Requests\AssertionRequest;
+use Laragear\WebAuthn\JsonTransport;
 
 class TwoFactorLoginController extends Controller
 {
@@ -64,7 +64,7 @@ class TwoFactorLoginController extends Controller
             // temp_tokenからユーザー情報を取得
             $tempData = \Illuminate\Support\Facades\Cache::get("two_factor_pending:{$request->temp_token}");
 
-            if (!$tempData) {
+            if (! $tempData) {
                 return response()->json([
                     'success' => false,
                     'message' => __('auth.invalid_reset_link'),
@@ -72,8 +72,9 @@ class TwoFactorLoginController extends Controller
             }
 
             $user = \App\Models\User::find($tempData['user_id']);
-            if (!$user) {
+            if (! $user) {
                 \Illuminate\Support\Facades\Cache::forget("two_factor_pending:{$request->temp_token}");
+
                 return response()->json([
                     'success' => false,
                     'message' => __('auth.invalid_reset_link'),
@@ -89,6 +90,7 @@ class TwoFactorLoginController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('WebAuthn 2FA options failed', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => __('auth.login_failed'),
@@ -109,7 +111,7 @@ class TwoFactorLoginController extends Controller
             // temp_tokenからユーザー情報を取得
             $tempData = \Illuminate\Support\Facades\Cache::get("two_factor_pending:{$request->temp_token}");
 
-            if (!$tempData) {
+            if (! $tempData) {
                 return response()->json([
                     'success' => false,
                     'message' => __('auth.invalid_reset_link'),
@@ -117,8 +119,9 @@ class TwoFactorLoginController extends Controller
             }
 
             $user = \App\Models\User::find($tempData['user_id']);
-            if (!$user) {
+            if (! $user) {
                 \Illuminate\Support\Facades\Cache::forget("two_factor_pending:{$request->temp_token}");
+
                 return response()->json([
                     'success' => false,
                     'message' => __('auth.invalid_reset_link'),
@@ -144,12 +147,14 @@ class TwoFactorLoginController extends Controller
 
             } catch (AssertionException $e) {
                 Log::error('WebAuthn 2FA assertion failed', ['error' => $e->getMessage(), 'user_id' => $user->id]);
+
                 return response()->json([
                     'success' => false,
                     'message' => __('auth.login_failed'),
                 ], 422);
             } catch (\Exception $e) {
                 Log::error('WebAuthn 2FA verification failed', ['error' => $e->getMessage(), 'user_id' => $user->id]);
+
                 return response()->json([
                     'success' => false,
                     'message' => __('auth.login_failed'),
@@ -169,13 +174,14 @@ class TwoFactorLoginController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'email_verified_at' => $user->email_verified_at,
-                    'two_factor_enabled' => !is_null($user->two_factor_secret),
+                    'two_factor_enabled' => ! is_null($user->two_factor_secret),
                 ],
                 'token' => $token,
                 'message' => __('auth.login_success'),
             ]);
         } catch (\Exception $e) {
             Log::error('WebAuthn 2FA complete failed', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
                 'message' => __('auth.login_failed'),

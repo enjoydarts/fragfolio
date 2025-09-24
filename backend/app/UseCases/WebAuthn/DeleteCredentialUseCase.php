@@ -14,7 +14,7 @@ class DeleteCredentialUseCase
             ->where('authenticatable_id', $user->id)
             ->first();
 
-        if (!$credential) {
+        if (! $credential) {
             throw new \InvalidArgumentException(__('auth.webauthn_credential_not_found'));
         }
 

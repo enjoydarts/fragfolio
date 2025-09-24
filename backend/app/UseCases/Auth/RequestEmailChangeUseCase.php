@@ -14,7 +14,7 @@ class RequestEmailChangeUseCase
     public function execute(User $user, string $newEmail): EmailChangeRequest
     {
         // メールアドレス形式の検証
-        if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+        if (! filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
             throw new \InvalidArgumentException(__('validation.email'));
         }
 

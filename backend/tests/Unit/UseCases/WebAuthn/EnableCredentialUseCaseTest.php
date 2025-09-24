@@ -1,18 +1,18 @@
 <?php
 
 use App\Models\User;
-use Laragear\WebAuthn\Models\WebAuthnCredential;
 use App\UseCases\WebAuthn\EnableCredentialUseCase;
+use Laragear\WebAuthn\Models\WebAuthnCredential;
 
 describe('EnableCredentialUseCase', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
-        $this->useCase = new EnableCredentialUseCase();
+        $this->useCase = new EnableCredentialUseCase;
         createDefaultRoles();
     });
 
     test('WebAuthnクレデンシャルを有効化できる', function () {
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id',
             'authenticatable_id' => $this->user->id,
@@ -43,7 +43,7 @@ describe('EnableCredentialUseCase', function () {
 
     test('他のユーザーのクレデンシャルは有効化できない', function () {
         $otherUser = User::factory()->create();
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id-2',
             'authenticatable_id' => $otherUser->id,
@@ -69,7 +69,7 @@ describe('EnableCredentialUseCase', function () {
     });
 
     test('既に有効なクレデンシャルでエラー', function () {
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id-3',
             'authenticatable_id' => $this->user->id,

@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\WebAuthn\WebAuthnRegisterController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -14,7 +13,5 @@ Route::get('/password/reset/{token}', [AuthController::class, 'showResetForm'])
 
 // Add login route for Laravel's default auth redirects
 Route::get('/login', function () {
-    return redirect(config('app.frontend_url') . '/auth');
+    return redirect(config('app.frontend_url').'/auth');
 })->name('login');
-
-

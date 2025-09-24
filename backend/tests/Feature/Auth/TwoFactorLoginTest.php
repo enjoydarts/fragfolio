@@ -15,14 +15,14 @@ describe('2段階認証ログイン', function () {
         ]);
 
         // 一時トークンをキャッシュに保存
-        $this->tempToken = 'temp-token-' . time();
+        $this->tempToken = 'temp-token-'.time();
         Cache::put("two_factor_pending:{$this->tempToken}", [
             'user_id' => $this->user->id,
             'remember' => false,
             'login_method' => 'password',
         ], now()->addMinutes(10));
 
-        $this->google2fa = new Google2FA();
+        $this->google2fa = new Google2FA;
     });
 
     test('正しいTOTPコードで2段階認証ログインができる', function () {

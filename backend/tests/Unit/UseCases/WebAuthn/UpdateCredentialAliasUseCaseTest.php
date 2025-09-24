@@ -1,18 +1,18 @@
 <?php
 
 use App\Models\User;
-use Laragear\WebAuthn\Models\WebAuthnCredential;
 use App\UseCases\WebAuthn\UpdateCredentialAliasUseCase;
+use Laragear\WebAuthn\Models\WebAuthnCredential;
 
 describe('UpdateCredentialAliasUseCase', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
-        $this->useCase = new UpdateCredentialAliasUseCase();
+        $this->useCase = new UpdateCredentialAliasUseCase;
         createDefaultRoles();
     });
 
     test('WebAuthnクレデンシャルのエイリアスを更新できる', function () {
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id',
             'authenticatable_id' => $this->user->id,
@@ -48,7 +48,7 @@ describe('UpdateCredentialAliasUseCase', function () {
 
     test('他のユーザーのクレデンシャルは更新できない', function () {
         $otherUser = User::factory()->create();
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id-2',
             'authenticatable_id' => $otherUser->id,
@@ -75,7 +75,7 @@ describe('UpdateCredentialAliasUseCase', function () {
     });
 
     test('空のエイリアスでも処理される', function () {
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id-3',
             'authenticatable_id' => $this->user->id,
@@ -100,7 +100,7 @@ describe('UpdateCredentialAliasUseCase', function () {
     });
 
     test('長すぎるエイリアスでデータベースエラー', function () {
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id-4',
             'authenticatable_id' => $this->user->id,
@@ -125,7 +125,7 @@ describe('UpdateCredentialAliasUseCase', function () {
     });
 
     test('無効化されたクレデンシャルは更新できない', function () {
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id-5',
             'authenticatable_id' => $this->user->id,

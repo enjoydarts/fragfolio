@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use App\Models\EmailChangeRequest;
+use App\Models\User;
 use App\UseCases\Auth\VerifyEmailChangeUseCase;
 
 describe('VerifyEmailChangeUseCase', function () {
@@ -9,13 +9,13 @@ describe('VerifyEmailChangeUseCase', function () {
         $this->user = User::factory()->create([
             'email' => 'old@example.com',
         ]);
-        $this->useCase = new VerifyEmailChangeUseCase();
+        $this->useCase = new VerifyEmailChangeUseCase;
 
         // 既存のリクエストをクリア
         EmailChangeRequest::where('user_id', $this->user->id)->delete();
 
         // 有効なリクエストを作成
-        $this->token = 'valid-token-' . time() . '-' . rand(1000, 9999);
+        $this->token = 'valid-token-'.time().'-'.rand(1000, 9999);
         $this->emailRequest = EmailChangeRequest::create([
             'user_id' => $this->user->id,
             'new_email' => 'new@example.com',

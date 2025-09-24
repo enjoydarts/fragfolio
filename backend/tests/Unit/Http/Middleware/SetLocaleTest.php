@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\App;
 
 describe('SetLocale', function () {
     beforeEach(function () {
-        $this->middleware = new SetLocale();
+        $this->middleware = new SetLocale;
         $this->next = function ($request) {
             return response('Success');
         };

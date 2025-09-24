@@ -1,18 +1,18 @@
 <?php
 
 use App\Models\User;
-use Laragear\WebAuthn\Models\WebAuthnCredential;
 use App\UseCases\WebAuthn\DeleteCredentialUseCase;
+use Laragear\WebAuthn\Models\WebAuthnCredential;
 
 describe('DeleteCredentialUseCase', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
-        $this->useCase = new DeleteCredentialUseCase();
+        $this->useCase = new DeleteCredentialUseCase;
         createDefaultRoles();
     });
 
     test('WebAuthnクレデンシャルを削除できる', function () {
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id',
             'authenticatable_id' => $this->user->id,
@@ -41,7 +41,7 @@ describe('DeleteCredentialUseCase', function () {
 
     test('他のユーザーのクレデンシャルは削除できない', function () {
         $otherUser = User::factory()->create();
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id-2',
             'authenticatable_id' => $otherUser->id,
@@ -65,7 +65,7 @@ describe('DeleteCredentialUseCase', function () {
     });
 
     test('無効化されたクレデンシャルも削除できる', function () {
-        $credential = new WebAuthnCredential();
+        $credential = new WebAuthnCredential;
         $credential->forceFill([
             'id' => 'test-credential-id-3',
             'authenticatable_id' => $this->user->id,

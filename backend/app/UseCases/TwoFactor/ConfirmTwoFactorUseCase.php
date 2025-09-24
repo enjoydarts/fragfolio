@@ -14,7 +14,7 @@ class ConfirmTwoFactorUseCase
 
     public function execute(User $user, string $code): array
     {
-        if (!$user->two_factor_secret) {
+        if (! $user->two_factor_secret) {
             throw new \InvalidArgumentException(__('auth.two_factor_not_enabled'));
         }
 
@@ -30,7 +30,7 @@ class ConfirmTwoFactorUseCase
             $recoveryCodes = json_decode(decrypt($user->two_factor_recovery_codes), true);
 
             return [
-                'recovery_codes' => $recoveryCodes
+                'recovery_codes' => $recoveryCodes,
             ];
         } catch (ValidationException $e) {
             throw ValidationException::withMessages([

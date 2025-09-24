@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Responsable;
 class TwoFactorLoginResponse implements Responsable
 {
     protected $user;
+
     protected $remember;
 
     public function __construct($user, $remember = false)
@@ -30,7 +31,7 @@ class TwoFactorLoginResponse implements Responsable
         ], now()->addMinutes(10));
 
         // 利用可能な2FA認証方法を確認
-        $hasTotp = !is_null($this->user->two_factor_secret) && !is_null($this->user->two_factor_confirmed_at);
+        $hasTotp = ! is_null($this->user->two_factor_secret) && ! is_null($this->user->two_factor_confirmed_at);
         $hasWebAuthn = $this->user->webAuthnCredentials()->whereNull('disabled_at')->exists();
 
         $availableMethods = [];

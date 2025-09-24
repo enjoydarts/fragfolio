@@ -13,7 +13,7 @@ class UpdateCredentialAliasUseCase
         Log::info('UpdateCredentialAliasUseCase started', [
             'user_id' => $user->id,
             'credential_id' => $credentialId,
-            'alias' => $alias
+            'alias' => $alias,
         ]);
 
         $credential = WebAuthnCredential::where('id', $credentialId)
@@ -24,13 +24,13 @@ class UpdateCredentialAliasUseCase
 
         Log::info('Credential search result', [
             'found' => $credential !== null,
-            'credential' => $credential ? $credential->toArray() : null
+            'credential' => $credential ? $credential->toArray() : null,
         ]);
 
-        if (!$credential) {
+        if (! $credential) {
             Log::warning('WebAuthn credential not found', [
                 'user_id' => $user->id,
-                'credential_id' => $credentialId
+                'credential_id' => $credentialId,
             ]);
             throw new \InvalidArgumentException(__('auth.webauthn_credential_not_found'));
         }
@@ -50,7 +50,7 @@ class UpdateCredentialAliasUseCase
         } catch (\Exception $e) {
             Log::error('Failed to update credential alias', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
             throw $e;
         }

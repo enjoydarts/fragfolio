@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Cache;
 use Laragear\WebAuthn\Attestation\Validator\AttestationValidation;
 use Laragear\WebAuthn\Attestation\Validator\AttestationValidator;
 use Laragear\WebAuthn\JsonTransport;
-use Laragear\WebAuthn\Models\WebAuthnCredential;
 
 class RegisterCredentialUseCase
 {
@@ -19,7 +18,7 @@ class RegisterCredentialUseCase
     {
         // キャッシュからチャレンジを取得
         $storedChallenge = Cache::get($challengeKey);
-        if (!$storedChallenge) {
+        if (! $storedChallenge) {
             throw new \InvalidArgumentException('Challenge has expired or is invalid.');
         }
 

@@ -15,7 +15,7 @@ class LoginResponse implements LoginResponseContract, Responsable
         $user = $request->user()->load('profile');
 
         // 利用可能な2FA認証方法を確認
-        $hasTotp = !is_null($user->two_factor_secret) && !is_null($user->two_factor_confirmed_at);
+        $hasTotp = ! is_null($user->two_factor_secret) && ! is_null($user->two_factor_confirmed_at);
         $hasWebAuthn = $user->webAuthnCredentials()->whereNull('disabled_at')->exists();
 
         // いずれかの2FA方法が有効な場合は、2FAチャレンジを要求
@@ -29,8 +29,8 @@ class LoginResponse implements LoginResponseContract, Responsable
 
             \Log::info('LoginResponse 2FA check', [
                 'user_id' => $user->id,
-                'has_totp_secret' => !is_null($user->two_factor_secret),
-                'has_totp_confirmed' => !is_null($user->two_factor_confirmed_at),
+                'has_totp_secret' => ! is_null($user->two_factor_secret),
+                'has_totp_confirmed' => ! is_null($user->two_factor_confirmed_at),
                 'has_totp' => $hasTotp,
                 'webauthn_count' => $user->webAuthnCredentials()->whereNull('disabled_at')->count(),
                 'has_webauthn' => $hasWebAuthn,

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\WebAuthn;
 
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Laragear\WebAuthn\Http\Requests\AttestationRequest;
@@ -34,7 +33,7 @@ class WebAuthnRegisterController
         $credentialId = $request->save();
 
         // エイリアスが提供されている場合は設定
-        if ($request->has('alias') && !empty($request->input('alias'))) {
+        if ($request->has('alias') && ! empty($request->input('alias'))) {
             $alias = $request->input('alias');
 
             // 登録された認証器をIDで検索してエイリアスを設定
@@ -45,18 +44,18 @@ class WebAuthnRegisterController
                 Log::info('WebAuthn credential registered with alias', [
                     'credential_id' => $credentialId,
                     'alias' => $alias,
-                    'user_id' => $request->user()->id
+                    'user_id' => $request->user()->id,
                 ]);
             } else {
                 Log::warning('WebAuthn credential not found for alias update', [
                     'credential_id' => $credentialId,
-                    'user_id' => $request->user()->id
+                    'user_id' => $request->user()->id,
                 ]);
             }
         } else {
             Log::info('WebAuthn credential registered without alias', [
                 'credential_id' => $credentialId,
-                'user_id' => $request->user()->id
+                'user_id' => $request->user()->id,
             ]);
         }
 

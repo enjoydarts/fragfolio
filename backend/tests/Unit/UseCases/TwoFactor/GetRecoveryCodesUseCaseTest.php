@@ -6,7 +6,7 @@ use App\UseCases\TwoFactor\GetRecoveryCodesUseCase;
 describe('GetRecoveryCodesUseCase', function () {
     beforeEach(function () {
         $this->user = User::factory()->create();
-        $this->useCase = new GetRecoveryCodesUseCase();
+        $this->useCase = new GetRecoveryCodesUseCase;
         createDefaultRoles();
     });
 

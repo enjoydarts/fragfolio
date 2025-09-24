@@ -13,7 +13,7 @@ class RegenerateRecoveryCodesUseCase
 
     public function execute(User $user): array
     {
-        if (!$user->two_factor_confirmed_at) {
+        if (! $user->two_factor_confirmed_at) {
             throw new \InvalidArgumentException(__('auth.two_factor_not_confirmed'));
         }
 

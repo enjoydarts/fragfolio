@@ -2,8 +2,8 @@
 
 use App\Models\User;
 use App\UseCases\WebAuthn\RegisterCredentialUseCase;
-use Laragear\WebAuthn\Attestation\Validator\AttestationValidator;
 use Illuminate\Support\Facades\Cache;
+use Laragear\WebAuthn\Attestation\Validator\AttestationValidator;
 
 describe('RegisterCredentialUseCase', function () {
     beforeEach(function () {
@@ -19,20 +19,30 @@ describe('RegisterCredentialUseCase', function () {
         $this->attestationValidator->shouldReceive('send')
             ->andReturnSelf();
         $this->attestationValidator->shouldReceive('thenReturn')
-            ->andReturn(new class {
+            ->andReturn(new class
+            {
                 public $success = true;
+
                 public $credential;
 
-                public function __construct() {
-                    $this->credential = new class {
+                public function __construct()
+                {
+                    $this->credential = new class
+                    {
                         public $id = 'mock-credential-id';
+
                         public $user_id = 'mock-user-id';
+
                         public $counter = 0;
+
                         public $rp_id = 'localhost';
+
                         public $origin = 'http://localhost';
+
                         public $alias;
 
-                        public function save() {
+                        public function save()
+                        {
                             return true;
                         }
                     };

@@ -11,7 +11,7 @@ describe('TOTP 2段階認証管理', function () {
         ]);
 
         Auth::login($this->user);
-        $this->google2fa = new Google2FA();
+        $this->google2fa = new Google2FA;
     });
 
     test('2段階認証を有効化できる', function () {

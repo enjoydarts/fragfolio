@@ -12,10 +12,10 @@ describe('TwoFactorLoginController', function () {
             'two_factor_confirmed_at' => now(),
         ]);
 
-        $this->google2fa = new Google2FA();
+        $this->google2fa = new Google2FA;
 
         // 一時トークンを設定
-        $this->tempToken = 'temp-token-' . time();
+        $this->tempToken = 'temp-token-'.time();
         Cache::put("two_factor_pending:{$this->tempToken}", [
             'user_id' => $this->user->id,
             'remember' => false,

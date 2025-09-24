@@ -12,7 +12,7 @@ class EnableCredentialUseCase
     {
         Log::info('EnableCredentialUseCase started', [
             'user_id' => $user->id,
-            'credential_id' => $credentialId
+            'credential_id' => $credentialId,
         ]);
 
         $credential = WebAuthnCredential::where('id', $credentialId)
@@ -23,13 +23,13 @@ class EnableCredentialUseCase
 
         Log::info('Credential search result for enable', [
             'found' => $credential !== null,
-            'credential' => $credential ? $credential->toArray() : null
+            'credential' => $credential ? $credential->toArray() : null,
         ]);
 
-        if (!$credential) {
+        if (! $credential) {
             Log::warning('WebAuthn credential not found for enable', [
                 'user_id' => $user->id,
-                'credential_id' => $credentialId
+                'credential_id' => $credentialId,
             ]);
             throw new \InvalidArgumentException(__('auth.webauthn_disabled_credential_not_found'));
         }
@@ -41,7 +41,7 @@ class EnableCredentialUseCase
         } catch (\Exception $e) {
             Log::error('Failed to enable credential', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
             throw $e;
         }

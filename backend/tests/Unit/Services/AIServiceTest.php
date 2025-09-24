@@ -1,9 +1,8 @@
 <?php
 
 use App\Services\AIService;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 
 describe('AIService', function () {
     beforeEach(function () {
@@ -16,7 +15,7 @@ describe('AIService', function () {
             'services.ai.claude_model' => 'claude-3-sonnet-20240229',
         ]);
 
-        $this->service = new AIService();
+        $this->service = new AIService;
     });
 
     test('OpenAIで香水データを正規化できる', function () {
@@ -36,15 +35,15 @@ describe('AIService', function () {
                             'suitable_seasons' => ['春', '秋'],
                             'suitable_scenes' => ['フォーマル', 'デート'],
                             'description_ja' => '伝説的な香水',
-                            'description_en' => 'Legendary fragrance'
-                        ])
-                    ]
-                ]
-            ]
+                            'description_en' => 'Legendary fragrance',
+                        ]),
+                    ],
+                ],
+            ],
         ];
 
         Http::fake([
-            'https://api.openai.com/v1/chat/completions' => Http::response($mockResponse, 200)
+            'https://api.openai.com/v1/chat/completions' => Http::response($mockResponse, 200),
         ]);
 
         $result = $this->service->normalizeFragranceData('シャネル', 'No.5', 'openai');
@@ -71,14 +70,14 @@ describe('AIService', function () {
                         'suitable_seasons' => ['春', '夏'],
                         'suitable_scenes' => ['カジュアル', 'ビジネス'],
                         'description_ja' => 'モダンなフレッシュフレグランス',
-                        'description_en' => 'Modern fresh fragrance'
-                    ])
-                ]
-            ]
+                        'description_en' => 'Modern fresh fragrance',
+                    ]),
+                ],
+            ],
         ];
 
         Http::fake([
-            'https://api.anthropic.com/v1/messages' => Http::response($mockResponse, 200)
+            'https://api.anthropic.com/v1/messages' => Http::response($mockResponse, 200),
         ]);
 
         $result = $this->service->normalizeFragranceData('ディオール', 'ソヴァージュ', 'anthropic');
@@ -92,8 +91,8 @@ describe('AIService', function () {
     test('デフォルトプロバイダーが使用される', function () {
         Http::fake([
             'https://api.openai.com/v1/chat/completions' => Http::response([
-                'choices' => [['message' => ['content' => '{"test": "data"}']]]
-            ], 200)
+                'choices' => [['message' => ['content' => '{"test": "data"}']]],
+            ], 200),
         ]);
 
         $this->service->normalizeFragranceData('Test', 'Fragrance');
@@ -113,8 +112,8 @@ describe('AIService', function () {
 
         Http::fake([
             'https://api.openai.com/v1/chat/completions' => Http::response([
-                'choices' => [['message' => ['content' => $jsonResponse]]]
-            ], 200)
+                'choices' => [['message' => ['content' => $jsonResponse]]],
+            ], 200),
         ]);
 
         $result = $this->service->normalizeFragranceData('Test', 'Fragrance');
@@ -124,52 +123,52 @@ describe('AIService', function () {
     });
 
     test('サポートされていないプロバイダーでエラー', function () {
-        expect(fn() => $this->service->normalizeFragranceData('Test', 'Fragrance', 'invalid'))
+        expect(fn () => $this->service->normalizeFragranceData('Test', 'Fragrance', 'invalid'))
             ->toThrow(\InvalidArgumentException::class, 'Unsupported AI provider: invalid');
     });
 
     test('OpenAI APIキーが設定されていない場合はエラー', function () {
         Config::set('services.openai.api_key', null);
-        $service = new AIService();
+        $service = new AIService;
 
-        expect(fn() => $service->normalizeFragranceData('Test', 'Fragrance', 'openai'))
+        expect(fn () => $service->normalizeFragranceData('Test', 'Fragrance', 'openai'))
             ->toThrow(\Exception::class, 'OpenAI API key is not configured');
     });
 
     test('Anthropic APIキーが設定されていない場合はエラー', function () {
         Config::set('services.anthropic.api_key', null);
-        $service = new AIService();
+        $service = new AIService;
 
-        expect(fn() => $service->normalizeFragranceData('Test', 'Fragrance', 'anthropic'))
+        expect(fn () => $service->normalizeFragranceData('Test', 'Fragrance', 'anthropic'))
             ->toThrow(\Exception::class, 'Anthropic API key is not configured');
     });
 
     test('OpenAI APIリクエストが失敗した場合はエラー', function () {
         Http::fake([
-            'https://api.openai.com/v1/chat/completions' => Http::response('API Error', 500)
+            'https://api.openai.com/v1/chat/completions' => Http::response('API Error', 500),
         ]);
 
-        expect(fn() => $this->service->normalizeFragranceData('Test', 'Fragrance', 'openai'))
+        expect(fn () => $this->service->normalizeFragranceData('Test', 'Fragrance', 'openai'))
             ->toThrow(\Exception::class);
     });
 
     test('Anthropic APIリクエストが失敗した場合はエラー', function () {
         Http::fake([
-            'https://api.anthropic.com/v1/messages' => Http::response('API Error', 500)
+            'https://api.anthropic.com/v1/messages' => Http::response('API Error', 500),
         ]);
 
-        expect(fn() => $this->service->normalizeFragranceData('Test', 'Fragrance', 'anthropic'))
+        expect(fn () => $this->service->normalizeFragranceData('Test', 'Fragrance', 'anthropic'))
             ->toThrow(\Exception::class);
     });
 
     test('無効なJSONレスポンスでエラー', function () {
         Http::fake([
             'https://api.openai.com/v1/chat/completions' => Http::response([
-                'choices' => [['message' => ['content' => 'invalid json']]]
-            ], 200)
+                'choices' => [['message' => ['content' => 'invalid json']]],
+            ], 200),
         ]);
 
-        expect(fn() => $this->service->normalizeFragranceData('Test', 'Fragrance'))
+        expect(fn () => $this->service->normalizeFragranceData('Test', 'Fragrance'))
             ->toThrow(\Exception::class, 'Failed to parse AI response as JSON');
     });
 
@@ -178,7 +177,7 @@ describe('AIService', function () {
             'services.openai.api_key' => 'test-key',
             'services.anthropic.api_key' => 'test-key',
         ]);
-        $service = new AIService();
+        $service = new AIService;
 
         $providers = $service->getAvailableProviders();
 
@@ -191,7 +190,7 @@ describe('AIService', function () {
             'services.openai.api_key' => 'test-key',
             'services.anthropic.api_key' => null,
         ]);
-        $service = new AIService();
+        $service = new AIService;
 
         $providers = $service->getAvailableProviders();
 
@@ -202,8 +201,8 @@ describe('AIService', function () {
     test('プロンプトが正しく構築される', function () {
         Http::fake([
             'https://api.openai.com/v1/chat/completions' => Http::response([
-                'choices' => [['message' => ['content' => '{"test": "data"}']]]
-            ], 200)
+                'choices' => [['message' => ['content' => '{"test": "data"}']]],
+            ], 200),
         ]);
 
         $this->service->normalizeFragranceData('Test Brand', 'Test Fragrance');

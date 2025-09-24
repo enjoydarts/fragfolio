@@ -1,17 +1,17 @@
 <?php
 
-use App\Models\User;
+use App\Mail\VerifyNewEmailChange;
 use App\Models\EmailChangeRequest;
+use App\Models\User;
 use App\UseCases\Auth\RequestEmailChangeUseCase;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\VerifyNewEmailChange;
 
 describe('RequestEmailChangeUseCase', function () {
     beforeEach(function () {
         $this->user = User::factory()->create([
             'email' => 'old@example.com',
         ]);
-        $this->useCase = new RequestEmailChangeUseCase();
+        $this->useCase = new RequestEmailChangeUseCase;
 
         // 既存のリクエストをクリア
         EmailChangeRequest::where('user_id', $this->user->id)->delete();
