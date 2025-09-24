@@ -95,7 +95,7 @@
       "registration_failed": "Registration failed",
       "login_failed": "Login failed",
       "password_mismatch": "Passwords do not match",
-      "turnstile_required": "Please complete verification",
+      "turnstile_required": "Turnstile authentication required",
       "turnstile_failed": "Verification failed",
       "email_required": "Email is required",
       "email_invalid": "Please enter a valid email address",

@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '../../utils';
 import { RegisterForm } from '../../../src/components/auth/RegisterForm';
@@ -7,12 +8,24 @@ import { useToast } from '../../../src/hooks/useToast';
 // モックの設定
 vi.mock('../../../src/hooks/useAuth');
 vi.mock('../../../src/hooks/useToast');
+// グローバル変数でTurnstileの動作を制御
+let skipAutoVerifyRegister = false;
+
 vi.mock('../../../src/components/auth/TurnstileWidget', () => ({
-  TurnstileWidget: ({ onVerify }: { onVerify: (token: string) => void }) => (
-    <div data-testid="turnstile-widget">
-      <button onClick={() => onVerify('test-token')}>Verify</button>
-    </div>
-  ),
+  TurnstileWidget: ({ onVerify }: { onVerify: (token: string) => void }) => {
+    React.useEffect(() => {
+      // skipAutoVerifyRegisterがfalseの場合のみ自動的にトークンを検証
+      if (!skipAutoVerifyRegister) {
+        onVerify('test-token');
+      }
+    }, [onVerify]);
+
+    return (
+      <div data-testid="turnstile-widget">
+        <button onClick={() => onVerify('test-token')}>Verify</button>
+      </div>
+    );
+  },
 }));
 
 const mockRegister = vi.fn();
@@ -197,6 +210,9 @@ describe('RegisterForm', () => {
   });
 
   it('Turnstile認証なしではフォーム送信できない', async () => {
+    // この特定のテストでは自動検証をスキップ
+    skipAutoVerifyRegister = true;
+
     render(<RegisterForm />);
 
     // フォームに入力
@@ -213,13 +229,27 @@ describe('RegisterForm', () => {
       target: { value: 'password123' },
     });
 
-    // Turnstile認証なしではボタンが無効になっていることを確認
+    // ボタンが無効化されていることを確認
     const submitButton = screen.getByRole('button', { name: /アカウント作成/ });
     expect(submitButton).toBeDisabled();
 
-    // 無効なボタンをクリックしても登録処理は呼ばれない
-    fireEvent.click(submitButton);
+    // フォームの直接送信をトリガー（ボタンではなくフォーム要素で）
+    const form = submitButton.closest('form');
+    expect(form).toBeInTheDocument();
+
+    // フォームのsubmitイベントを直接発火
+    fireEvent.submit(form!);
+
+    await waitFor(() => {
+      // Turnstile必須エラーメッセージを確認
+      expect(screen.getByText(/Turnstile認証が必要です/)).toBeInTheDocument();
+    });
+
+    // 登録処理は呼ばれない
     expect(mockRegister).not.toHaveBeenCalled();
+
+    // テスト後にリセット
+    skipAutoVerifyRegister = false;
   });
 
   it('メールアドレスのバリデーションが動作する', async () => {

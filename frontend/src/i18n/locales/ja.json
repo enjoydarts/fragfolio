@@ -95,7 +95,7 @@
       "registration_failed": "ユーザー登録に失敗しました",
       "login_failed": "ログインに失敗しました",
       "password_mismatch": "パスワードが一致しません",
-      "turnstile_required": "認証を完了してください",
+      "turnstile_required": "Turnstile認証が必要です",
       "turnstile_failed": "認証に失敗しました",
       "email_required": "メールアドレスは必須です",
       "email_invalid": "正しいメールアドレスを入力してください",
