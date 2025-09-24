@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { TurnstileWidget } from './TurnstileWidget';
-import { WebAuthnAPI, WebAuthnUtils } from '../../api/webauthn';
+import { WebAuthnUtils } from '../../api/webauthn';
 import { FingerPrintIcon } from '@heroicons/react/24/outline';
 
 interface LoginFormProps {
@@ -81,17 +81,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         turnstileToken
       );
       onSuccess?.();
-    } catch (error: any) {
+    } catch (error: unknown) {
       // レスポンスから2FA要求チェック
-      if (error?.requires_two_factor) {
-        console.log('2FA required, available methods:', error.available_methods);
+      const authError = error as { requires_two_factor?: boolean; temp_token?: string; available_methods?: string[]; message?: string };
+      if (authError?.requires_two_factor) {
+        console.log('2FA required, available methods:', authError.available_methods);
         setRequiresTwoFactor(true);
-        setTempToken(error.temp_token);
-        setAvailableMethods(error.available_methods || []);
+        setTempToken(authError.temp_token);
+        setAvailableMethods(authError.available_methods || []);
 
         // 利用可能な認証方法が1つだけの場合は自動選択
-        if (error.available_methods?.length === 1) {
-          setTwoFactorMethod(error.available_methods[0]);
+        if (authError.available_methods?.length === 1) {
+          setTwoFactorMethod(authError.available_methods[0]);
         }
         return;
       }
@@ -100,7 +101,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       setTurnstileToken(null);
       setTurnstileResetCounter(prev => prev + 1);
       setError(
-        error?.message || error instanceof Error ? error.message : t('auth.errors.login_failed')
+        authError?.message || error instanceof Error ? error.message : t('auth.errors.login_failed')
       );
     }
   };
@@ -139,7 +140,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       } else {
         setError(data.message || t('auth.errors.two_factor_invalid'));
       }
-    } catch (error) {
+    } catch {
       setError(t('auth.errors.two_factor_failed'));
     }
   };
@@ -212,14 +213,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       } else {
         setError(completeData.message || t('auth.webauthn.login_failed', 'WebAuthnログインに失敗しました'));
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('WebAuthn 2FA failed:', error);
-      if (error.name === 'NotAllowedError') {
+      const webauthnError = error as { name?: string; message?: string };
+      if (webauthnError.name === 'NotAllowedError') {
         setError(t('auth.webauthn.not_allowed', '認証が拒否されました'));
-      } else if (error.name === 'InvalidStateError') {
+      } else if (webauthnError.name === 'InvalidStateError') {
         setError(t('auth.webauthn.invalid_state', '認証器の状態が無効です'));
       } else {
-        setError(error.message || t('auth.webauthn.login_failed', 'WebAuthnログインに失敗しました'));
+        setError(webauthnError.message || t('auth.webauthn.login_failed', 'WebAuthnログインに失敗しました'));
       }
     } finally {
       setTwoFactorWebAuthnLoading(false);

@@ -141,11 +141,12 @@ export const TOTPSettings: React.FC = () => {
           loading: false
         }));
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('2FA enable error:', error);
+      const errorMessage = error instanceof Error ? error.message : t('settings.security.twofa.enable_failed');
       setState(prev => ({
         ...prev,
-        error: error.message || t('settings.security.twofa.enable_failed'),
+        error: errorMessage,
         loading: false
       }));
     }

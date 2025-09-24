@@ -78,9 +78,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else {
         throw new Error(response.message || t('auth.errors.login_failed'));
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // 2FA要求の場合はエラーログを出さない
-      if (!error?.requires_two_factor) {
+      const authError = error as { requires_two_factor?: boolean };
+      if (!authError?.requires_two_factor) {
         console.error('Login failed:', error);
       }
       throw error;
