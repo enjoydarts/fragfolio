@@ -1,10 +1,7 @@
-import React, { createContext } from 'react';
+import React from 'react';
 import { useToast } from '../hooks/useToast';
 import { ToastContainer } from '../components/ui/ToastContainer';
-
-export const ToastContext = createContext<ReturnType<typeof useToast> | undefined>(
-  undefined
-);
+import { ToastContext } from './toast';
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
