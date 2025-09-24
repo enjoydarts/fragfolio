@@ -146,7 +146,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         window.location.reload();
         onSuccess?.();
       } else {
-        setError(data.message || t('auth.errors.two_factor_invalid'));
+        setError(t('auth.errors.two_factor_invalid'));
       }
     } catch {
       setError(t('auth.errors.two_factor_failed'));
@@ -183,10 +183,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       const data = await response.json();
 
       if (!data.success) {
-        setError(
-          data.message ||
-            t('auth.webauthn.login_failed', 'WebAuthnログインに失敗しました')
-        );
+        setError(t('webauthn.login_failed'));
         return;
       }
 
@@ -234,23 +231,17 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         window.location.reload();
         onSuccess?.();
       } else {
-        setError(
-          completeData.message ||
-            t('auth.webauthn.login_failed', 'WebAuthnログインに失敗しました')
-        );
+        setError(t('webauthn.login_failed'));
       }
     } catch (error: unknown) {
       console.error('WebAuthn 2FA failed:', error);
       const webauthnError = error as { name?: string; message?: string };
       if (webauthnError.name === 'NotAllowedError') {
-        setError(t('auth.webauthn.not_allowed', '認証が拒否されました'));
+        setError(t('webauthn.not_allowed'));
       } else if (webauthnError.name === 'InvalidStateError') {
-        setError(t('auth.webauthn.invalid_state', '認証器の状態が無効です'));
+        setError(t('webauthn.invalid_state'));
       } else {
-        setError(
-          webauthnError.message ||
-            t('auth.webauthn.login_failed', 'WebAuthnログインに失敗しました')
-        );
+        setError(t('webauthn.login_failed'));
       }
     } finally {
       setTwoFactorWebAuthnLoading(false);

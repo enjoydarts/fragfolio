@@ -24,10 +24,10 @@ export const EmailVerification: React.FC = () => {
       if (response.success) {
         setMessage(t('email_verification.success'));
       } else {
-        setError(t('auth.errors.registration_failed'));
+        setError(t('auth.errors.email_verification_failed'));
       }
     } catch {
-      setError(t('auth.errors.registration_failed'));
+      setError(t('auth.errors.email_verification_failed'));
     } finally {
       setIsResending(false);
     }

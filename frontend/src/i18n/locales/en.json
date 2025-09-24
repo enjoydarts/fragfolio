@@ -101,7 +101,11 @@
       "auth_token_missing": "Authentication token is missing",
       "token_refresh_failed": "Token refresh failed",
       "profile_update_failed": "Profile update failed",
-      "profile_update_success": "Profile updated successfully"
+      "profile_update_success": "Profile updated successfully",
+      "logout_failed": "Logout failed",
+      "password_reset_failed": "Password reset failed",
+      "email_verification_failed": "Email verification failed",
+      "email_change_failed": "Email change failed"
     },
     "password": {
       "weak_password": "Password does not meet requirements",

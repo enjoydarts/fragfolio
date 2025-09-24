@@ -23,7 +23,7 @@ export const ForgotPassword: React.FC = () => {
       if (response.success) {
         setMessage(t('password_reset.link_sent'));
       } else {
-        setError(t('auth.errors.registration_failed'));
+        setError(t('auth.errors.password_reset_failed'));
       }
     } catch {
       setError(t('auth.errors.registration_failed'));

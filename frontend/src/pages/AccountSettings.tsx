@@ -253,7 +253,7 @@ const ProfileSettings: React.FC = () => {
             'settings.profile.email_change_failed',
             'メールアドレス変更リクエストに失敗しました'
           ),
-          t('auth.errors.registration_failed')
+          t('auth.errors.email_change_failed')
         );
       }
     } catch {
@@ -1685,11 +1685,11 @@ const SessionsSettings: React.FC = () => {
           )
         );
       } else {
-        toast.error(t('auth.errors.registration_failed'));
+        toast.error(t('auth.errors.logout_failed'));
       }
     } catch (error) {
       console.error('Logout other sessions failed:', error);
-      toast.error(t('auth.errors.registration_failed'));
+      toast.error(t('auth.errors.logout_failed'));
     } finally {
       setIsLoading(false);
     }

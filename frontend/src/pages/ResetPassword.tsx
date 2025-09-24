@@ -61,10 +61,10 @@ export const ResetPassword: React.FC = () => {
           navigate('/auth');
         }, 2000);
       } else {
-        setError(t('auth.errors.registration_failed'));
+        setError(t('auth.errors.password_reset_failed'));
       }
     } catch {
-      setError(t('auth.errors.registration_failed'));
+      setError(t('auth.errors.password_reset_failed'));
     } finally {
       setIsLoading(false);
     }
