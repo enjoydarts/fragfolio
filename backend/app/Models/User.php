@@ -19,7 +19,6 @@ class User extends Authenticatable implements MustVerifyEmail, WebAuthnAuthentic
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable, WebAuthnAuthentication;
 
-
     /**
      * The attributes that are mass assignable.
      *

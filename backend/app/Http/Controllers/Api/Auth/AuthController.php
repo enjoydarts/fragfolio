@@ -418,7 +418,7 @@ class AuthController extends Controller
         $user = $request->user();
 
         // 現在のパスワードを確認
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return response()->json([
                 'success' => false,
                 'message' => __('auth.current_password_incorrect'),
