@@ -6,17 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string $new_email
+ * @property string $token
+ * @property bool $verified
+ * @property \Illuminate\Support\Carbon $expires_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class EmailChangeRequest extends Model
 {
     use HasFactory;
-
-    public string $new_email;
-
-    public string $token;
-
-    public bool $verified;
-
-    public string $expires_at;
 
     protected $fillable = [
         'user_id',

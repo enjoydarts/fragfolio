@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
-import { AuthProvider, useAuth } from '../../src/contexts/AuthContext';
+import { AuthProvider } from '../../src/contexts/AuthContext';
+import { useAuth } from '../../src/hooks/useAuth';
 import { AuthAPI } from '../../src/api/auth';
 import { useToast } from '../../src/hooks/useToast';
 

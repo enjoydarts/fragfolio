@@ -55,7 +55,7 @@ describe('PasswordResetUseCase', function () {
     describe('resetPassword', function () {
         test('正しいトークンでパスワードリセットができる', function () {
             $user = User::factory()->create();
-            $newPassword = 'newpassword123';
+            $newPassword = 'NewPassword123!';
 
             Password::shouldReceive('reset')
                 ->once()
@@ -81,8 +81,8 @@ describe('PasswordResetUseCase', function () {
 
             $data = [
                 'email' => 'test@example.com',
-                'password' => 'newpassword123',
-                'password_confirmation' => 'newpassword123',
+                'password' => 'NewPassword123!',
+                'password_confirmation' => 'NewPassword123!',
                 'token' => 'invalid-token',
             ];
 
@@ -94,7 +94,7 @@ describe('PasswordResetUseCase', function () {
 
         test('パスワードリセット時にハッシュ化とトークン更新が実行される', function () {
             $user = User::factory()->create();
-            $newPassword = 'newpassword123';
+            $newPassword = 'NewPassword123!';
 
             // Password::resetのコールバック関数をテスト
             Password::shouldReceive('reset')

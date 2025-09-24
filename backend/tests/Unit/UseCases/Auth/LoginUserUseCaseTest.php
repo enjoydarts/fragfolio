@@ -10,14 +10,14 @@ describe('LoginUserUseCase', function () {
         $this->useCase = new LoginUserUseCase;
         $this->user = User::factory()->create([
             'email' => 'test@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('Password123!'),
         ]);
     });
 
     test('正しい認証情報でログインできる', function () {
         $credentials = [
             'email' => 'test@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
         ];
 
         $result = $this->useCase->execute($credentials);
@@ -32,7 +32,7 @@ describe('LoginUserUseCase', function () {
     test('記憶するオプション付きでログインできる', function () {
         $credentials = [
             'email' => 'test@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
         ];
 
         $result = $this->useCase->execute($credentials, remember: true);
@@ -55,7 +55,7 @@ describe('LoginUserUseCase', function () {
     test('存在しないメールアドレスでは認証例外が発生する', function () {
         $credentials = [
             'email' => 'nonexistent@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
         ];
 
         expect(fn () => $this->useCase->execute($credentials))
@@ -65,7 +65,7 @@ describe('LoginUserUseCase', function () {
     test('返されるユーザーにはプロフィールとロールが含まれる', function () {
         $credentials = [
             'email' => 'test@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
         ];
 
         $result = $this->useCase->execute($credentials);
@@ -78,7 +78,7 @@ describe('LoginUserUseCase', function () {
     test('記憶するオプションによってトークン名が変わる', function () {
         $credentials = [
             'email' => 'test@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
         ];
 
         // 通常のログイン
@@ -100,7 +100,7 @@ describe('LoginUserUseCase', function () {
     test('ログイン時にトークンが生成される', function () {
         $credentials = [
             'email' => 'test@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
         ];
 
         $initialTokenCount = $this->user->tokens()->count();

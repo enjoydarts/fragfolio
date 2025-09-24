@@ -173,8 +173,8 @@ describe('AuthController', function () {
         $userData = [
             'name' => 'New User',
             'email' => 'new@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
             'language' => 'ja',
             'timezone' => 'Asia/Tokyo',
             'cf-turnstile-response' => 'test-token',
@@ -210,8 +210,8 @@ describe('AuthController', function () {
         $userData = [
             'name' => 'New User',
             'email' => 'existing@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
             'cf-turnstile-response' => 'test-token',
         ];
 
@@ -225,7 +225,7 @@ describe('AuthController', function () {
         $userData = [
             'name' => 'New User',
             'email' => 'new@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
             'password_confirmation' => 'different-password',
             'cf-turnstile-response' => 'test-token',
         ];
@@ -239,12 +239,12 @@ describe('AuthController', function () {
     test('ログイン（2FA無効ユーザー）ができる', function () {
         $user = User::factory()->create([
             'email' => 'test@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('Password123!'),
         ]);
 
         $response = $this->postJson('/api/login', [
             'email' => 'test@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
             'cf-turnstile-response' => 'test-token',
         ]);
 
@@ -263,14 +263,14 @@ describe('AuthController', function () {
     test('ログイン（2FA有効ユーザー）で2FA要求される', function () {
         $user = User::factory()->create([
             'email' => 'test@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('Password123!'),
             'two_factor_secret' => encrypt('ABCDEFGHIJKLMNOP'),
             'two_factor_confirmed_at' => now(),
         ]);
 
         $response = $this->postJson('/api/login', [
             'email' => 'test@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
             'cf-turnstile-response' => 'test-token',
         ]);
 
@@ -292,7 +292,7 @@ describe('AuthController', function () {
     test('間違ったパスワードでログインエラー', function () {
         User::factory()->create([
             'email' => 'test@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('Password123!'),
         ]);
 
         $response = $this->postJson('/api/login', [

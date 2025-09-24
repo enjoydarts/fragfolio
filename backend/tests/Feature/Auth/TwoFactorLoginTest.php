@@ -9,7 +9,7 @@ describe('2段階認証ログイン', function () {
     beforeEach(function () {
         $this->user = User::factory()->create([
             'email' => 'test@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('Password123!'),
             'two_factor_secret' => encrypt('ABCDEFGHIJKLMNOP'),
             'two_factor_confirmed_at' => now(),
         ]);

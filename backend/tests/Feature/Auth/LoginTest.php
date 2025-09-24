@@ -16,12 +16,12 @@ describe('ユーザーログイン', function () {
     test('正常なログインができる', function () {
         $user = User::factory()->create([
             'email' => 'test@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('Password123!'),
         ]);
 
         $response = $this->postJson('/api/login', [
             'email' => 'test@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
             'cf-turnstile-response' => 'test_token',
         ]);
 
@@ -44,12 +44,12 @@ describe('ユーザーログイン', function () {
     test('記憶するオプション付きでログインができる', function () {
         $user = User::factory()->create([
             'email' => 'test@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('Password123!'),
         ]);
 
         $response = $this->postJson('/api/login', [
             'email' => 'test@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
             'remember' => true,
             'cf-turnstile-response' => 'test_token',
         ]);
@@ -64,7 +64,7 @@ describe('ユーザーログイン', function () {
     test('間違ったパスワードではログインできない', function () {
         User::factory()->create([
             'email' => 'test@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('Password123!'),
         ]);
 
         $response = $this->postJson('/api/login', [
@@ -79,7 +79,7 @@ describe('ユーザーログイン', function () {
     test('存在しないメールアドレスではログインできない', function () {
         $response = $this->postJson('/api/login', [
             'email' => 'nonexistent@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
             'cf-turnstile-response' => 'test_token',
         ]);
 
@@ -98,7 +98,7 @@ describe('ユーザーログイン', function () {
     test('無効なメールアドレスではログインできない', function () {
         $response = $this->postJson('/api/login', [
             'email' => 'invalid-email',
-            'password' => 'password123',
+            'password' => 'Password123!',
             'cf-turnstile-response' => 'test_token',
         ]);
 

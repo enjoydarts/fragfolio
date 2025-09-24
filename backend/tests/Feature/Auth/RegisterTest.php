@@ -17,8 +17,8 @@ describe('ユーザー登録', function () {
         $userData = [
             'name' => 'テストユーザー',
             'email' => 'test@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
             'language' => 'ja',
             'timezone' => 'Asia/Tokyo',
             'cf-turnstile-response' => 'test_token',
@@ -55,8 +55,8 @@ describe('ユーザー登録', function () {
         $userData = [
             'name' => 'テストユーザー',
             'email' => 'test@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
             'cf-turnstile-response' => 'test_token',
         ];
 
@@ -79,8 +79,8 @@ describe('ユーザー登録', function () {
         $userData = [
             'name' => 'テストユーザー',
             'email' => 'invalid-email',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
             'cf-turnstile-response' => 'test_token',
         ];
 
