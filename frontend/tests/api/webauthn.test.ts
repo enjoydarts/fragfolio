@@ -25,16 +25,12 @@ describe('WebAuthn API', () => {
 
   describe('getRegistrationOptions', () => {
     it('WebAuthn登録オプションを取得できる', async () => {
-      // The MSW handler is already set up in handlers.ts
-      // Based on the implementation, it expects success and options structure
-      try {
-        const result = await getRegistrationOptions();
-        expect(result.challenge).toBe('test-challenge');
-        expect(result.user.name).toBe('test@example.com');
-      } catch (error) {
-        // Expect the actual error message from fetch failure
-        expect(error.message).toContain('fetch failed');
-      }
+      const result = await getRegistrationOptions();
+
+      expect(result.success).toBe(true);
+      expect(result.challenge).toBe('Y2hhbGxlbmdl');
+      expect(result.user).toMatchObject({ name: 'test@example.com' });
+      expect(Array.isArray(result.pubKeyCredParams)).toBe(true);
     });
   });
 
@@ -119,21 +115,41 @@ describe('WebAuthn API', () => {
     it('WebAuthnクレデンシャルを削除できる', async () => {
       const credentialId = 'test-credential-id';
 
-      // MSW handler is not properly matching, expect current behavior
       const result = await deleteCredential(credentialId);
 
-      expect(result.success).toBe(false);
-      expect(result.message).toContain('fetch failed');
+      expect(result.success).toBe(true);
+      expect(result.message).toBe('WebAuthn key deleted successfully');
+      expect(result.messageKey).toBe(
+        'settings.security.webauthn.delete_success'
+      );
     });
 
     it('存在しないクレデンシャルの削除でエラー', async () => {
       const credentialId = 'non-existent-id';
 
-      // MSW handler not matching, expect fetch failed
+      server.use(
+        http.delete(
+          `http://localhost:8002/api/auth/webauthn/credentials/${credentialId}`,
+          () => {
+            return HttpResponse.json(
+              {
+                success: false,
+                message: 'Credential not found',
+                messageKey: 'settings.security.webauthn.delete_failed',
+              },
+              { status: 404 }
+            );
+          }
+        )
+      );
+
       const result = await deleteCredential(credentialId);
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('fetch failed');
+      expect(result.message).toBe('WebAuthn credential not found');
+      expect(result.messageKey).toBe(
+        'settings.security.webauthn.delete_failed'
+      );
     });
   });
 
@@ -209,11 +225,13 @@ describe('WebAuthn API', () => {
     it('WebAuthnクレデンシャルを無効化できる', async () => {
       const credentialId = 'test-credential-id';
 
-      // MSW handler not matching, expect current behavior
       const result = await disableCredential(credentialId);
 
-      expect(result.success).toBe(false);
-      expect(result.message).toContain('fetch failed');
+      expect(result.success).toBe(true);
+      expect(result.message).toBe('WebAuthn key disabled successfully');
+      expect(result.messageKey).toBe(
+        'settings.security.webauthn.disable_success'
+      );
     });
   });
 
@@ -310,13 +328,37 @@ describe('WebAuthn API', () => {
       expect(requestHeaders?.get('Accept')).toBe('application/json');
     });
 
-    it('WebAuthn登録オプション取得では認証ヘッダーが必要', async () => {
-      // Since MSW handlers aren't working properly, just expect the error
-      try {
-        await getRegistrationOptions();
-      } catch (error) {
-        expect(error.message).toContain('fetch failed');
-      }
+    it('WebAuthn登録オプション取得では認証ヘッダーが送信される', async () => {
+      let requestHeaders: Headers | undefined;
+
+      server.use(
+        http.post(
+          'http://localhost:8002/api/auth/webauthn/register/options',
+          ({ request }) => {
+            requestHeaders = request.headers;
+            return HttpResponse.json({
+              success: true,
+              options: {
+                challenge: 'Y2hhbGxlbmdl',
+                rp: { name: 'fragfolio', id: 'localhost' },
+                user: {
+                  id: 'dGVzdHVzZXI=',
+                  name: 'test@example.com',
+                  displayName: 'Test User',
+                },
+                pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+                timeout: 60000,
+                attestation: 'none',
+              },
+            });
+          }
+        )
+      );
+
+      const result = await getRegistrationOptions();
+
+      expect(requestHeaders?.get('Authorization')).toBe(`Bearer ${mockToken}`);
+      expect(result.success).toBe(true);
     });
   });
 

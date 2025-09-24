@@ -397,14 +397,14 @@ export const handlers = [
     });
   }),
 
-  http.post('http://localhost:8002/api/webauthn/register', () => {
+  http.post('http://localhost:8002/api/auth/webauthn/register', () => {
     return HttpResponse.json({
       success: true,
       message: 'WebAuthn credential registered successfully',
     });
   }),
 
-  http.get('http://localhost:8002/api/webauthn/credentials', () => {
+  http.get('http://localhost:8002/api/auth/webauthn/credentials', () => {
     return HttpResponse.json({
       success: true,
       credentials: [
@@ -419,31 +419,41 @@ export const handlers = [
     });
   }),
 
-  http.put('http://localhost:8002/api/webauthn/credentials/:id/alias', () => {
+  http.put('http://localhost:8002/api/auth/webauthn/credentials/:id', () => {
     return HttpResponse.json({
       success: true,
       message: 'Credential alias updated successfully',
+      messageKey: 'settings.security.webauthn.alias_update_success',
     });
   }),
 
-  http.put('http://localhost:8002/api/webauthn/credentials/:id/enable', () => {
-    return HttpResponse.json({
-      success: true,
-      message: 'Credential enabled successfully',
-    });
-  }),
+  http.post(
+    'http://localhost:8002/api/auth/webauthn/credentials/:id/enable',
+    () => {
+      return HttpResponse.json({
+        success: true,
+        message: 'Credential enabled successfully',
+        messageKey: 'settings.security.webauthn.enable_success',
+      });
+    }
+  ),
 
-  http.put('http://localhost:8002/api/webauthn/credentials/:id/disable', () => {
-    return HttpResponse.json({
-      success: true,
-      message: 'Credential disabled successfully',
-    });
-  }),
+  http.post(
+    'http://localhost:8002/api/auth/webauthn/credentials/:id/disable',
+    () => {
+      return HttpResponse.json({
+        success: true,
+        message: 'Credential disabled successfully',
+        messageKey: 'settings.security.webauthn.disable_success',
+      });
+    }
+  ),
 
-  http.delete('http://localhost:8002/api/webauthn/credentials/:id', () => {
+  http.delete('http://localhost:8002/api/auth/webauthn/credentials/:id', () => {
     return HttpResponse.json({
       success: true,
       message: 'Credential deleted successfully',
+      messageKey: 'settings.security.webauthn.delete_success',
     });
   }),
 ];

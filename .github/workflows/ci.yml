@@ -177,7 +177,7 @@ jobs:
 
       - name: Run tests with coverage
         working-directory: ./frontend
-        run: npm run test:coverage -- --runInBand --reporter=verbose --no-colors
+        run: npm run test:coverage -- --reporter=verbose --no-color --maxWorkers=1
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
