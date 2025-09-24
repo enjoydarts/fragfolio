@@ -37,13 +37,12 @@ describe('RegisterForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Turnstile環境変数をモック
-    Object.defineProperty(import.meta, 'env', {
-      value: {
-        VITE_TURNSTILE_SITE_KEY: 'test-site-key',
-      },
-      writable: true,
-    });
+    // グローバル変数をリセット
+    skipAutoVerifyRegister = false;
+
+    // Turnstile環境変数をVitest stubでモック（CI環境対応）
+    vi.unstubAllEnvs();
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', 'test-site-key');
 
     mockUseAuth.mockReturnValue({
       user: null,
@@ -64,6 +63,10 @@ describe('RegisterForm', () => {
       },
       removeToast: vi.fn(),
     });
+  });
+
+  afterAll(() => {
+    vi.unstubAllEnvs();
   });
 
   it('正しくレンダリングされる', () => {
@@ -99,7 +102,8 @@ describe('RegisterForm', () => {
       target: { value: 'password123' },
     });
 
-    // Turnstileを認証
+    // Turnstileが表示されているか確認してから認証
+    expect(screen.getByTestId('turnstile-widget')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Verify'));
 
     // フォーム送信
@@ -145,7 +149,8 @@ describe('RegisterForm', () => {
       target: { value: 'test@example.com' },
     });
 
-    // Turnstileを認証
+    // Turnstileが表示されているか確認してから認証
+    expect(screen.getByTestId('turnstile-widget')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Verify'));
 
     fireEvent.click(screen.getByRole('button', { name: /アカウント作成/ }));
@@ -180,7 +185,8 @@ describe('RegisterForm', () => {
       target: { value: 'password123' },
     });
 
-    // Turnstileを認証
+    // Turnstileが表示されているか確認してから認証
+    expect(screen.getByTestId('turnstile-widget')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Verify'));
 
     // フォーム送信
@@ -229,7 +235,15 @@ describe('RegisterForm', () => {
       target: { value: 'password123' },
     });
 
-    // ボタンが無効化されていることを確認
+    // TurnstileWidgetが表示されていることを確認
+    const turnstileWidget = screen.getByTestId('turnstile-widget');
+    expect(turnstileWidget).toBeInTheDocument();
+
+    // Verifyボタンが表示されていることを確認
+    const verifyButton = screen.getByText('Verify');
+    expect(verifyButton).toBeInTheDocument();
+
+    // ボタンが無効化されていることを確認（Turnstileトークンなしのため）
     const submitButton = screen.getByRole('button', { name: /アカウント作成/ });
     expect(submitButton).toBeDisabled();
 
@@ -269,7 +283,8 @@ describe('RegisterForm', () => {
       target: { value: 'password123' },
     });
 
-    // Turnstileを認証
+    // Turnstileが表示されているか確認してから認証
+    expect(screen.getByTestId('turnstile-widget')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Verify'));
 
     fireEvent.click(screen.getByRole('button', { name: /アカウント作成/ }));
@@ -297,7 +312,8 @@ describe('RegisterForm', () => {
       target: { value: 'test@example.com' },
     });
 
-    // Turnstileを認証
+    // Turnstileが表示されているか確認してから認証
+    expect(screen.getByTestId('turnstile-widget')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Verify'));
 
     fireEvent.click(screen.getByRole('button', { name: /アカウント作成/ }));
@@ -332,7 +348,8 @@ describe('RegisterForm', () => {
       target: { value: 'password123' },
     });
 
-    // Turnstileを認証
+    // Turnstileが表示されているか確認してから認証
+    expect(screen.getByTestId('turnstile-widget')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Verify'));
 
     // フォーム送信
