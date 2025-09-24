@@ -462,7 +462,7 @@ export const handlers = [
   // Delete credential (this is the actual endpoint used by the implementation)
   http.delete(
     'http://localhost:8002/api/auth/webauthn/credentials/:id',
-    ({ params, request }) => {
+    ({ request }) => {
       const authHeader = request.headers.get('Authorization');
 
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -492,7 +492,7 @@ export const handlers = [
   // Disable credential
   http.post(
     'http://localhost:8002/api/auth/webauthn/credentials/:id/disable',
-    ({ params, request }) => {
+    ({ request }) => {
       const authHeader = request.headers.get('Authorization');
 
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -512,7 +512,7 @@ export const handlers = [
   // Enable credential
   http.post(
     'http://localhost:8002/api/auth/webauthn/credentials/:id/enable',
-    ({ params, request }) => {
+    ({ request }) => {
       const authHeader = request.headers.get('Authorization');
 
       if (!authHeader || !authHeader.startsWith('Bearer ')) {

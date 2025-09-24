@@ -1,9 +1,53 @@
 import { http, HttpResponse } from 'msw';
 
+// 型ガード関数
+type RegisterPayload = {
+  email: string;
+  password: string;
+  name: string;
+  language?: string;
+  timezone?: string;
+};
+
+type LoginPayload = {
+  email: string;
+  password: string;
+  remember_me?: boolean;
+  turnstile_token?: string;
+};
+
+function assertRegisterPayload(data: unknown): asserts data is RegisterPayload {
+  const obj = data as Record<string, unknown>;
+  if (
+    !data ||
+    typeof data !== 'object' ||
+    typeof obj.email !== 'string' ||
+    typeof obj.name !== 'string' ||
+    typeof obj.password !== 'string'
+  ) {
+    throw new Error('Invalid register payload');
+  }
+}
+
+function assertLoginPayload(data: unknown): asserts data is LoginPayload {
+  const obj = data as Record<string, unknown>;
+  if (
+    !data ||
+    typeof data !== 'object' ||
+    typeof obj.email !== 'string' ||
+    typeof obj.password !== 'string'
+  ) {
+    throw new Error('Invalid login payload');
+  }
+}
+
 export const handlers = [
   // Register API
   http.post('http://localhost:8002/api/register', async ({ request }) => {
-    const body = await request.json();
+    const json = await request.json();
+    assertRegisterPayload(json);
+    const body = json;
+
     if (body.email === 'existing@example.com') {
       return HttpResponse.json(
         {
@@ -46,7 +90,9 @@ export const handlers = [
 
   // Login API
   http.post('http://localhost:8002/api/login', async ({ request }) => {
-    const body = await request.json();
+    const json = await request.json();
+    assertLoginPayload(json);
+    const body = json;
 
     // 2FA必要なユーザーのケース
     if (body.email === '2fa-user@example.com') {

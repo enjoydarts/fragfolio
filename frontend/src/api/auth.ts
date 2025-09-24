@@ -20,11 +20,13 @@ export interface User {
 export interface AuthResponse {
   success: boolean;
   message?: string;
+  messageKey?: string;
   user?: User;
   token?: string;
   errors?: Record<string, string[]>;
   requires_two_factor?: boolean;
   temp_token?: string;
+  available_methods?: string[];
 }
 
 const API_BASE_URL =

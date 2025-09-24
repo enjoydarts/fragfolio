@@ -10,7 +10,9 @@ export interface WebAuthnCredential {
 export interface WebAuthnResponse {
   success: boolean;
   message?: string;
+  messageKey?: string;
   credentials?: WebAuthnCredential[];
+  credential?: unknown;
   errors?: Record<string, string[]>;
   requires_two_factor?: boolean;
   temp_token?: string;
@@ -36,7 +38,7 @@ export interface WebAuthnRegistrationOptions {
     displayName: string;
   };
   pubKeyCredParams: Array<{
-    type: string;
+    type: PublicKeyCredentialType;
     alg: number;
   }>;
   timeout: number;
@@ -48,7 +50,7 @@ export interface WebAuthnRegistrationOptions {
   };
   excludeCredentials?: Array<{
     id: string;
-    type: string;
+    type: PublicKeyCredentialType;
   }>;
 }
 
@@ -58,7 +60,7 @@ export interface WebAuthnLoginOptions {
   rpId: string;
   allowCredentials?: Array<{
     id: string;
-    type: string;
+    type: PublicKeyCredentialType;
   }>;
 }
 
@@ -443,7 +445,7 @@ export const getRegistrationOptions = async (): Promise<{
 
 export const registerCredential = async (
   credential: unknown
-): Promise<{ success: boolean; message?: string }> => {
+): Promise<{ success: boolean; message?: string; messageKey?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('Authentication token is not set');
@@ -509,7 +511,7 @@ export const getCredentials = async (): Promise<{
 
 export const deleteCredential = async (
   credentialId: string
-): Promise<{ success: boolean; message?: string }> => {
+): Promise<{ success: boolean; message?: string; messageKey?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('Authentication token is not set');
@@ -543,6 +545,7 @@ export const updateCredentialAlias = async (
   success: boolean;
   credential?: unknown;
   message?: string;
+  messageKey?: string;
   errors?: unknown;
 }> => {
   const token = localStorage.getItem('auth_token');
@@ -585,7 +588,7 @@ export const updateCredentialAlias = async (
 
 export const disableCredential = async (
   credentialId: string
-): Promise<{ success: boolean; message?: string }> => {
+): Promise<{ success: boolean; message?: string; messageKey?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('Authentication token is not set');
@@ -614,7 +617,7 @@ export const disableCredential = async (
 
 export const enableCredential = async (
   credentialId: string
-): Promise<{ success: boolean; message?: string }> => {
+): Promise<{ success: boolean; message?: string; messageKey?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('Authentication token is not set');
