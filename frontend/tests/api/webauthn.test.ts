@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { server } from '../mocks/server';
 import {
@@ -51,17 +51,23 @@ describe('WebAuthn API', () => {
       };
 
       server.use(
-        http.post('http://localhost:8002/api/auth/webauthn/register', ({ request }) => {
-          const authHeader = request.headers.get('Authorization');
-          if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return HttpResponse.json({ success: false, message: '認証が必要です' }, { status: 401 });
-          }
+        http.post(
+          'http://localhost:8002/api/auth/webauthn/register',
+          ({ request }) => {
+            const authHeader = request.headers.get('Authorization');
+            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+              return HttpResponse.json(
+                { success: false, message: '認証が必要です' },
+                { status: 401 }
+              );
+            }
 
-          return HttpResponse.json({
-            success: true,
-            message: 'WebAuthnキーを登録しました',
-          });
-        })
+            return HttpResponse.json({
+              success: true,
+              message: 'WebAuthnキーを登録しました',
+            });
+          }
+        )
       );
 
       const result = await registerCredential(mockCredential);
@@ -133,20 +139,23 @@ describe('WebAuthn API', () => {
       const newAlias = 'New Security Key';
 
       server.use(
-        http.put(`http://localhost:8002/api/auth/webauthn/credentials/${credentialId}`, async ({ request }) => {
-          const body = await request.json() as { alias: string };
+        http.put(
+          `http://localhost:8002/api/auth/webauthn/credentials/${credentialId}`,
+          async ({ request }) => {
+            const body = (await request.json()) as { alias: string };
 
-          return HttpResponse.json({
-            success: true,
-            credential: {
-              id: credentialId,
-              alias: body.alias,
-              created_at: '2024-01-01T00:00:00Z',
-              disabled_at: null,
-            },
-            message: 'エイリアスを更新しました',
-          });
-        })
+            return HttpResponse.json({
+              success: true,
+              credential: {
+                id: credentialId,
+                alias: body.alias,
+                created_at: '2024-01-01T00:00:00Z',
+                disabled_at: null,
+              },
+              message: 'エイリアスを更新しました',
+            });
+          }
+        )
       );
 
       const result = await updateCredentialAlias(credentialId, newAlias);
@@ -160,15 +169,21 @@ describe('WebAuthn API', () => {
       const credentialId = 'test-credential-id';
 
       server.use(
-        http.put(`http://localhost:8002/api/auth/webauthn/credentials/${credentialId}`, () => {
-          return HttpResponse.json({
-            success: false,
-            message: 'エイリアスは必須です',
-            errors: {
-              alias: ['エイリアスは必須です'],
-            },
-          }, { status: 422 });
-        })
+        http.put(
+          `http://localhost:8002/api/auth/webauthn/credentials/${credentialId}`,
+          () => {
+            return HttpResponse.json(
+              {
+                success: false,
+                message: 'エイリアスは必須です',
+                errors: {
+                  alias: ['エイリアスは必須です'],
+                },
+              },
+              { status: 422 }
+            );
+          }
+        )
       );
 
       const result = await updateCredentialAlias(credentialId, '');
@@ -195,12 +210,15 @@ describe('WebAuthn API', () => {
       const credentialId = 'test-credential-id';
 
       server.use(
-        http.post(`http://localhost:8002/api/auth/webauthn/credentials/${credentialId}/enable`, () => {
-          return HttpResponse.json({
-            success: true,
-            message: 'WebAuthnキーを有効化しました',
-          });
-        })
+        http.post(
+          `http://localhost:8002/api/auth/webauthn/credentials/${credentialId}/enable`,
+          () => {
+            return HttpResponse.json({
+              success: true,
+              message: 'WebAuthnキーを有効化しました',
+            });
+          }
+        )
       );
 
       const result = await enableCredential(credentialId);
@@ -213,9 +231,12 @@ describe('WebAuthn API', () => {
   describe('エラーハンドリング', () => {
     it('ネットワークエラーの場合は適切なエラーが投げられる', async () => {
       server.use(
-        http.post('http://localhost:8002/api/auth/webauthn/register/options', () => {
-          return HttpResponse.error();
-        })
+        http.post(
+          'http://localhost:8002/api/auth/webauthn/register/options',
+          () => {
+            return HttpResponse.error();
+          }
+        )
       );
 
       await expect(getRegistrationOptions()).rejects.toThrow();
@@ -224,24 +245,31 @@ describe('WebAuthn API', () => {
     it('サーバーエラーの場合は適切なエラーが投げられる', async () => {
       server.use(
         http.get('http://localhost:8002/api/auth/webauthn/credentials', () => {
-          return new Response(JSON.stringify({
-            success: false,
-            message: 'Internal Server Error'
-          }), {
-            status: 500,
-            statusText: 'Internal Server Error',
-            headers: { 'Content-Type': 'application/json' }
-          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              message: 'Internal Server Error',
+            }),
+            {
+              status: 500,
+              statusText: 'Internal Server Error',
+              headers: { 'Content-Type': 'application/json' },
+            }
+          );
         })
       );
 
-      await expect(getCredentials()).rejects.toThrow('WebAuthn認証器一覧の取得に失敗しました');
+      await expect(getCredentials()).rejects.toThrow(
+        'WebAuthn認証器一覧の取得に失敗しました'
+      );
     });
 
     it('認証トークンが設定されていない場合は適切なエラーが投げられる', async () => {
       localStorage.removeItem('auth_token');
 
-      await expect(getCredentials()).rejects.toThrow('認証トークンが設定されていません');
+      await expect(getCredentials()).rejects.toThrow(
+        '認証トークンが設定されていません'
+      );
     });
   });
 
@@ -250,10 +278,13 @@ describe('WebAuthn API', () => {
       let requestHeaders: Headers | undefined;
 
       server.use(
-        http.get('http://localhost:8002/api/auth/webauthn/credentials', ({ request }) => {
-          requestHeaders = request.headers;
-          return HttpResponse.json({ success: true, credentials: [] });
-        })
+        http.get(
+          'http://localhost:8002/api/auth/webauthn/credentials',
+          ({ request }) => {
+            requestHeaders = request.headers;
+            return HttpResponse.json({ success: true, credentials: [] });
+          }
+        )
       );
 
       await getCredentials();
@@ -285,13 +316,16 @@ describe('WebAuthn API', () => {
         },
       };
 
-      let sentData: any;
+      let sentData: unknown;
 
       server.use(
-        http.post('http://localhost:8002/api/auth/webauthn/register', async ({ request }) => {
-          sentData = await request.json();
-          return HttpResponse.json({ success: true });
-        })
+        http.post(
+          'http://localhost:8002/api/auth/webauthn/register',
+          async ({ request }) => {
+            sentData = await request.json();
+            return HttpResponse.json({ success: true });
+          }
+        )
       );
 
       await registerCredential(mockCredential);

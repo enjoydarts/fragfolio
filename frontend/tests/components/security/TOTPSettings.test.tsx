@@ -42,7 +42,9 @@ describe.skip('TOTPSettings', () => {
     expect(screen.getByText('TOTP 2段階認証')).toBeInTheDocument();
     expect(screen.getByText('有効')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '無効化' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'リカバリーコード表示' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'リカバリーコード表示' })
+    ).toBeInTheDocument();
   });
 
   it('2段階認証の有効化ができる', async () => {
@@ -54,21 +56,32 @@ describe.skip('TOTPSettings', () => {
       message: '2段階認証を有効にしました',
     };
 
-    vi.mocked(twoFactorApi.enableTwoFactor).mockResolvedValue(mockEnableResponse);
+    vi.mocked(twoFactorApi.enableTwoFactor).mockResolvedValue(
+      mockEnableResponse
+    );
     vi.mocked(twoFactorApi.confirmTwoFactor).mockResolvedValue({
       success: true,
       recovery_codes: ['code1', 'code2', 'code3'],
       message: '2段階認証を確認しました',
     });
 
-    render(<TOTPSettings twoFactorEnabled={false} onStatusChange={mockOnStatusChange} />);
+    render(
+      <TOTPSettings
+        twoFactorEnabled={false}
+        onStatusChange={mockOnStatusChange}
+      />
+    );
 
     // 有効化ボタンをクリック
     fireEvent.click(screen.getByRole('button', { name: '有効化' }));
 
     await waitFor(() => {
-      expect(screen.getByText('QRコードをスキャンしてください')).toBeInTheDocument();
-      expect(screen.getByText('シークレットキー: ABCDEFGHIJKLMNOP')).toBeInTheDocument();
+      expect(
+        screen.getByText('QRコードをスキャンしてください')
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('シークレットキー: ABCDEFGHIJKLMNOP')
+      ).toBeInTheDocument();
     });
 
     // 確認コードを入力
@@ -80,7 +93,10 @@ describe.skip('TOTPSettings', () => {
 
     await waitFor(() => {
       expect(twoFactorApi.confirmTwoFactor).toHaveBeenCalledWith('123456');
-      expect(mockShowToast).toHaveBeenCalledWith('2段階認証を確認しました', 'success');
+      expect(mockShowToast).toHaveBeenCalledWith(
+        '2段階認証を確認しました',
+        'success'
+      );
       expect(mockOnStatusChange).toHaveBeenCalledWith(true);
     });
 
@@ -99,7 +115,12 @@ describe.skip('TOTPSettings', () => {
       message: '2段階認証を無効にしました',
     });
 
-    render(<TOTPSettings twoFactorEnabled={true} onStatusChange={mockOnStatusChange} />);
+    render(
+      <TOTPSettings
+        twoFactorEnabled={true}
+        onStatusChange={mockOnStatusChange}
+      />
+    );
 
     // 無効化ボタンをクリック
     fireEvent.click(screen.getByRole('button', { name: '無効化' }));
@@ -115,7 +136,10 @@ describe.skip('TOTPSettings', () => {
 
     await waitFor(() => {
       expect(twoFactorApi.disableTwoFactor).toHaveBeenCalled();
-      expect(mockShowToast).toHaveBeenCalledWith('2段階認証を無効にしました', 'success');
+      expect(mockShowToast).toHaveBeenCalledWith(
+        '2段階認証を無効にしました',
+        'success'
+      );
       expect(mockOnStatusChange).toHaveBeenCalledWith(false);
     });
   });
@@ -129,7 +153,9 @@ describe.skip('TOTPSettings', () => {
     render(<TOTPSettings twoFactorEnabled={true} onStatusChange={vi.fn()} />);
 
     // リカバリーコード表示ボタンをクリック
-    fireEvent.click(screen.getByRole('button', { name: 'リカバリーコード表示' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'リカバリーコード表示' })
+    );
 
     await waitFor(() => {
       expect(screen.getByText('リカバリーコード')).toBeInTheDocument();
@@ -157,19 +183,26 @@ describe.skip('TOTPSettings', () => {
     render(<TOTPSettings twoFactorEnabled={true} onStatusChange={vi.fn()} />);
 
     // リカバリーコード表示
-    fireEvent.click(screen.getByRole('button', { name: 'リカバリーコード表示' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'リカバリーコード表示' })
+    );
 
     await waitFor(() => {
       expect(screen.getByText('old1')).toBeInTheDocument();
     });
 
     // 再生成ボタンをクリック
-    fireEvent.click(screen.getByRole('button', { name: 'リカバリーコード再生成' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'リカバリーコード再生成' })
+    );
 
     await waitFor(() => {
       expect(mockConfirm).toHaveBeenCalled();
       expect(twoFactorApi.regenerateRecoveryCodes).toHaveBeenCalled();
-      expect(mockShowToast).toHaveBeenCalledWith('リカバリーコードを再生成しました', 'success');
+      expect(mockShowToast).toHaveBeenCalledWith(
+        'リカバリーコードを再生成しました',
+        'success'
+      );
     });
 
     await waitFor(() => {
@@ -180,7 +213,9 @@ describe.skip('TOTPSettings', () => {
 
   it('エラー時にエラーメッセージが表示される', async () => {
     const errorMessage = 'エラーが発生しました';
-    vi.mocked(twoFactorApi.enableTwoFactor).mockRejectedValue(new Error(errorMessage));
+    vi.mocked(twoFactorApi.enableTwoFactor).mockRejectedValue(
+      new Error(errorMessage)
+    );
 
     render(<TOTPSettings twoFactorEnabled={false} onStatusChange={vi.fn()} />);
 
@@ -218,7 +253,10 @@ describe.skip('TOTPSettings', () => {
     fireEvent.click(screen.getByRole('button', { name: '確認' }));
 
     await waitFor(() => {
-      expect(mockShowToast).toHaveBeenCalledWith('認証コードが無効です', 'error');
+      expect(mockShowToast).toHaveBeenCalledWith(
+        '認証コードが無効です',
+        'error'
+      );
     });
   });
 
@@ -236,7 +274,9 @@ describe.skip('TOTPSettings', () => {
     fireEvent.click(screen.getByRole('button', { name: '有効化' }));
 
     await waitFor(() => {
-      expect(screen.getByText('QRコードをスキャンしてください')).toBeInTheDocument();
+      expect(
+        screen.getByText('QRコードをスキャンしてください')
+      ).toBeInTheDocument();
     });
 
     // キャンセルボタンをクリック
@@ -244,6 +284,8 @@ describe.skip('TOTPSettings', () => {
 
     // 初期状態に戻る
     expect(screen.getByRole('button', { name: '有効化' })).toBeInTheDocument();
-    expect(screen.queryByText('QRコードをスキャンしてください')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('QRコードをスキャンしてください')
+    ).not.toBeInTheDocument();
   });
 });

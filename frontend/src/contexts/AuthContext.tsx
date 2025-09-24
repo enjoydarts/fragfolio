@@ -70,7 +70,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setUser(response.user);
       } else if (response.requires_two_factor) {
         // 2FA要求エラーオブジェクトを作成
-        const error = new Error(response.message || '2要素認証が必要です') as Error & { requires_two_factor?: boolean; temp_token?: string; available_methods?: string[] };
+        const error = new Error(
+          response.message || '2要素認証が必要です'
+        ) as Error & {
+          requires_two_factor?: boolean;
+          temp_token?: string;
+          available_methods?: string[];
+        };
         error.requires_two_factor = true;
         error.temp_token = response.temp_token;
         error.available_methods = response.available_methods;
@@ -159,7 +165,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.success && response.user) {
         setUser(response.user);
       } else {
-        throw new Error(response.message || t('auth.errors.profile_update_failed'));
+        throw new Error(
+          response.message || t('auth.errors.profile_update_failed')
+        );
       }
     } catch (error) {
       console.error('Profile update failed:', error);
@@ -185,12 +193,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = (): AuthContextType => {
-  const context = React.useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { server } from '../mocks/server';
 import {
@@ -26,19 +26,26 @@ describe('TwoFactor API', () => {
   describe('enableTwoFactor', () => {
     it('2段階認証の有効化ができる', async () => {
       server.use(
-        http.post('http://localhost:8002/api/auth/two-factor-authentication', ({ request }) => {
-          const authHeader = request.headers.get('Authorization');
-          if (authHeader !== `Bearer ${mockToken}`) {
-            return HttpResponse.json({ success: false, message: '認証が必要です' }, { status: 401 });
-          }
+        http.post(
+          'http://localhost:8002/api/auth/two-factor-authentication',
+          ({ request }) => {
+            const authHeader = request.headers.get('Authorization');
+            if (authHeader !== `Bearer ${mockToken}`) {
+              return HttpResponse.json(
+                { success: false, message: '認証が必要です' },
+                { status: 401 }
+              );
+            }
 
-          return HttpResponse.json({
-            success: true,
-            secret_key: 'ABCDEFGHIJKLMNOP',
-            qr_code: 'otpauth://totp/fragfolio:test@example.com?secret=ABCDEFGHIJKLMNOP&issuer=fragfolio',
-            message: '2段階認証を有効にしました',
-          });
-        })
+            return HttpResponse.json({
+              success: true,
+              secret_key: 'ABCDEFGHIJKLMNOP',
+              qr_code:
+                'otpauth://totp/fragfolio:test@example.com?secret=ABCDEFGHIJKLMNOP&issuer=fragfolio',
+              message: '2段階認証を有効にしました',
+            });
+          }
+        )
       );
 
       const result = await enableTwoFactor();
@@ -51,29 +58,37 @@ describe('TwoFactor API', () => {
     it('未認証の場合はエラーが返される', async () => {
       localStorage.removeItem('auth_token');
 
-      await expect(enableTwoFactor()).rejects.toThrow('認証トークンが設定されていません');
+      await expect(enableTwoFactor()).rejects.toThrow(
+        '認証トークンが設定されていません'
+      );
     });
   });
 
   describe('confirmTwoFactor', () => {
     it('2段階認証の確認ができる', async () => {
       server.use(
-        http.post('http://localhost:8002/api/auth/confirmed-two-factor-authentication', async ({ request }) => {
-          const body = await request.json() as { code: string };
+        http.post(
+          'http://localhost:8002/api/auth/confirmed-two-factor-authentication',
+          async ({ request }) => {
+            const body = (await request.json()) as { code: string };
 
-          if (body.code === '123456') {
-            return HttpResponse.json({
-              success: true,
-              recovery_codes: ['code1', 'code2', 'code3'],
-              message: '2段階認証を確認しました',
-            });
+            if (body.code === '123456') {
+              return HttpResponse.json({
+                success: true,
+                recovery_codes: ['code1', 'code2', 'code3'],
+                message: '2段階認証を確認しました',
+              });
+            }
+
+            return HttpResponse.json(
+              {
+                success: false,
+                message: '認証コードが無効です',
+              },
+              { status: 422 }
+            );
           }
-
-          return HttpResponse.json({
-            success: false,
-            message: '認証コードが無効です',
-          }, { status: 422 });
-        })
+        )
       );
 
       const result = await confirmTwoFactor('123456');
@@ -84,14 +99,18 @@ describe('TwoFactor API', () => {
 
     it('無効なコードの場合はエラー', async () => {
       server.use(
-        http.post('http://localhost:8002/api/auth/confirmed-two-factor-authentication', async ({ request }) => {
-          const body = await request.json() as { code: string };
-
-          return HttpResponse.json({
-            success: false,
-            message: '認証コードが無効です',
-          }, { status: 422 });
-        })
+        http.post(
+          'http://localhost:8002/api/auth/confirmed-two-factor-authentication',
+          async () => {
+            return HttpResponse.json(
+              {
+                success: false,
+                message: '認証コードが無効です',
+              },
+              { status: 422 }
+            );
+          }
+        )
       );
 
       const result = await confirmTwoFactor('000000');
@@ -104,12 +123,15 @@ describe('TwoFactor API', () => {
   describe('disableTwoFactor', () => {
     it('2段階認証の無効化ができる', async () => {
       server.use(
-        http.delete('http://localhost:8002/api/auth/two-factor-authentication', () => {
-          return HttpResponse.json({
-            success: true,
-            message: '2段階認証を無効にしました',
-          });
-        })
+        http.delete(
+          'http://localhost:8002/api/auth/two-factor-authentication',
+          () => {
+            return HttpResponse.json({
+              success: true,
+              message: '2段階認証を無効にしました',
+            });
+          }
+        )
       );
 
       const result = await disableTwoFactor();
@@ -127,7 +149,7 @@ describe('TwoFactor API', () => {
         }),
         http.get('http://localhost:8002/api/auth/two-factor-secret-key', () => {
           return HttpResponse.json({
-            secret_key: 'ABCDEFGHIJKLMNOP'
+            secret_key: 'ABCDEFGHIJKLMNOP',
           });
         })
       );
@@ -142,10 +164,13 @@ describe('TwoFactor API', () => {
     it('2段階認証が無効な場合はエラー', async () => {
       server.use(
         http.get('http://localhost:8002/api/auth/two-factor-qr-code', () => {
-          return HttpResponse.json({
-            success: false,
-            message: '2段階認証が有効化されていません',
-          }, { status: 422 });
+          return HttpResponse.json(
+            {
+              success: false,
+              message: '2段階認証が有効化されていません',
+            },
+            { status: 422 }
+          );
         })
       );
 
@@ -159,11 +184,14 @@ describe('TwoFactor API', () => {
   describe('getRecoveryCodes', () => {
     it('リカバリーコードを取得できる', async () => {
       server.use(
-        http.get('http://localhost:8002/api/auth/two-factor-recovery-codes', () => {
-          return HttpResponse.json({
-            recovery_codes: ['code1', 'code2', 'code3'],
-          });
-        })
+        http.get(
+          'http://localhost:8002/api/auth/two-factor-recovery-codes',
+          () => {
+            return HttpResponse.json({
+              recovery_codes: ['code1', 'code2', 'code3'],
+            });
+          }
+        )
       );
 
       const result = await getRecoveryCodes();
@@ -176,11 +204,14 @@ describe('TwoFactor API', () => {
   describe('regenerateRecoveryCodes', () => {
     it('リカバリーコードを再生成できる', async () => {
       server.use(
-        http.post('http://localhost:8002/api/auth/two-factor-recovery-codes', () => {
-          return HttpResponse.json({
-            recovery_codes: ['new1', 'new2', 'new3'],
-          });
-        })
+        http.post(
+          'http://localhost:8002/api/auth/two-factor-recovery-codes',
+          () => {
+            return HttpResponse.json({
+              recovery_codes: ['new1', 'new2', 'new3'],
+            });
+          }
+        )
       );
 
       const result = await regenerateRecoveryCodes();
@@ -194,9 +225,12 @@ describe('TwoFactor API', () => {
   describe('エラーハンドリング', () => {
     it('ネットワークエラーの場合は適切なエラーが投げられる', async () => {
       server.use(
-        http.post('http://localhost:8002/api/auth/two-factor-authentication', () => {
-          return HttpResponse.error();
-        })
+        http.post(
+          'http://localhost:8002/api/auth/two-factor-authentication',
+          () => {
+            return HttpResponse.error();
+          }
+        )
       );
 
       await expect(enableTwoFactor()).rejects.toThrow();
@@ -204,12 +238,15 @@ describe('TwoFactor API', () => {
 
     it('サーバーエラーの場合は適切なエラーが投げられる', async () => {
       server.use(
-        http.post('http://localhost:8002/api/auth/two-factor-authentication', () => {
-          return HttpResponse.json(
-            { success: false, message: 'Internal Server Error' },
-            { status: 500 }
-          );
-        })
+        http.post(
+          'http://localhost:8002/api/auth/two-factor-authentication',
+          () => {
+            return HttpResponse.json(
+              { success: false, message: 'Internal Server Error' },
+              { status: 500 }
+            );
+          }
+        )
       );
 
       const result = await enableTwoFactor();
@@ -220,7 +257,9 @@ describe('TwoFactor API', () => {
     it('認証トークンが設定されていない場合は適切なエラーが投げられる', async () => {
       localStorage.removeItem('auth_token');
 
-      await expect(enableTwoFactor()).rejects.toThrow('認証トークンが設定されていません');
+      await expect(enableTwoFactor()).rejects.toThrow(
+        '認証トークンが設定されていません'
+      );
     });
   });
 
@@ -229,10 +268,13 @@ describe('TwoFactor API', () => {
       let requestHeaders: Headers | undefined;
 
       server.use(
-        http.post('http://localhost:8002/api/auth/two-factor-authentication', ({ request }) => {
-          requestHeaders = request.headers;
-          return HttpResponse.json({ success: true });
-        })
+        http.post(
+          'http://localhost:8002/api/auth/two-factor-authentication',
+          ({ request }) => {
+            requestHeaders = request.headers;
+            return HttpResponse.json({ success: true });
+          }
+        )
       );
 
       await enableTwoFactor();

@@ -40,7 +40,9 @@ describe('Header', () => {
 
     it('ログインリンクが表示される', () => {
       renderWithAuth();
-      expect(screen.getByRole('link', { name: 'ログイン' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'ログイン' })
+      ).toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'ログイン' })).toHaveAttribute(
         'href',
         '/auth'
@@ -96,7 +98,9 @@ describe('Header', () => {
 
     it('ログインリンクが表示されない', () => {
       renderWithAuth({ user: mockUser });
-      expect(screen.queryByRole('link', { name: 'ログイン' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: 'ログイン' })
+      ).not.toBeInTheDocument();
     });
 
     it('ユーザーメニューから設定にアクセスできる', async () => {
@@ -126,7 +130,9 @@ describe('Header', () => {
 
       // 初期状態は日本語
       expect(screen.getByText('🇺🇸 English')).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'ログイン' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'ログイン' })
+      ).toBeInTheDocument();
 
       // 英語に切り替え
       await user.click(screen.getByText('🇺🇸 English'));
@@ -146,7 +152,9 @@ describe('Header', () => {
 
       // 日本語に戻す
       await user.click(screen.getByText('🇯🇵 日本語'));
-      expect(screen.getByRole('link', { name: 'ログイン' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'ログイン' })
+      ).toBeInTheDocument();
     });
   });
 

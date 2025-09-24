@@ -13,7 +13,7 @@ export const ToastContainer: React.FC = () => {
           className="pointer-events-auto"
           style={{
             transform: `translateY(${index * 10}px)`,
-            zIndex: 99999 - index
+            zIndex: 99999 - index,
           }}
         >
           <Toast

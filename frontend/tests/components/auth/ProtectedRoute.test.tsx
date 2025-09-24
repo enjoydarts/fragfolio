@@ -109,7 +109,9 @@ describe.skip('ProtectedRoute', () => {
       </ProtectedRoute>
     );
 
-    expect(screen.getByText('メールアドレスの確認が必要です')).toBeInTheDocument();
+    expect(
+      screen.getByText('メールアドレスの確認が必要です')
+    ).toBeInTheDocument();
     expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
   });
 

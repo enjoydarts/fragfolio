@@ -88,8 +88,7 @@ describe('AuthPage', () => {
       renderWithAuth();
 
       // 新規登録リンクをクリック（実際のテキストは「新規登録はこちら」）
-      const registerLink =
-        screen.getByText('新規登録はこちら');
+      const registerLink = screen.getByText('新規登録はこちら');
       await user.click(registerLink);
 
       // 新規登録フォームの要素が表示される（実際のラベルに合わせる）
@@ -105,8 +104,7 @@ describe('AuthPage', () => {
       renderWithAuth();
 
       // 新規登録モードに切り替え
-      const registerLink =
-        screen.getByText('新規登録はこちら');
+      const registerLink = screen.getByText('新規登録はこちら');
       await user.click(registerLink);
 
       // ログインリンクをクリック
@@ -147,8 +145,7 @@ describe('AuthPage', () => {
       renderWithAuth();
 
       // 新規登録モードに切り替え
-      const registerLink =
-        screen.getByText('新規登録はこちら');
+      const registerLink = screen.getByText('新規登録はこちら');
       await user.click(registerLink);
 
       // 新規登録フォームが表示される

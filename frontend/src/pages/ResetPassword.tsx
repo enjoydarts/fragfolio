@@ -30,7 +30,7 @@ export const ResetPassword: React.FC = () => {
     if (!token || !email) {
       setError(t('password_reset.invalid_link'));
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

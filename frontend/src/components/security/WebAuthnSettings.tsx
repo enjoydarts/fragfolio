@@ -2,7 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
-import { WebAuthnAPI, WebAuthnUtils, type WebAuthnCredential } from '../../api/webauthn';
+import {
+  WebAuthnAPI,
+  WebAuthnUtils,
+  type WebAuthnCredential,
+} from '../../api/webauthn';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 
 interface WebAuthnSettingsState {
@@ -43,17 +47,17 @@ export const WebAuthnSettings: React.FC = () => {
   useEffect(() => {
     const loadCredentialsIfNeeded = async () => {
       if (token) {
-        setState(prev => ({ ...prev, loading: true, error: null }));
+        setState((prev) => ({ ...prev, loading: true, error: null }));
 
         try {
           const credentials = await WebAuthnAPI.getCredentials(token);
-          setState(prev => ({
+          setState((prev) => ({
             ...prev,
             credentials,
             loading: false,
           }));
         } catch {
-          setState(prev => ({
+          setState((prev) => ({
             ...prev,
             error: t('settings.security.webauthn.fetch_failed'),
             loading: false,
@@ -64,7 +68,7 @@ export const WebAuthnSettings: React.FC = () => {
 
     checkWebAuthnSupport();
     loadCredentialsIfNeeded();
-  }, [token]);
+  }, [token, t]);
 
   const checkWebAuthnSupport = async () => {
     const isSupported = WebAuthnUtils.isSupported();
@@ -72,7 +76,7 @@ export const WebAuthnSettings: React.FC = () => {
       ? await WebAuthnUtils.isPlatformAuthenticatorAvailable()
       : false;
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       isSupported,
       isPlatformAvailable,
@@ -82,17 +86,17 @@ export const WebAuthnSettings: React.FC = () => {
   const loadCredentials = async () => {
     if (!token) return;
 
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
       const credentials = await WebAuthnAPI.getCredentials(token);
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         credentials,
         loading: false,
       }));
     } catch {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         error: t('settings.security.webauthn.fetch_failed'),
         loading: false,
@@ -103,7 +107,7 @@ export const WebAuthnSettings: React.FC = () => {
   const handleRegister = async () => {
     if (!token) return;
 
-    setState(prev => ({ ...prev, isRegistering: true, error: null }));
+    setState((prev) => ({ ...prev, isRegistering: true, error: null }));
 
     try {
       // 1. 登録オプションを取得
@@ -113,16 +117,17 @@ export const WebAuthnSettings: React.FC = () => {
       const createOptions = WebAuthnUtils.convertRegistrationOptions(options);
 
       // 3. WebAuthn認証器で登録
-      const credential = await navigator.credentials.create({
+      const credential = (await navigator.credentials.create({
         publicKey: createOptions,
-      }) as PublicKeyCredential;
+      })) as PublicKeyCredential;
 
       if (!credential) {
         throw new Error(t('settings.security.webauthn.registration_cancelled'));
       }
 
       // 4. サーバー送信用に変換
-      const credentialData = WebAuthnUtils.convertRegistrationResponse(credential);
+      const credentialData =
+        WebAuthnUtils.convertRegistrationResponse(credential);
 
       // 5. サーバーに送信
       const response = await WebAuthnAPI.registerCredential(
@@ -132,16 +137,18 @@ export const WebAuthnSettings: React.FC = () => {
       );
 
       if (response.success) {
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           isRegistering: false,
           newCredentialAlias: '',
         }));
         await loadCredentials(); // 認証器一覧を再読み込み
       } else {
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
-          error: response.message || t('settings.security.webauthn.registration_failed'),
+          error:
+            response.message ||
+            t('settings.security.webauthn.registration_failed'),
           isRegistering: false,
         }));
       }
@@ -152,25 +159,40 @@ export const WebAuthnSettings: React.FC = () => {
         // WebAuthnの特定エラーをハンドリング
         if (error.name === 'NotAllowedError') {
           // ユーザーがキャンセルした場合
-          errorMessage = t('settings.security.webauthn.registration_cancelled', '登録がキャンセルされました');
+          errorMessage = t(
+            'settings.security.webauthn.registration_cancelled',
+            '登録がキャンセルされました'
+          );
         } else if (error.name === 'TimeoutError') {
           // タイムアウトの場合
-          errorMessage = t('settings.security.webauthn.registration_timeout', '登録がタイムアウトしました');
+          errorMessage = t(
+            'settings.security.webauthn.registration_timeout',
+            '登録がタイムアウトしました'
+          );
         } else if (error.name === 'InvalidStateError') {
           // 既に登録済みの認証器の場合
-          errorMessage = t('settings.security.webauthn.registration_invalid_state', '認証器の状態が無効です。別の認証器をお試しください');
+          errorMessage = t(
+            'settings.security.webauthn.registration_invalid_state',
+            '認証器の状態が無効です。別の認証器をお試しください'
+          );
         } else if (error.name === 'NotSupportedError') {
           // サポートされていない場合
-          errorMessage = t('settings.security.webauthn.registration_not_supported', 'この認証器はサポートされていません');
+          errorMessage = t(
+            'settings.security.webauthn.registration_not_supported',
+            'この認証器はサポートされていません'
+          );
         } else if (error.message.includes('Invalid base64url string')) {
           // base64url変換エラーの場合
-          errorMessage = t('settings.security.webauthn.invalid_response', 'サーバーからの応答が無効です');
+          errorMessage = t(
+            'settings.security.webauthn.invalid_response',
+            'サーバーからの応答が無効です'
+          );
         } else {
           errorMessage = error.message;
         }
       }
 
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         error: errorMessage,
         isRegistering: false,
@@ -179,10 +201,12 @@ export const WebAuthnSettings: React.FC = () => {
   };
 
   const handleDisable = (credentialId: string) => {
-    const credential = state.credentials.find(c => c.id === credentialId);
-    const credentialName = credential?.alias || t('settings.security.webauthn.unnamed_credential', '名前なし認証器');
+    const credential = state.credentials.find((c) => c.id === credentialId);
+    const credentialName =
+      credential?.alias ||
+      t('settings.security.webauthn.unnamed_credential', '名前なし認証器');
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       confirmDialog: {
         isOpen: true,
@@ -194,10 +218,12 @@ export const WebAuthnSettings: React.FC = () => {
   };
 
   const handleDelete = (credentialId: string) => {
-    const credential = state.credentials.find(c => c.id === credentialId);
-    const credentialName = credential?.alias || t('settings.security.webauthn.unnamed_credential', '名前なし認証器');
+    const credential = state.credentials.find((c) => c.id === credentialId);
+    const credentialName =
+      credential?.alias ||
+      t('settings.security.webauthn.unnamed_credential', '名前なし認証器');
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       confirmDialog: {
         isOpen: true,
@@ -211,23 +237,31 @@ export const WebAuthnSettings: React.FC = () => {
   const handleEnable = async (credentialId: string) => {
     if (!token) return;
 
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
       const response = await WebAuthnAPI.enableCredential(token, credentialId);
       if (response.success) {
         await loadCredentials();
       } else {
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
-          error: response.message || t('settings.security.webauthn.enable_failed', 'WebAuthn認証器の有効化に失敗しました'),
+          error:
+            response.message ||
+            t(
+              'settings.security.webauthn.enable_failed',
+              'WebAuthn認証器の有効化に失敗しました'
+            ),
           loading: false,
         }));
       }
     } catch {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
-        error: t('settings.security.webauthn.enable_failed', 'WebAuthn認証器の有効化に失敗しました'),
+        error: t(
+          'settings.security.webauthn.enable_failed',
+          'WebAuthn認証器の有効化に失敗しました'
+        ),
         loading: false,
       }));
     }
@@ -238,7 +272,7 @@ export const WebAuthnSettings: React.FC = () => {
 
     const { credentialId, action } = state.confirmDialog;
 
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       loading: true,
       error: null,
@@ -261,20 +295,22 @@ export const WebAuthnSettings: React.FC = () => {
       if (response.success) {
         await loadCredentials();
       } else {
-        const errorKey = action === 'delete'
-          ? 'settings.security.webauthn.delete_failed'
-          : 'settings.security.webauthn.disable_failed';
-        setState(prev => ({
+        const errorKey =
+          action === 'delete'
+            ? 'settings.security.webauthn.delete_failed'
+            : 'settings.security.webauthn.disable_failed';
+        setState((prev) => ({
           ...prev,
           error: response.message || t(errorKey),
           loading: false,
         }));
       }
     } catch {
-      const errorKey = action === 'delete'
-        ? 'settings.security.webauthn.delete_failed'
-        : 'settings.security.webauthn.disable_failed';
-      setState(prev => ({
+      const errorKey =
+        action === 'delete'
+          ? 'settings.security.webauthn.delete_failed'
+          : 'settings.security.webauthn.disable_failed';
+      setState((prev) => ({
         ...prev,
         error: t(errorKey),
         loading: false,
@@ -283,7 +319,7 @@ export const WebAuthnSettings: React.FC = () => {
   };
 
   const handleCancelAction = () => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       confirmDialog: {
         isOpen: false,
@@ -297,21 +333,27 @@ export const WebAuthnSettings: React.FC = () => {
   const handleUpdateAlias = async (credentialId: string, newAlias: string) => {
     if (!token) return;
 
-    setState(prev => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
-      const response = await WebAuthnAPI.updateCredentialAlias(token, credentialId, newAlias);
+      const response = await WebAuthnAPI.updateCredentialAlias(
+        token,
+        credentialId,
+        newAlias
+      );
       if (response.success) {
         await loadCredentials();
       } else {
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
-          error: response.message || t('settings.security.webauthn.alias_update_failed'),
+          error:
+            response.message ||
+            t('settings.security.webauthn.alias_update_failed'),
           loading: false,
         }));
       }
     } catch {
-      setState(prev => ({
+      setState((prev) => ({
         ...prev,
         error: t('settings.security.webauthn.alias_update_failed'),
         loading: false,
@@ -326,7 +368,10 @@ export const WebAuthnSettings: React.FC = () => {
           {t('settings.security.webauthn.title', 'WebAuthn / FIDO2')}
         </h4>
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded">
-          {t('settings.security.webauthn.not_supported', 'お使いのブラウザはWebAuthnをサポートしていません')}
+          {t(
+            'settings.security.webauthn.not_supported',
+            'お使いのブラウザはWebAuthnをサポートしていません'
+          )}
         </div>
       </div>
     );
@@ -345,7 +390,10 @@ export const WebAuthnSettings: React.FC = () => {
       )}
 
       <p className="text-sm text-gray-600 mb-6">
-        {t('settings.security.webauthn.description', 'セキュリティキーや生体認証でパスワードレス認証が利用できます')}
+        {t(
+          'settings.security.webauthn.description',
+          'セキュリティキーや生体認証でパスワードレス認証が利用できます'
+        )}
       </p>
 
       {/* 新しい認証器の登録 */}
@@ -362,8 +410,16 @@ export const WebAuthnSettings: React.FC = () => {
             <input
               type="text"
               value={state.newCredentialAlias}
-              onChange={(e) => setState(prev => ({ ...prev, newCredentialAlias: e.target.value }))}
-              placeholder={t('settings.security.webauthn.alias_placeholder', '例: iPhone Touch ID、YubiKey')}
+              onChange={(e) =>
+                setState((prev) => ({
+                  ...prev,
+                  newCredentialAlias: e.target.value,
+                }))
+              }
+              placeholder={t(
+                'settings.security.webauthn.alias_placeholder',
+                '例: iPhone Touch ID、YubiKey'
+              )}
               className="w-full p-2 border border-gray-300 rounded focus:ring-orange-500 focus:border-orange-500"
               disabled={state.isRegistering}
             />
@@ -376,13 +432,15 @@ export const WebAuthnSettings: React.FC = () => {
           >
             {state.isRegistering
               ? t('settings.security.webauthn.registering', '登録中...')
-              : t('settings.security.webauthn.register', '認証器を登録')
-            }
+              : t('settings.security.webauthn.register', '認証器を登録')}
           </button>
 
           {state.isPlatformAvailable && (
             <p className="text-xs text-gray-500">
-              {t('settings.security.webauthn.platform_available', 'このデバイスの生体認証が利用可能です')}
+              {t(
+                'settings.security.webauthn.platform_available',
+                'このデバイスの生体認証が利用可能です'
+              )}
             </p>
           )}
         </div>
@@ -391,16 +449,24 @@ export const WebAuthnSettings: React.FC = () => {
       {/* 登録済み認証器一覧 */}
       <div>
         <h5 className="font-medium text-gray-900 mb-3">
-          {t('settings.security.webauthn.registered_credentials', '登録済み認証器')}
+          {t(
+            'settings.security.webauthn.registered_credentials',
+            '登録済み認証器'
+          )}
         </h5>
 
         {state.loading ? (
           <div className="text-center py-4">
-            <div className="text-gray-500">{t('common.loading', '読み込み中...')}</div>
+            <div className="text-gray-500">
+              {t('common.loading', '読み込み中...')}
+            </div>
           </div>
         ) : state.credentials.length === 0 ? (
           <div className="text-center py-4 text-gray-500">
-            {t('settings.security.webauthn.no_credentials', '登録済みの認証器がありません')}
+            {t(
+              'settings.security.webauthn.no_credentials',
+              '登録済みの認証器がありません'
+            )}
           </div>
         ) : (
           <div className="space-y-3">
@@ -419,38 +485,54 @@ export const WebAuthnSettings: React.FC = () => {
         )}
       </div>
 
-      {state.confirmDialog.isOpen && createPortal(
-        <ConfirmDialog
-          isOpen={state.confirmDialog.isOpen}
-          title={state.confirmDialog.action === 'delete'
-            ? t('settings.security.webauthn.delete_confirm_title', '認証器の削除')
-            : t('settings.security.webauthn.disable_confirm_title', '認証器の無効化')
-          }
-          message={state.confirmDialog.action === 'delete'
-            ? t('settings.security.webauthn.delete_confirm_message', '「{{credentialName}}」を完全に削除しますか？この操作は取り消せません。', {
-                credentialName: state.confirmDialog.credentialName
-              })
-            : t('settings.security.webauthn.disable_confirm_message', '「{{credentialName}}」を無効化しますか？この操作は元に戻せません。', {
-                credentialName: state.confirmDialog.credentialName
-              })
-          }
-          confirmText={state.loading
-            ? (state.confirmDialog.action === 'delete'
-                ? t('settings.security.webauthn.deleting', '削除中...')
-                : t('settings.security.webauthn.disabling', '無効化中...')
-              )
-            : (state.confirmDialog.action === 'delete'
-                ? t('settings.security.webauthn.delete', '削除')
-                : t('settings.security.webauthn.disable', '無効化')
-              )
-          }
-          cancelText={t('common.cancel', 'キャンセル')}
-          confirmVariant="danger"
-          onConfirm={handleConfirmAction}
-          onCancel={handleCancelAction}
-        />,
-        document.body
-      )}
+      {state.confirmDialog.isOpen &&
+        createPortal(
+          <ConfirmDialog
+            isOpen={state.confirmDialog.isOpen}
+            title={
+              state.confirmDialog.action === 'delete'
+                ? t(
+                    'settings.security.webauthn.delete_confirm_title',
+                    '認証器の削除'
+                  )
+                : t(
+                    'settings.security.webauthn.disable_confirm_title',
+                    '認証器の無効化'
+                  )
+            }
+            message={
+              state.confirmDialog.action === 'delete'
+                ? t(
+                    'settings.security.webauthn.delete_confirm_message',
+                    '「{{credentialName}}」を完全に削除しますか？この操作は取り消せません。',
+                    {
+                      credentialName: state.confirmDialog.credentialName,
+                    }
+                  )
+                : t(
+                    'settings.security.webauthn.disable_confirm_message',
+                    '「{{credentialName}}」を無効化しますか？この操作は元に戻せません。',
+                    {
+                      credentialName: state.confirmDialog.credentialName,
+                    }
+                  )
+            }
+            confirmText={
+              state.loading
+                ? state.confirmDialog.action === 'delete'
+                  ? t('settings.security.webauthn.deleting', '削除中...')
+                  : t('settings.security.webauthn.disabling', '無効化中...')
+                : state.confirmDialog.action === 'delete'
+                  ? t('settings.security.webauthn.delete', '削除')
+                  : t('settings.security.webauthn.disable', '無効化')
+            }
+            cancelText={t('common.cancel', 'キャンセル')}
+            confirmVariant="danger"
+            onConfirm={handleConfirmAction}
+            onCancel={handleCancelAction}
+          />,
+          document.body
+        )}
     </div>
   );
 };
@@ -471,7 +553,7 @@ const CredentialItem: React.FC<CredentialItemProps> = ({
   onEnable,
   onDelete,
   onUpdateAlias,
-  disabled
+  disabled,
 }) => {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -498,35 +580,48 @@ const CredentialItem: React.FC<CredentialItemProps> = ({
   const isDisabled = !!credential.disabled_at;
 
   return (
-    <div className={`flex items-center justify-between p-4 border rounded-lg ${
-      isDisabled ? 'border-red-200 bg-red-50' : 'border-gray-200'
-    }`}>
+    <div
+      className={`flex items-center justify-between p-4 border rounded-lg ${
+        isDisabled ? 'border-red-200 bg-red-50' : 'border-gray-200'
+      }`}
+    >
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
-          <div className={`w-3 h-3 rounded-full ${
-            isDisabled ? 'bg-red-400' : 'bg-green-400'
-          }`}></div>
+          <div
+            className={`w-3 h-3 rounded-full ${
+              isDisabled ? 'bg-red-400' : 'bg-green-400'
+            }`}
+          ></div>
           {isEditing ? (
             <input
               type="text"
               value={editAlias}
               onChange={(e) => setEditAlias(e.target.value)}
-              placeholder={t('settings.security.webauthn.alias_placeholder', '例: iPhone Touch ID、YubiKey')}
+              placeholder={t(
+                'settings.security.webauthn.alias_placeholder',
+                '例: iPhone Touch ID、YubiKey'
+              )}
               className="flex-1 text-sm font-medium text-gray-900 border border-gray-300 rounded px-2 py-1 focus:ring-blue-500 focus:border-blue-500"
               disabled={disabled}
             />
           ) : (
             <h6 className="text-sm font-medium text-gray-900">
-              {credential.alias || t('settings.security.webauthn.unnamed_credential', '名前なし認証器')}
+              {credential.alias ||
+                t(
+                  'settings.security.webauthn.unnamed_credential',
+                  '名前なし認証器'
+                )}
             </h6>
           )}
         </div>
         <div className="text-xs text-gray-500">
-          {t('settings.security.webauthn.registered_on', '登録日')}: {formatDate(credential.created_at)}
+          {t('settings.security.webauthn.registered_on', '登録日')}:{' '}
+          {formatDate(credential.created_at)}
         </div>
         {isDisabled && (
           <div className="text-xs text-red-500">
-            {t('settings.security.webauthn.disabled_on', '無効化日')}: {formatDate(credential.disabled_at)}
+            {t('settings.security.webauthn.disabled_on', '無効化日')}:{' '}
+            {formatDate(credential.disabled_at)}
           </div>
         )}
         <div className="text-xs text-gray-500">
@@ -597,4 +692,3 @@ const CredentialItem: React.FC<CredentialItemProps> = ({
     </div>
   );
 };
-

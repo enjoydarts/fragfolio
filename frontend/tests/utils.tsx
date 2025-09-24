@@ -10,10 +10,16 @@ import i18n from '../src/i18n';
 // カスタムレンダーを作成
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   initialEntries?: string[];
-  authContext?: any;
+  authContext?: unknown;
 }
 
-function AllTheProviders({ children, authContext }: { children: React.ReactNode; authContext?: any }) {
+function AllTheProviders({
+  children,
+  authContext,
+}: {
+  children: React.ReactNode;
+  authContext?: unknown;
+}) {
   // AuthContextの値をモック
   const defaultAuthContext = {
     user: null,
@@ -32,9 +38,7 @@ function AllTheProviders({ children, authContext }: { children: React.ReactNode;
     <MemoryRouter initialEntries={['/']}>
       <I18nextProvider i18n={i18n}>
         <AuthProvider value={defaultAuthContext}>
-          <ToastProvider>
-            {children}
-          </ToastProvider>
+          <ToastProvider>{children}</ToastProvider>
         </AuthProvider>
       </I18nextProvider>
     </MemoryRouter>
@@ -48,7 +52,9 @@ const customRender = (
   const { authContext, ...renderOptions } = options;
 
   return render(ui, {
-    wrapper: (props) => <AllTheProviders {...props} authContext={authContext} />,
+    wrapper: (props) => (
+      <AllTheProviders {...props} authContext={authContext} />
+    ),
     ...renderOptions,
   });
 };

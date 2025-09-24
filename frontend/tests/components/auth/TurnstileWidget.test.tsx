@@ -31,7 +31,13 @@ describe('TurnstileWidget', () => {
   it('Turnstileウィジェットが正しく初期化される', () => {
     mockTurnstileRender.mockReturnValue('widget-id');
 
-    render(<TurnstileWidget siteKey={testSiteKey} onVerify={mockOnVerify} onError={mockOnError} />);
+    render(
+      <TurnstileWidget
+        siteKey={testSiteKey}
+        onVerify={mockOnVerify}
+        onError={mockOnError}
+      />
+    );
 
     expect(mockTurnstileRender).toHaveBeenCalledWith(
       expect.any(Element),
@@ -51,7 +57,13 @@ describe('TurnstileWidget', () => {
       return 'widget-id';
     });
 
-    render(<TurnstileWidget siteKey={testSiteKey} onVerify={mockOnVerify} onError={mockOnError} />);
+    render(
+      <TurnstileWidget
+        siteKey={testSiteKey}
+        onVerify={mockOnVerify}
+        onError={mockOnError}
+      />
+    );
 
     const testToken = 'test-turnstile-token';
     successCallback!(testToken);
@@ -67,7 +79,13 @@ describe('TurnstileWidget', () => {
       return 'widget-id';
     });
 
-    render(<TurnstileWidget siteKey={testSiteKey} onVerify={mockOnVerify} onError={mockOnError} />);
+    render(
+      <TurnstileWidget
+        siteKey={testSiteKey}
+        onVerify={mockOnVerify}
+        onError={mockOnError}
+      />
+    );
 
     errorCallback!();
 
@@ -79,7 +97,11 @@ describe('TurnstileWidget', () => {
     mockTurnstileRender.mockReturnValue(widgetId);
 
     const { unmount } = render(
-      <TurnstileWidget siteKey={testSiteKey} onVerify={mockOnVerify} onError={mockOnError} />
+      <TurnstileWidget
+        siteKey={testSiteKey}
+        onVerify={mockOnVerify}
+        onError={mockOnError}
+      />
     );
 
     unmount();
@@ -90,9 +112,15 @@ describe('TurnstileWidget', () => {
   it('Turnstile APIが利用できない場合の処理', () => {
     // turnstile APIを一時的に削除
     const originalTurnstile = window.turnstile;
-    delete (window as any).turnstile;
+    delete (window as Window & { turnstile?: unknown }).turnstile;
 
-    render(<TurnstileWidget siteKey={testSiteKey} onVerify={mockOnVerify} onError={mockOnError} />);
+    render(
+      <TurnstileWidget
+        siteKey={testSiteKey}
+        onVerify={mockOnVerify}
+        onError={mockOnError}
+      />
+    );
 
     // TurnstileWidgetのコンテナが存在することを確認
     const containers = screen.getAllByRole('generic');
@@ -103,7 +131,13 @@ describe('TurnstileWidget', () => {
   });
 
   it('サイトキーが空の場合でもコンポーネントが正常に動作する', () => {
-    render(<TurnstileWidget siteKey="" onVerify={mockOnVerify} onError={mockOnError} />);
+    render(
+      <TurnstileWidget
+        siteKey=""
+        onVerify={mockOnVerify}
+        onError={mockOnError}
+      />
+    );
 
     const containers = screen.getAllByRole('generic');
     expect(containers.length).toBeGreaterThan(0);
@@ -114,14 +148,26 @@ describe('TurnstileWidget', () => {
     mockTurnstileRender.mockReturnValue(widgetId);
 
     const { rerender } = render(
-      <TurnstileWidget siteKey={testSiteKey} onVerify={mockOnVerify} onError={mockOnError} reset={0} />
+      <TurnstileWidget
+        siteKey={testSiteKey}
+        onVerify={mockOnVerify}
+        onError={mockOnError}
+        reset={0}
+      />
     );
 
     // ウィジェットがレンダーされるまで待つ
     expect(mockTurnstileRender).toHaveBeenCalled();
 
     // reset propを変更
-    rerender(<TurnstileWidget siteKey={testSiteKey} onVerify={mockOnVerify} onError={mockOnError} reset={1} />);
+    rerender(
+      <TurnstileWidget
+        siteKey={testSiteKey}
+        onVerify={mockOnVerify}
+        onError={mockOnError}
+        reset={1}
+      />
+    );
 
     expect(mockTurnstileReset).toHaveBeenCalledWith(widgetId);
   });

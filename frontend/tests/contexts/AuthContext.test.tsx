@@ -28,7 +28,15 @@ const mockUseToast = vi.mocked(useToast);
 
 // テスト用コンポーネント
 const TestComponent = () => {
-  const { user, isLoading, login, logout, register, refreshToken, updateProfile } = useAuth();
+  const {
+    user,
+    isLoading,
+    login,
+    logout,
+    register,
+    refreshToken,
+    updateProfile,
+  } = useAuth();
 
   const handleLogin = async () => {
     try {
@@ -47,7 +55,7 @@ const TestComponent = () => {
         password: 'password123',
         language: 'ja',
         timezone: 'Asia/Tokyo',
-        turnstile_token: 'turnstile-token'
+        turnstile_token: 'turnstile-token',
       });
     } catch (error) {
       console.log('Registration error:', error);
@@ -142,9 +150,11 @@ describe('AuthContext', () => {
         email: 'test@example.com',
         password: 'password123',
         remember: false,
-        turnstile_token: 'turnstile-token'
+        turnstile_token: 'turnstile-token',
       });
-      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
+      expect(screen.getByTestId('user')).toHaveTextContent(
+        JSON.stringify(mockUser)
+      );
     });
 
     // トークンがlocalStorageに保存される
@@ -210,14 +220,6 @@ describe('AuthContext', () => {
   });
 
   it('ログアウト処理が正しく動作する', async () => {
-    const mockUser = {
-      id: 1,
-      name: 'Test User',
-      email: 'test@example.com',
-      profile: { language: 'ja', timezone: 'Asia/Tokyo' },
-      roles: ['user'],
-    };
-
     // 最初にログイン状態にする
     localStorage.setItem('auth_token', 'jwt-token');
 
@@ -232,8 +234,6 @@ describe('AuthContext', () => {
       </AuthProvider>
     );
 
-    // ユーザーを設定（実際のアプリではログイン時に設定される）
-    const authContextElement = screen.getByTestId('user').parentElement;
     // 実際のテストでは、まずログイン処理を行ってからログアウトをテストする
 
     fireEvent.click(screen.getByText('Logout'));
@@ -277,9 +277,11 @@ describe('AuthContext', () => {
         password: 'password123',
         language: 'ja',
         timezone: 'Asia/Tokyo',
-        turnstile_token: 'turnstile-token'
+        turnstile_token: 'turnstile-token',
       });
-      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
+      expect(screen.getByTestId('user')).toHaveTextContent(
+        JSON.stringify(mockUser)
+      );
     });
 
     expect(localStorage.getItem('auth_token')).toBe('jwt-token');
@@ -313,7 +315,9 @@ describe('AuthContext', () => {
 
     await waitFor(() => {
       expect(AuthAPI.refreshToken).toHaveBeenCalled();
-      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
+      expect(screen.getByTestId('user')).toHaveTextContent(
+        JSON.stringify(mockUser)
+      );
     });
 
     expect(localStorage.getItem('auth_token')).toBe('new-jwt-token');
@@ -356,7 +360,9 @@ describe('AuthContext', () => {
         language: 'en',
         timezone: 'UTC',
       });
-      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(updatedUser));
+      expect(screen.getByTestId('user')).toHaveTextContent(
+        JSON.stringify(updatedUser)
+      );
     });
   });
 
@@ -368,7 +374,7 @@ describe('AuthContext', () => {
             () =>
               resolve({
                 success: true,
-                user: { id: 1, name: 'Test User' } as any,
+                user: { id: 1, name: 'Test User' } as User,
                 token: 'jwt-token',
                 message: 'ログイン成功',
               }),
@@ -423,7 +429,9 @@ describe('AuthContext', () => {
 
     await waitFor(() => {
       expect(AuthAPI.me).toHaveBeenCalledWith('existing-token');
-      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
+      expect(screen.getByTestId('user')).toHaveTextContent(
+        JSON.stringify(mockUser)
+      );
     });
   });
 

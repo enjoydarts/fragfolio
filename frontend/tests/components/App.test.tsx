@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { I18nextProvider } from 'react-i18next';
-import { vi } from 'vitest';
 import i18n from '../../src/i18n';
 import App from '../../src/App';
 

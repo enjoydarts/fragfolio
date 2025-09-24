@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircleIcon, ExclamationCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 
 type ToastType = 'success' | 'error' | 'info';
 
@@ -16,7 +20,7 @@ export const Toast: React.FC<ToastProps> = ({
   title,
   message,
   duration = 5000,
-  onClose
+  onClose,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -79,16 +83,14 @@ export const Toast: React.FC<ToastProps> = ({
           : 'translate-x-full opacity-0 scale-95'
       }`}
     >
-      <div className={`rounded-xl border shadow-xl backdrop-blur-sm p-4 transition-all duration-300 hover:shadow-2xl hover:scale-105 ${getStyles()}`}>
+      <div
+        className={`rounded-xl border shadow-xl backdrop-blur-sm p-4 transition-all duration-300 hover:shadow-2xl hover:scale-105 ${getStyles()}`}
+      >
         <div className="flex items-start">
-          <div className="flex-shrink-0">
-            {getIcon()}
-          </div>
+          <div className="flex-shrink-0">{getIcon()}</div>
           <div className="ml-3 flex-1">
             <h3 className="text-sm font-medium">{title}</h3>
-            {message && (
-              <p className="mt-1 text-sm opacity-80">{message}</p>
-            )}
+            {message && <p className="mt-1 text-sm opacity-80">{message}</p>}
           </div>
           <div className="ml-4 flex-shrink-0">
             <button

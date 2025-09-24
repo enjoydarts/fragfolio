@@ -5,47 +5,59 @@ export const handlers = [
   http.post('http://localhost:8002/api/register', async ({ request }) => {
     const body = await request.json();
     if (body.email === 'existing@example.com') {
-      return HttpResponse.json({
-        success: false,
-        message: 'Validation error',
-        errors: {
-          email: ['The email has already been taken.'],
+      return HttpResponse.json(
+        {
+          success: false,
+          message: 'Validation error',
+          errors: {
+            email: ['The email has already been taken.'],
+          },
         },
-      }, { status: 422 });
+        { status: 422 }
+      );
     }
-    return HttpResponse.json({
-      success: true,
-      user: {
-        id: 1,
-        name: body.name,
-        email: body.email,
-        email_verified_at: null,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        profile: {
-          bio: null,
-          language: body.language || 'ja',
-          timezone: body.timezone || 'Asia/Tokyo',
-          date_of_birth: null,
-          gender: null,
-          country: null,
+    return HttpResponse.json(
+      {
+        success: true,
+        user: {
+          id: 1,
+          name: body.name,
+          email: body.email,
+          email_verified_at: null,
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+          profile: {
+            bio: null,
+            language: body.language || 'ja',
+            timezone: body.timezone || 'Asia/Tokyo',
+            date_of_birth: null,
+            gender: null,
+            country: null,
+          },
+          roles: ['user'],
+          two_factor_enabled: false,
         },
-        roles: ['user'],
-        two_factor_enabled: false,
+        token: 'mock-jwt-token',
+        message: 'Registration successful',
       },
-      token: 'mock-jwt-token',
-      message: 'Registration successful',
-    }, { status: 201 });
+      { status: 201 }
+    );
   }),
 
   // Login API
   http.post('http://localhost:8002/api/login', async ({ request }) => {
     const body = await request.json();
-    if (body.email === 'invalid@example.com' && body.password === 'wrong-password') {
-      return HttpResponse.json({
-        success: false,
-        message: 'メールアドレスまたはパスワードが正しくありません',
-      }, { status: 422 });
+    if (
+      body.email === 'invalid@example.com' &&
+      body.password === 'wrong-password'
+    ) {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: 'メールアドレスまたはパスワードが正しくありません',
+        },
+        { status: 422 }
+      );
     }
     return HttpResponse.json({
       success: true,
@@ -83,11 +95,18 @@ export const handlers = [
   // Auth API
   http.get('http://localhost:8002/api/auth/me', ({ request }) => {
     const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ') || authHeader === 'Bearer invalid-token') {
-      return HttpResponse.json({
-        success: false,
-        message: '認証が必要です',
-      }, { status: 401 });
+    if (
+      !authHeader ||
+      !authHeader.startsWith('Bearer ') ||
+      authHeader === 'Bearer invalid-token'
+    ) {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: '認証が必要です',
+        },
+        { status: 401 }
+      );
     }
     return HttpResponse.json({
       success: true,
@@ -168,14 +187,24 @@ export const handlers = [
     return HttpResponse.json({
       success: true,
       secret: 'JBSWY3DPEHPK3PXP',
-      qr_code_url: 'otpauth://totp/fragfolio:test@example.com?secret=JBSWY3DPEHPK3PXP&issuer=fragfolio',
+      qr_code_url:
+        'otpauth://totp/fragfolio:test@example.com?secret=JBSWY3DPEHPK3PXP&issuer=fragfolio',
     });
   }),
 
   http.post('http://localhost:8002/api/two-factor/confirm', () => {
     return HttpResponse.json({
       success: true,
-      recovery_codes: ['12345678', '87654321', '11223344', '44332211', '55667788', '88776655', '99001122', '22110099'],
+      recovery_codes: [
+        '12345678',
+        '87654321',
+        '11223344',
+        '44332211',
+        '55667788',
+        '88776655',
+        '99001122',
+        '22110099',
+      ],
     });
   }),
 
@@ -189,7 +218,8 @@ export const handlers = [
   http.get('http://localhost:8002/api/two-factor/qr-code', () => {
     return HttpResponse.json({
       success: true,
-      qr_code_url: 'otpauth://totp/fragfolio:test@example.com?secret=JBSWY3DPEHPK3PXP&issuer=fragfolio',
+      qr_code_url:
+        'otpauth://totp/fragfolio:test@example.com?secret=JBSWY3DPEHPK3PXP&issuer=fragfolio',
       secret: 'JBSWY3DPEHPK3PXP',
     });
   }),

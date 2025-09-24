@@ -27,9 +27,9 @@ describe('LoginForm', () => {
     // Turnstile環境変数をモック
     Object.defineProperty(import.meta, 'env', {
       value: {
-        VITE_TURNSTILE_SITE_KEY: 'test-site-key'
+        VITE_TURNSTILE_SITE_KEY: 'test-site-key',
       },
-      writable: true
+      writable: true,
     });
 
     mockUseAuth.mockReturnValue({
@@ -59,7 +59,9 @@ describe('LoginForm', () => {
     expect(screen.getByLabelText(/メールアドレス/)).toBeInTheDocument();
     expect(screen.getByLabelText(/パスワード/)).toBeInTheDocument();
     expect(screen.getByLabelText(/ログイン状態を保持/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /ログイン/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /ログイン/ })
+    ).toBeInTheDocument();
   });
 
   it('フォーム送信時にログイン処理が実行される', async () => {

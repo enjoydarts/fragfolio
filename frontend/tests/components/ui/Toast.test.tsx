@@ -32,7 +32,11 @@ describe.skip('Toast', () => {
     render(<Toast {...defaultProps} type="success" />);
 
     const toast = screen.getByRole('alert');
-    expect(toast).toHaveClass('bg-green-100', 'border-green-400', 'text-green-700');
+    expect(toast).toHaveClass(
+      'bg-green-100',
+      'border-green-400',
+      'text-green-700'
+    );
   });
 
   it('エラータイプのトーストが正しいスタイルで表示される', () => {
@@ -46,14 +50,22 @@ describe.skip('Toast', () => {
     render(<Toast {...defaultProps} type="warning" />);
 
     const toast = screen.getByRole('alert');
-    expect(toast).toHaveClass('bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
+    expect(toast).toHaveClass(
+      'bg-yellow-100',
+      'border-yellow-400',
+      'text-yellow-700'
+    );
   });
 
   it('情報タイプのトーストが正しいスタイルで表示される', () => {
     render(<Toast {...defaultProps} type="info" />);
 
     const toast = screen.getByRole('alert');
-    expect(toast).toHaveClass('bg-blue-100', 'border-blue-400', 'text-blue-700');
+    expect(toast).toHaveClass(
+      'bg-blue-100',
+      'border-blue-400',
+      'text-blue-700'
+    );
   });
 
   it('閉じるボタンをクリックするとonCloseが呼ばれる', () => {

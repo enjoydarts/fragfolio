@@ -198,15 +198,20 @@ export class AuthAPI {
   }
 
   static async logoutOtherSessions(token: string): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/sessions/logout-others`, {
-      method: 'POST',
-      headers: this.getHeaders(token),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/sessions/logout-others`,
+      {
+        method: 'POST',
+        headers: this.getHeaders(token),
+      }
+    );
 
     return response.json();
   }
 
-  static async getSessions(token: string): Promise<AuthResponse & { sessions?: any[] }> {
+  static async getSessions(
+    token: string
+  ): Promise<AuthResponse & { sessions?: unknown[] }> {
     const response = await fetch(`${API_BASE_URL}/api/auth/sessions`, {
       method: 'GET',
       headers: this.getHeaders(token),
@@ -219,11 +224,14 @@ export class AuthAPI {
     token: string,
     data: { new_email: string }
   ): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/email/change-request`, {
-      method: 'POST',
-      headers: this.getHeaders(token),
-      body: JSON.stringify(data),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/email/change-request`,
+      {
+        method: 'POST',
+        headers: this.getHeaders(token),
+        body: JSON.stringify(data),
+      }
+    );
 
     return response.json();
   }

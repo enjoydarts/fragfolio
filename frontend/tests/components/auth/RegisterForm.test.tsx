@@ -27,9 +27,9 @@ describe('RegisterForm', () => {
     // Turnstile環境変数をモック
     Object.defineProperty(import.meta, 'env', {
       value: {
-        VITE_TURNSTILE_SITE_KEY: 'test-site-key'
+        VITE_TURNSTILE_SITE_KEY: 'test-site-key',
       },
-      writable: true
+      writable: true,
     });
 
     mockUseAuth.mockReturnValue({
@@ -62,7 +62,9 @@ describe('RegisterForm', () => {
     expect(screen.getByLabelText(/パスワード確認/)).toBeInTheDocument();
     expect(screen.getByLabelText(/言語設定/)).toBeInTheDocument();
     // タイムゾーンフィールドは自動設定のためテストから削除
-    expect(screen.getByRole('button', { name: /アカウント作成/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /アカウント作成/ })
+    ).toBeInTheDocument();
   });
 
   it('フォーム送信時に登録処理が実行される', async () => {

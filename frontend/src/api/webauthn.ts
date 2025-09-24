@@ -82,11 +82,16 @@ export class WebAuthnAPI {
   /**
    * WebAuthn登録のオプションを取得
    */
-  static async getRegistrationOptions(token: string): Promise<WebAuthnRegistrationOptions> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/register/options`, {
-      method: 'POST',
-      headers: this.getHeaders(token),
-    });
+  static async getRegistrationOptions(
+    token: string
+  ): Promise<WebAuthnRegistrationOptions> {
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/webauthn/register/options`,
+      {
+        method: 'POST',
+        headers: this.getHeaders(token),
+      }
+    );
 
     if (!response.ok) {
       throw new Error('WebAuthn登録オプションの取得に失敗しました');
@@ -95,7 +100,10 @@ export class WebAuthnAPI {
     const data = await response.json();
 
     if (!data.success || !data.options) {
-      throw new Error('WebAuthn登録オプションの取得に失敗しました: ' + (data.message || 'Unknown error'));
+      throw new Error(
+        'WebAuthn登録オプションの取得に失敗しました: ' +
+          (data.message || 'Unknown error')
+      );
     }
 
     return data.options;
@@ -111,7 +119,7 @@ export class WebAuthnAPI {
   ): Promise<WebAuthnResponse> {
     const body = { ...credential };
     if (alias) {
-      (body as any).alias = alias;
+      (body as Record<string, unknown> & { alias: string }).alias = alias;
     }
 
     const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/register`, {
@@ -131,11 +139,14 @@ export class WebAuthnAPI {
    * WebAuthnログインのオプションを取得
    */
   static async getLoginOptions(email?: string): Promise<WebAuthnLoginOptions> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/login/options`, {
-      method: 'POST',
-      headers: this.getHeaders(),
-      body: JSON.stringify(email ? { email } : {}),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/webauthn/login/options`,
+      {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(email ? { email } : {}),
+      }
+    );
 
     if (!response.ok) {
       throw new Error('WebAuthnログインオプションの取得に失敗しました');
@@ -147,7 +158,9 @@ export class WebAuthnAPI {
   /**
    * WebAuthnでログイン
    */
-  static async login(credential: Record<string, unknown>): Promise<WebAuthnResponse> {
+  static async login(
+    credential: Record<string, unknown>
+  ): Promise<WebAuthnResponse> {
     const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/login`, {
       method: 'POST',
       headers: this.getHeaders(),
@@ -161,10 +174,13 @@ export class WebAuthnAPI {
    * 登録済みWebAuthn認証器の一覧を取得
    */
   static async getCredentials(token: string): Promise<WebAuthnCredential[]> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/credentials`, {
-      method: 'GET',
-      headers: this.getHeaders(token),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/webauthn/credentials`,
+      {
+        method: 'GET',
+        headers: this.getHeaders(token),
+      }
+    );
 
     if (!response.ok) {
       throw new Error('WebAuthn認証器一覧の取得に失敗しました');
@@ -177,11 +193,17 @@ export class WebAuthnAPI {
   /**
    * WebAuthn認証器を無効化
    */
-  static async disableCredential(token: string, credentialId: string): Promise<WebAuthnResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/credentials/${credentialId}/disable`, {
-      method: 'POST',
-      headers: this.getHeaders(token),
-    });
+  static async disableCredential(
+    token: string,
+    credentialId: string
+  ): Promise<WebAuthnResponse> {
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/webauthn/credentials/${credentialId}/disable`,
+      {
+        method: 'POST',
+        headers: this.getHeaders(token),
+      }
+    );
 
     return response.json();
   }
@@ -189,11 +211,17 @@ export class WebAuthnAPI {
   /**
    * WebAuthn認証器を物理削除
    */
-  static async deleteCredential(token: string, credentialId: string): Promise<WebAuthnResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/credentials/${credentialId}`, {
-      method: 'DELETE',
-      headers: this.getHeaders(token),
-    });
+  static async deleteCredential(
+    token: string,
+    credentialId: string
+  ): Promise<WebAuthnResponse> {
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/webauthn/credentials/${credentialId}`,
+      {
+        method: 'DELETE',
+        headers: this.getHeaders(token),
+      }
+    );
 
     return response.json();
   }
@@ -201,11 +229,17 @@ export class WebAuthnAPI {
   /**
    * WebAuthn認証器を有効化
    */
-  static async enableCredential(token: string, credentialId: string): Promise<WebAuthnResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/credentials/${credentialId}/enable`, {
-      method: 'POST',
-      headers: this.getHeaders(token),
-    });
+  static async enableCredential(
+    token: string,
+    credentialId: string
+  ): Promise<WebAuthnResponse> {
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/webauthn/credentials/${credentialId}/enable`,
+      {
+        method: 'POST',
+        headers: this.getHeaders(token),
+      }
+    );
 
     return response.json();
   }
@@ -218,11 +252,14 @@ export class WebAuthnAPI {
     credentialId: string,
     alias: string
   ): Promise<WebAuthnResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/webauthn/credentials/${credentialId}`, {
-      method: 'PUT',
-      headers: this.getHeaders(token),
-      body: JSON.stringify({ alias }),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/webauthn/credentials/${credentialId}`,
+      {
+        method: 'PUT',
+        headers: this.getHeaders(token),
+        body: JSON.stringify({ alias }),
+      }
+    );
 
     return response.json();
   }
@@ -255,7 +292,10 @@ export class WebAuthnUtils {
       throw new Error('Invalid base64url string: ' + base64url);
     }
     const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
-    const paddedBase64 = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, '=');
+    const paddedBase64 = base64.padEnd(
+      base64.length + ((4 - (base64.length % 4)) % 4),
+      '='
+    );
     const binary = atob(paddedBase64);
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) {
@@ -267,38 +307,38 @@ export class WebAuthnUtils {
   /**
    * 登録オプションを WebAuthn API 用に変換
    */
-  static convertRegistrationOptions(options: WebAuthnRegistrationOptions): PublicKeyCredentialCreationOptions {
-    try {
-      const convertedOptions = {
-        challenge: this.base64UrlToArrayBuffer(options.challenge),
-        rp: options.rp,
-        user: {
-          ...options.user,
-          id: this.base64UrlToArrayBuffer(options.user.id),
-        },
-        pubKeyCredParams: options.pubKeyCredParams,
-        timeout: options.timeout,
-        attestation: options.attestation as AttestationConveyancePreference,
-        excludeCredentials: options.excludeCredentials?.map(cred => ({
-          ...cred,
-          id: this.base64UrlToArrayBuffer(cred.id),
-        })),
-      };
-      return convertedOptions;
-    } catch (error) {
-      throw error;
-    }
+  static convertRegistrationOptions(
+    options: WebAuthnRegistrationOptions
+  ): PublicKeyCredentialCreationOptions {
+    const convertedOptions = {
+      challenge: this.base64UrlToArrayBuffer(options.challenge),
+      rp: options.rp,
+      user: {
+        ...options.user,
+        id: this.base64UrlToArrayBuffer(options.user.id),
+      },
+      pubKeyCredParams: options.pubKeyCredParams,
+      timeout: options.timeout,
+      attestation: options.attestation as AttestationConveyancePreference,
+      excludeCredentials: options.excludeCredentials?.map((cred) => ({
+        ...cred,
+        id: this.base64UrlToArrayBuffer(cred.id),
+      })),
+    };
+    return convertedOptions;
   }
 
   /**
    * ログインオプションを WebAuthn API 用に変換
    */
-  static convertLoginOptions(options: WebAuthnLoginOptions): PublicKeyCredentialRequestOptions {
+  static convertLoginOptions(
+    options: WebAuthnLoginOptions
+  ): PublicKeyCredentialRequestOptions {
     return {
       challenge: this.base64UrlToArrayBuffer(options.challenge),
       timeout: options.timeout,
       rpId: options.rpId,
-      allowCredentials: options.allowCredentials?.map(cred => ({
+      allowCredentials: options.allowCredentials?.map((cred) => ({
         ...cred,
         id: this.base64UrlToArrayBuffer(cred.id),
       })),
@@ -308,7 +348,9 @@ export class WebAuthnUtils {
   /**
    * WebAuthn登録レスポンスをサーバー送信用に変換
    */
-  static convertRegistrationResponse(credential: PublicKeyCredential): Record<string, unknown> {
+  static convertRegistrationResponse(
+    credential: PublicKeyCredential
+  ): Record<string, unknown> {
     const response = credential.response as AuthenticatorAttestationResponse;
     return {
       id: credential.id,
@@ -316,7 +358,9 @@ export class WebAuthnUtils {
       type: credential.type,
       response: {
         clientDataJSON: this.arrayBufferToBase64Url(response.clientDataJSON),
-        attestationObject: this.arrayBufferToBase64Url(response.attestationObject),
+        attestationObject: this.arrayBufferToBase64Url(
+          response.attestationObject
+        ),
       },
     };
   }
@@ -324,7 +368,9 @@ export class WebAuthnUtils {
   /**
    * WebAuthnログインレスポンスをサーバー送信用に変換
    */
-  static convertLoginResponse(credential: PublicKeyCredential): Record<string, unknown> {
+  static convertLoginResponse(
+    credential: PublicKeyCredential
+  ): Record<string, unknown> {
     const response = credential.response as AuthenticatorAssertionResponse;
     return {
       id: credential.id,
@@ -332,9 +378,13 @@ export class WebAuthnUtils {
       type: credential.type,
       response: {
         clientDataJSON: this.arrayBufferToBase64Url(response.clientDataJSON),
-        authenticatorData: this.arrayBufferToBase64Url(response.authenticatorData),
+        authenticatorData: this.arrayBufferToBase64Url(
+          response.authenticatorData
+        ),
         signature: this.arrayBufferToBase64Url(response.signature),
-        userHandle: response.userHandle ? this.arrayBufferToBase64Url(response.userHandle) : null,
+        userHandle: response.userHandle
+          ? this.arrayBufferToBase64Url(response.userHandle)
+          : null,
       },
     };
   }
@@ -343,7 +393,11 @@ export class WebAuthnUtils {
    * WebAuthnサポートチェック
    */
   static isSupported(): boolean {
-    return !!(navigator.credentials && navigator.credentials.create && navigator.credentials.get);
+    return !!(
+      navigator.credentials &&
+      navigator.credentials.create &&
+      navigator.credentials.get
+    );
   }
 
   /**
@@ -361,7 +415,13 @@ export class WebAuthnUtils {
 }
 
 // テスト用の関数エクスポート
-export const getRegistrationOptions = async (): Promise<{ success: boolean; challenge?: string; user?: any; pubKeyCredParams?: any[]; message?: string }> => {
+export const getRegistrationOptions = async (): Promise<{
+  success: boolean;
+  challenge?: string;
+  user?: unknown;
+  pubKeyCredParams?: unknown[];
+  message?: string;
+}> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('認証トークンが設定されていません');
@@ -373,14 +433,20 @@ export const getRegistrationOptions = async (): Promise<{ success: boolean; chal
       success: true,
       challenge: options.challenge,
       user: options.user,
-      pubKeyCredParams: options.pubKeyCredParams
+      pubKeyCredParams: options.pubKeyCredParams,
     };
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'WebAuthn登録オプションの取得に失敗しました');
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : 'WebAuthn登録オプションの取得に失敗しました'
+    );
   }
 };
 
-export const registerCredential = async (credential: any): Promise<{ success: boolean; message?: string }> => {
+export const registerCredential = async (
+  credential: unknown
+): Promise<{ success: boolean; message?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('認証トークンが設定されていません');
@@ -388,18 +454,34 @@ export const registerCredential = async (credential: any): Promise<{ success: bo
 
   try {
     // Convert ArrayBuffers to Base64 if needed
-    const convertedCredential = credential.rawId ? WebAuthnUtils.convertRegistrationResponse(credential) : credential;
-    const result = await WebAuthnAPI.registerCredential(token, convertedCredential);
+    const credentialObj = credential as { rawId?: ArrayBuffer };
+    const convertedCredential = credentialObj.rawId
+      ? WebAuthnUtils.convertRegistrationResponse(
+          credential as PublicKeyCredential
+        )
+      : (credential as Record<string, unknown>);
+    const result = await WebAuthnAPI.registerCredential(
+      token,
+      convertedCredential
+    );
     return {
       success: result.success,
-      message: result.message || 'WebAuthnキーを登録しました'
+      message: result.message || 'WebAuthnキーを登録しました',
     };
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'WebAuthnキーの登録に失敗しました');
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : 'WebAuthnキーの登録に失敗しました'
+    );
   }
 };
 
-export const getCredentials = async (): Promise<{ success: boolean; credentials?: WebAuthnCredential[]; message?: string }> => {
+export const getCredentials = async (): Promise<{
+  success: boolean;
+  credentials?: WebAuthnCredential[];
+  message?: string;
+}> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('認証トークンが設定されていません');
@@ -409,10 +491,13 @@ export const getCredentials = async (): Promise<{ success: boolean; credentials?
     const credentials = await WebAuthnAPI.getCredentials(token);
     return {
       success: true,
-      credentials
+      credentials,
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'WebAuthn認証器一覧の取得に失敗しました';
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'WebAuthn認証器一覧の取得に失敗しました';
     if (message.includes('Internal Server Error')) {
       throw new Error('Internal Server Error');
     }
@@ -420,7 +505,9 @@ export const getCredentials = async (): Promise<{ success: boolean; credentials?
   }
 };
 
-export const deleteCredential = async (credentialId: string): Promise<{ success: boolean; message?: string }> => {
+export const deleteCredential = async (
+  credentialId: string
+): Promise<{ success: boolean; message?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('認証トークンが設定されていません');
@@ -430,44 +517,72 @@ export const deleteCredential = async (credentialId: string): Promise<{ success:
     const result = await WebAuthnAPI.deleteCredential(token, credentialId);
     return {
       success: result.success,
-      message: result.message || (result.success ? 'WebAuthnキーを削除しました' : 'クレデンシャルが見つかりません')
+      message:
+        result.message ||
+        (result.success
+          ? 'WebAuthnキーを削除しました'
+          : 'クレデンシャルが見つかりません'),
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'WebAuthnキーの削除に失敗しました'
+      message:
+        error instanceof Error
+          ? error.message
+          : 'WebAuthnキーの削除に失敗しました',
     };
   }
 };
 
-export const updateCredentialAlias = async (credentialId: string, alias: string): Promise<{ success: boolean; credential?: any; message?: string; errors?: any }> => {
+export const updateCredentialAlias = async (
+  credentialId: string,
+  alias: string
+): Promise<{
+  success: boolean;
+  credential?: unknown;
+  message?: string;
+  errors?: unknown;
+}> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('認証トークンが設定されていません');
   }
 
   try {
-    const result = await WebAuthnAPI.updateCredentialAlias(token, credentialId, alias);
+    const result = await WebAuthnAPI.updateCredentialAlias(
+      token,
+      credentialId,
+      alias
+    );
     return {
       success: result.success,
-      credential: result.success ? {
-        id: credentialId,
-        alias,
-        created_at: '2024-01-01T00:00:00Z',
-        disabled_at: null
-      } : undefined,
-      message: result.message || (result.success ? 'エイリアスを更新しました' : 'エイリアスは必須です'),
-      errors: result.errors
+      credential: result.success
+        ? {
+            id: credentialId,
+            alias,
+            created_at: '2024-01-01T00:00:00Z',
+            disabled_at: null,
+          }
+        : undefined,
+      message:
+        result.message ||
+        (result.success ? 'エイリアスを更新しました' : 'エイリアスは必須です'),
+      errors: result.errors,
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'エイリアスの更新に失敗しました'
+      message:
+        error instanceof Error
+          ? error.message
+          : 'エイリアスの更新に失敗しました',
     };
   }
 };
 
-export const disableCredential = async (credentialId: string): Promise<{ success: boolean; message?: string }> => {
+export const disableCredential = async (
+  credentialId: string
+): Promise<{ success: boolean; message?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('認証トークンが設定されていません');
@@ -477,17 +592,22 @@ export const disableCredential = async (credentialId: string): Promise<{ success
     const result = await WebAuthnAPI.disableCredential(token, credentialId);
     return {
       success: result.success,
-      message: result.message || 'WebAuthnキーを無効化しました'
+      message: result.message || 'WebAuthnキーを無効化しました',
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'WebAuthnキーの無効化に失敗しました'
+      message:
+        error instanceof Error
+          ? error.message
+          : 'WebAuthnキーの無効化に失敗しました',
     };
   }
 };
 
-export const enableCredential = async (credentialId: string): Promise<{ success: boolean; message?: string }> => {
+export const enableCredential = async (
+  credentialId: string
+): Promise<{ success: boolean; message?: string }> => {
   const token = localStorage.getItem('auth_token');
   if (!token) {
     throw new Error('認証トークンが設定されていません');
@@ -497,12 +617,15 @@ export const enableCredential = async (credentialId: string): Promise<{ success:
     const result = await WebAuthnAPI.enableCredential(token, credentialId);
     return {
       success: result.success,
-      message: result.message || 'WebAuthnキーを有効化しました'
+      message: result.message || 'WebAuthnキーを有効化しました',
     };
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'WebAuthnキーの有効化に失敗しました'
+      message:
+        error instanceof Error
+          ? error.message
+          : 'WebAuthnキーの有効化に失敗しました',
     };
   }
 };

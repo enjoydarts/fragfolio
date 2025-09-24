@@ -26,7 +26,9 @@ describe('ConfirmDialog', () => {
     expect(screen.getByText('テストダイアログ')).toBeInTheDocument();
     expect(screen.getByText('この操作を実行しますか？')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '実行' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'キャンセル' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'キャンセル' })
+    ).toBeInTheDocument();
   });
 
   it('isOpenがfalseの場合は表示されない', () => {
@@ -109,11 +111,7 @@ describe('ConfirmDialog', () => {
 
   it('カスタムボタンテキストが表示される', () => {
     render(
-      <ConfirmDialog
-        {...defaultProps}
-        confirmText="削除"
-        cancelText="やめる"
-      />
+      <ConfirmDialog {...defaultProps} confirmText="削除" cancelText="やめる" />
     );
 
     expect(screen.getByRole('button', { name: '削除' })).toBeInTheDocument();

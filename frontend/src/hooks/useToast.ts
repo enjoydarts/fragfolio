@@ -15,11 +15,11 @@ export const useToast = () => {
 
   const addToast = useCallback((toast: Omit<ToastItem, 'id'>) => {
     const id = Math.random().toString(36).substr(2, 9);
-    setToasts(prev => [...prev, { ...toast, id }]);
+    setToasts((prev) => [...prev, { ...toast, id }]);
   }, []);
 
   const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
   const toast = {
@@ -31,12 +31,12 @@ export const useToast = () => {
     },
     info: (title: string, message?: string, duration: number = 5000) => {
       addToast({ type: 'info', title, message, duration });
-    }
+    },
   };
 
   return {
     toasts,
     toast,
-    removeToast
+    removeToast,
   };
 };

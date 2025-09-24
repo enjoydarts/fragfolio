@@ -82,7 +82,11 @@ describe.skip('WebAuthnSettings', () => {
     vi.mocked(webauthnApi.getRegistrationOptions).mockResolvedValue({
       success: true,
       challenge: 'test-challenge',
-      user: { id: 'test-user-id', name: 'test@example.com', displayName: 'Test User' },
+      user: {
+        id: 'test-user-id',
+        name: 'test@example.com',
+        displayName: 'Test User',
+      },
       pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
     });
 
@@ -100,7 +104,10 @@ describe.skip('WebAuthnSettings', () => {
       expect(webauthnApi.getRegistrationOptions).toHaveBeenCalled();
       expect(mockNavigatorCredentials.create).toHaveBeenCalled();
       expect(webauthnApi.registerCredential).toHaveBeenCalled();
-      expect(mockShowToast).toHaveBeenCalledWith('WebAuthnキーを登録しました', 'success');
+      expect(mockShowToast).toHaveBeenCalledWith(
+        'WebAuthnキーを登録しました',
+        'success'
+      );
     });
   });
 
@@ -129,7 +136,10 @@ describe.skip('WebAuthnSettings', () => {
         cancelText: 'キャンセル',
       });
       expect(webauthnApi.deleteCredential).toHaveBeenCalledWith('cred1');
-      expect(mockShowToast).toHaveBeenCalledWith('WebAuthnキーを削除しました', 'success');
+      expect(mockShowToast).toHaveBeenCalledWith(
+        'WebAuthnキーを削除しました',
+        'success'
+      );
     });
   });
 
@@ -164,8 +174,14 @@ describe.skip('WebAuthnSettings', () => {
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(webauthnApi.updateCredentialAlias).toHaveBeenCalledWith('cred1', 'Updated Name');
-      expect(mockShowToast).toHaveBeenCalledWith('エイリアスを更新しました', 'success');
+      expect(webauthnApi.updateCredentialAlias).toHaveBeenCalledWith(
+        'cred1',
+        'Updated Name'
+      );
+      expect(mockShowToast).toHaveBeenCalledWith(
+        'エイリアスを更新しました',
+        'success'
+      );
     });
   });
 
@@ -186,7 +202,10 @@ describe.skip('WebAuthnSettings', () => {
 
     await waitFor(() => {
       expect(webauthnApi.disableCredential).toHaveBeenCalledWith('cred1');
-      expect(mockShowToast).toHaveBeenCalledWith('WebAuthnキーを無効化しました', 'success');
+      expect(mockShowToast).toHaveBeenCalledWith(
+        'WebAuthnキーを無効化しました',
+        'success'
+      );
     });
   });
 
@@ -201,7 +220,9 @@ describe.skip('WebAuthnSettings', () => {
 
     const addButton = screen.getByRole('button', { name: /新しいキーを追加/ });
     expect(addButton).toBeDisabled();
-    expect(screen.getByText('このブラウザはWebAuthnに対応していません')).toBeInTheDocument();
+    expect(
+      screen.getByText('このブラウザはWebAuthnに対応していません')
+    ).toBeInTheDocument();
   });
 
   it('WebAuthn登録時のエラーハンドリング', async () => {
@@ -217,7 +238,11 @@ describe.skip('WebAuthnSettings', () => {
     vi.mocked(webauthnApi.getRegistrationOptions).mockResolvedValue({
       success: true,
       challenge: 'test-challenge',
-      user: { id: 'test-user-id', name: 'test@example.com', displayName: 'Test User' },
+      user: {
+        id: 'test-user-id',
+        name: 'test@example.com',
+        displayName: 'Test User',
+      },
       pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
     });
 
@@ -227,7 +252,10 @@ describe.skip('WebAuthnSettings', () => {
     fireEvent.click(addButton);
 
     await waitFor(() => {
-      expect(mockShowToast).toHaveBeenCalledWith('WebAuthn登録に失敗しました: User cancelled', 'error');
+      expect(mockShowToast).toHaveBeenCalledWith(
+        'WebAuthn登録に失敗しました: User cancelled',
+        'error'
+      );
     });
   });
 
@@ -240,7 +268,9 @@ describe.skip('WebAuthnSettings', () => {
     render(<WebAuthnSettings />);
 
     await waitFor(() => {
-      expect(screen.getByText('登録されたWebAuthnキーはありません')).toBeInTheDocument();
+      expect(
+        screen.getByText('登録されたWebAuthnキーはありません')
+      ).toBeInTheDocument();
     });
   });
 

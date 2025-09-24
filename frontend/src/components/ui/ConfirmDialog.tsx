@@ -20,7 +20,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   cancelText = 'キャンセル',
   confirmVariant = 'primary',
   onConfirm,
-  onCancel
+  onCancel,
 }) => {
   if (!isOpen) return null;
 
@@ -52,12 +52,8 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
           {/* Content */}
           <div className="text-center mb-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {title}
-            </h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              {message}
-            </p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">{message}</p>
           </div>
 
           {/* Actions */}

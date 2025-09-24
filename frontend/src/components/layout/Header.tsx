@@ -21,7 +21,10 @@ export const Header: React.FC = () => {
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
         setIsUserMenuOpen(false);
       }
     };
@@ -75,7 +78,9 @@ export const Header: React.FC = () => {
                       {user.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="text-sm font-medium hidden lg:block">{user.name}</span>
+                  <span className="text-sm font-medium hidden lg:block">
+                    {user.name}
+                  </span>
                   <ChevronDownIcon className="w-4 h-4" />
                 </button>
 
@@ -83,7 +88,9 @@ export const Header: React.FC = () => {
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                     <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {user.name}
+                      </p>
                       <p className="text-xs text-gray-500">{user.email}</p>
                     </div>
                     <a
@@ -148,7 +155,9 @@ export const Header: React.FC = () => {
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {user.name}
+                      </p>
                       <p className="text-xs text-gray-500">{user.email}</p>
                     </div>
                   </div>

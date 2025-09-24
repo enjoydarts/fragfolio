@@ -60,7 +60,11 @@ describe.skip('ToastContainer', () => {
     });
 
     expect(screen.getByText('成功メッセージ')).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveClass('bg-green-100', 'border-green-400', 'text-green-700');
+    expect(screen.getByRole('alert')).toHaveClass(
+      'bg-green-100',
+      'border-green-400',
+      'text-green-700'
+    );
   });
 
   it('エラートーストが表示される', () => {
@@ -75,7 +79,11 @@ describe.skip('ToastContainer', () => {
     });
 
     expect(screen.getByText('エラーメッセージ')).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveClass('bg-red-100', 'border-red-400', 'text-red-700');
+    expect(screen.getByRole('alert')).toHaveClass(
+      'bg-red-100',
+      'border-red-400',
+      'text-red-700'
+    );
   });
 
   it('情報トーストが表示される', () => {
@@ -90,7 +98,11 @@ describe.skip('ToastContainer', () => {
     });
 
     expect(screen.getByText('情報メッセージ')).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveClass('bg-blue-100', 'border-blue-400', 'text-blue-700');
+    expect(screen.getByRole('alert')).toHaveClass(
+      'bg-blue-100',
+      'border-blue-400',
+      'text-blue-700'
+    );
   });
 
   it('警告トーストが表示される', () => {
@@ -105,7 +117,11 @@ describe.skip('ToastContainer', () => {
     });
 
     expect(screen.getByText('警告メッセージ')).toBeInTheDocument();
-    expect(screen.getByRole('alert')).toHaveClass('bg-yellow-100', 'border-yellow-400', 'text-yellow-700');
+    expect(screen.getByRole('alert')).toHaveClass(
+      'bg-yellow-100',
+      'border-yellow-400',
+      'text-yellow-700'
+    );
   });
 
   it('複数のトーストが同時に表示される', () => {
@@ -198,7 +214,9 @@ describe.skip('ToastContainer', () => {
   });
 
   it('異なる位置設定が適用される', () => {
-    render(<ToastContainer position="bottom-left" />, { wrapper: ToastProvider });
+    render(<ToastContainer position="bottom-left" />, {
+      wrapper: ToastProvider,
+    });
 
     const container = screen.getByTestId('toast-container');
     expect(container).toHaveClass('bottom-4', 'left-4');
