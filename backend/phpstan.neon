@@ -12,14 +12,12 @@ parameters:
     treatPhpDocTypesAsCertain: false
 
     ignoreErrors:
-        - '#Access to an undefined property App\\Models\\User::\$email#'
         - '#Access to an undefined property App\\Models\\UserProfile::\$date_of_birth#'
         - '#Access to an undefined property Laragear\\WebAuthn\\Contracts\\WebAuthnAuthenticatable::#'
         - '#Call to an undefined method Laragear\\WebAuthn\\Contracts\\WebAuthnAuthenticatable::#'
         - '#Using nullsafe property access.*on left side of \?\? is unnecessary#'
         - '#Instanceof between App\\Models\\User and.*will always evaluate to true#'
         - '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$email#'
-        - '#Call to an undefined method.*::toArray\\(\\)#'
 
     excludePaths:
         - ./*/*/FileToBeExcluded.php
