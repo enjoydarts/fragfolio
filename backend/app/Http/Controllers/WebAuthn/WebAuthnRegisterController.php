@@ -20,7 +20,7 @@ class WebAuthnRegisterController
 
         return response()->json([
             'success' => true,
-            'options' => $attestation->toArray(),
+            'options' => $attestation,
         ]);
     }
 
