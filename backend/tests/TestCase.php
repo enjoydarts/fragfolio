@@ -32,8 +32,17 @@ abstract class TestCase extends BaseTestCase
     protected function tearDown(): void
     {
         // 接続が正しくテスト用データベースになっているか確認
-        if (\DB::connection()->getDatabaseName() !== 'fragfolio_test') {
-            throw new \RuntimeException('テスト終了時にテスト用データベースに接続されていません: '.\DB::connection()->getDatabaseName());
+        $currentDatabase = \DB::connection()->getDatabaseName();
+        if ($currentDatabase !== 'fragfolio_test') {
+            // データベース接続が変更されている場合は復旧を試行
+            Config::set('database.connections.mysql.database', 'fragfolio_test');
+            \DB::purge('mysql');
+            \DB::reconnect('mysql');
+
+            // 復旧後も接続できない場合はエラー
+            if (\DB::connection()->getDatabaseName() !== 'fragfolio_test') {
+                throw new \RuntimeException('テスト終了時にテスト用データベースに接続されていません: 現在='.$currentDatabase.', 復旧後='.\DB::connection()->getDatabaseName());
+            }
         }
 
         // テスト終了後にデータをクリーンアップ
