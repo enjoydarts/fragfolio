@@ -84,7 +84,7 @@ export const AccountSettings: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-500">
-          {t('common.loading', '読み込み中...')}
+          {t('common.loading')}
         </div>
       </div>
     );
@@ -1207,7 +1207,7 @@ const ProfileSettings: React.FC = () => {
             className="w-full py-4 text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-4 focus:ring-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 rounded-xl font-medium tracking-wide shadow-md hover:shadow-lg"
           >
             {isLoading
-              ? t('common.loading', '読み込み中...')
+              ? t('common.loading')
               : t('common.save', '保存')}
           </button>
         </div>
@@ -1625,7 +1625,7 @@ const SecuritySettings: React.FC = () => {
               className="w-full py-4 text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-4 focus:ring-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 rounded-xl font-medium tracking-wide shadow-md hover:shadow-lg"
             >
               {isPasswordLoading
-                ? t('common.loading', '読み込み中...')
+                ? t('common.loading')
                 : t('settings.security.password.update', 'パスワードを更新')}
             </button>
           </div>
@@ -1760,7 +1760,7 @@ const SessionsSettings: React.FC = () => {
             className="w-full py-4 text-red-600 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-4 focus:ring-red-200 border border-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 rounded-xl font-medium tracking-wide shadow-sm hover:shadow-md"
           >
             {isLoading
-              ? t('common.loading', '読み込み中...')
+              ? t('common.loading')
               : t(
                   'settings.sessions.logout_all',
                   '他のセッションをすべてログアウト'
