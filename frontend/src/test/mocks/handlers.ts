@@ -377,13 +377,13 @@ export const handlers = [
         );
       }
 
-      const body = await request.json();
+      const body = (await request.json()) as { id?: string };
 
       return HttpResponse.json({
         success: true,
         message: 'WebAuthnキーを登録しました',
         credential: {
-          id: body.id || 'credential-id',
+          id: body?.id || 'credential-id',
           alias: 'Test Credential',
           created_at: '2024-01-01T00:00:00Z',
         },
@@ -462,7 +462,7 @@ export const handlers = [
   // Delete credential (this is the actual endpoint used by the implementation)
   http.delete(
     'http://localhost:8002/api/auth/webauthn/credentials/:id',
-    ({ request }) => {
+    ({ request, params }) => {
       const authHeader = request.headers.get('Authorization');
 
       if (!authHeader || !authHeader.startsWith('Bearer ')) {

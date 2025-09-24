@@ -605,7 +605,7 @@ const CredentialItem: React.FC<CredentialItemProps> = ({
           {t('settings.security.webauthn.registered_on')}:{' '}
           {formatDate(credential.created_at)}
         </div>
-        {isDisabled && (
+        {isDisabled && credential.disabled_at && (
           <div className="text-xs text-red-500">
             {t('settings.security.webauthn.disabled_on')}:{' '}
             {formatDate(credential.disabled_at)}

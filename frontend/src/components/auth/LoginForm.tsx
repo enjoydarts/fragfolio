@@ -91,12 +91,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           authError.available_methods
         );
         setRequiresTwoFactor(true);
-        setTempToken(authError.temp_token);
+        setTempToken(authError.temp_token || null);
         setAvailableMethods(authError.available_methods || []);
 
         // 利用可能な認証方法が1つだけの場合は自動選択
         if (authError.available_methods?.length === 1) {
-          setTwoFactorMethod(authError.available_methods[0]);
+          const method = authError.available_methods[0];
+          if (method === 'totp' || method === 'webauthn') {
+            setTwoFactorMethod(method);
+          }
         }
         return;
       }
@@ -105,9 +108,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       setTurnstileToken(null);
       setTurnstileResetCounter((prev) => prev + 1);
       setError(
-        authError?.message || error instanceof Error
-          ? error.message
-          : t('auth.errors.login_failed')
+        authError?.message ||
+          (error instanceof Error
+            ? error.message
+            : t('auth.errors.login_failed'))
       );
     }
   };
