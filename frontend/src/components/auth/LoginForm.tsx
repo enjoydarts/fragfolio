@@ -155,9 +155,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
   const handleTwoFactorWebAuthn = useCallback(async () => {
     if (!webAuthnSupported || !tempToken) {
-      setError(
-        t('webauthn.not_supported')
-      );
+      setError(t('webauthn.not_supported'));
       return;
     }
 
@@ -198,9 +196,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       })) as PublicKeyCredential;
 
       if (!credential) {
-        throw new Error(
-          t('webauthn.cancelled')
-        );
+        throw new Error(t('webauthn.cancelled'));
       }
 
       // 4. サーバー送信用に変換

@@ -201,8 +201,7 @@ export const WebAuthnSettings: React.FC = () => {
   const handleDisable = (credentialId: string) => {
     const credential = state.credentials.find((c) => c.id === credentialId);
     const credentialName =
-      credential?.alias ||
-      t('settings.security.webauthn.unnamed_credential');
+      credential?.alias || t('settings.security.webauthn.unnamed_credential');
 
     setState((prev) => ({
       ...prev,
@@ -218,8 +217,7 @@ export const WebAuthnSettings: React.FC = () => {
   const handleDelete = (credentialId: string) => {
     const credential = state.credentials.find((c) => c.id === credentialId);
     const credentialName =
-      credential?.alias ||
-      t('settings.security.webauthn.unnamed_credential');
+      credential?.alias || t('settings.security.webauthn.unnamed_credential');
 
     setState((prev) => ({
       ...prev,
@@ -448,9 +446,7 @@ export const WebAuthnSettings: React.FC = () => {
 
         {state.loading ? (
           <div className="text-center py-4">
-            <div className="text-gray-500">
-              {t('common.loading')}
-            </div>
+            <div className="text-gray-500">{t('common.loading')}</div>
           </div>
         ) : state.credentials.length === 0 ? (
           <div className="text-center py-4 text-gray-500">

@@ -2,7 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
-import { TwoFactorAPI, getQrCode, getRecoveryCodes, regenerateRecoveryCodes } from '../../api/twoFactor';
+import {
+  TwoFactorAPI,
+  getQrCode,
+  getRecoveryCodes,
+  regenerateRecoveryCodes,
+} from '../../api/twoFactor';
 import { useToastContext } from '../../hooks/useToastContext';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
@@ -58,9 +63,7 @@ export const TOTPSettings: React.FC = () => {
       );
     } catch (error) {
       console.error('Failed to copy:', error);
-      toast.error(
-        t('settings.security.twofa.copy_failed')
-      );
+      toast.error(t('settings.security.twofa.copy_failed'));
     }
   };
 
@@ -76,9 +79,7 @@ export const TOTPSettings: React.FC = () => {
       );
     } catch (error) {
       console.error('Failed to copy all codes:', error);
-      toast.error(
-        t('settings.security.twofa.copy_failed')
-      );
+      toast.error(t('settings.security.twofa.copy_failed'));
     }
   };
 
@@ -150,14 +151,18 @@ export const TOTPSettings: React.FC = () => {
         } else {
           setState((prev) => ({
             ...prev,
-            error: qrResult.messageKey ? t(qrResult.messageKey) : qrResult.message || t('settings.security.twofa.enable_failed'),
+            error: qrResult.messageKey
+              ? t(qrResult.messageKey)
+              : qrResult.message || t('settings.security.twofa.enable_failed'),
             loading: false,
           }));
         }
       } else {
         setState((prev) => ({
           ...prev,
-          error: response.messageKey ? t(response.messageKey) : response.message || t('settings.security.twofa.enable_failed'),
+          error: response.messageKey
+            ? t(response.messageKey)
+            : response.message || t('settings.security.twofa.enable_failed'),
           loading: false,
         }));
       }
@@ -190,14 +195,18 @@ export const TOTPSettings: React.FC = () => {
         setState((prev) => ({
           ...prev,
           enabled: true,
-          recoveryCodes: recoveryResult.success ? (recoveryResult.recovery_codes || []) : [],
+          recoveryCodes: recoveryResult.success
+            ? recoveryResult.recovery_codes || []
+            : [],
           step: 'complete',
           loading: false,
         }));
       } else {
         setState((prev) => ({
           ...prev,
-          error: response.messageKey ? t(response.messageKey) : response.message || t('settings.security.twofa.invalid_code'),
+          error: response.messageKey
+            ? t(response.messageKey)
+            : response.message || t('settings.security.twofa.invalid_code'),
           loading: false,
         }));
       }
@@ -247,14 +256,19 @@ export const TOTPSettings: React.FC = () => {
         } else {
           setState((prev) => ({
             ...prev,
-            error: response.messageKey ? t(response.messageKey) : response.message || t('settings.security.twofa.disable_failed'),
+            error: response.messageKey
+              ? t(response.messageKey)
+              : response.message || t('settings.security.twofa.disable_failed'),
             loading: false,
           }));
         }
       } catch (error) {
         setState((prev) => ({
           ...prev,
-          error: error instanceof Error ? error.message : t('settings.security.twofa.disable_failed'),
+          error:
+            error instanceof Error
+              ? error.message
+              : t('settings.security.twofa.disable_failed'),
           loading: false,
         }));
       }
@@ -277,7 +291,10 @@ export const TOTPSettings: React.FC = () => {
         } else {
           setState((prev) => ({
             ...prev,
-            error: result.messageKey ? t(result.messageKey) : result.message || t('settings.security.twofa.recovery_regenerate_failed'),
+            error: result.messageKey
+              ? t(result.messageKey)
+              : result.message ||
+                t('settings.security.twofa.recovery_regenerate_failed'),
             loading: false,
           }));
         }
@@ -285,7 +302,10 @@ export const TOTPSettings: React.FC = () => {
         console.error('Recovery codes regeneration error:', error);
         setState((prev) => ({
           ...prev,
-          error: error instanceof Error ? error.message : t('settings.security.twofa.recovery_regenerate_failed'),
+          error:
+            error instanceof Error
+              ? error.message
+              : t('settings.security.twofa.recovery_regenerate_failed'),
           loading: false,
         }));
       }
@@ -309,14 +329,20 @@ export const TOTPSettings: React.FC = () => {
       } else {
         setState((prev) => ({
           ...prev,
-          error: result.messageKey ? t(result.messageKey) : result.message || t('settings.security.twofa.recovery_fetch_failed'),
+          error: result.messageKey
+            ? t(result.messageKey)
+            : result.message ||
+              t('settings.security.twofa.recovery_fetch_failed'),
           loading: false,
         }));
       }
     } catch (error) {
       setState((prev) => ({
         ...prev,
-        error: error instanceof Error ? error.message : t('settings.security.twofa.recovery_fetch_failed'),
+        error:
+          error instanceof Error
+            ? error.message
+            : t('settings.security.twofa.recovery_fetch_failed'),
         loading: false,
       }));
     }

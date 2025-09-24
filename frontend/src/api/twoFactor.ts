@@ -232,10 +232,7 @@ export const getQrCode = async (): Promise<{
   } catch (error) {
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : '2FA is not enabled',
+      message: error instanceof Error ? error.message : '2FA is not enabled',
       messageKey: 'auth.two_factor.not_enabled',
     };
   }
@@ -262,9 +259,7 @@ export const getRecoveryCodes = async (): Promise<{
     return {
       success: false,
       message:
-        error instanceof Error
-          ? error.message
-          : 'Failed to get recovery codes',
+        error instanceof Error ? error.message : 'Failed to get recovery codes',
       messageKey: 'auth.two_factor.recovery_codes_get_failed',
     };
   }

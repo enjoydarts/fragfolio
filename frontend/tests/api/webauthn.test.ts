@@ -75,7 +75,9 @@ describe('WebAuthn API', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toBe('WebAuthn key registered successfully');
-      expect(result.messageKey).toBe('settings.security.webauthn.register_success');
+      expect(result.messageKey).toBe(
+        'settings.security.webauthn.register_success'
+      );
     });
   });
 
@@ -166,7 +168,9 @@ describe('WebAuthn API', () => {
       expect(result.success).toBe(true);
       expect(result.credential.alias).toBe(newAlias);
       expect(result.message).toBe('Alias updated successfully');
-      expect(result.messageKey).toBe('settings.security.webauthn.alias_update_success');
+      expect(result.messageKey).toBe(
+        'settings.security.webauthn.alias_update_success'
+      );
     });
 
     it('空のエイリアスでバリデーションエラー', async () => {
@@ -195,7 +199,9 @@ describe('WebAuthn API', () => {
 
       expect(result.success).toBe(false);
       expect(result.message).toBe('Alias is required');
-      expect(result.messageKey).toBe('settings.security.webauthn.alias_required');
+      expect(result.messageKey).toBe(
+        'settings.security.webauthn.alias_required'
+      );
     });
   });
 
@@ -232,7 +238,9 @@ describe('WebAuthn API', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toBe('WebAuthn key enabled successfully');
-      expect(result.messageKey).toBe('settings.security.webauthn.enable_success');
+      expect(result.messageKey).toBe(
+        'settings.security.webauthn.enable_success'
+      );
     });
   });
 

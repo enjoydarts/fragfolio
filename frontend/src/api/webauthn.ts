@@ -463,8 +463,12 @@ export const registerCredential = async (
     );
     return {
       success: result.success,
-      message: result.success ? 'WebAuthn key registered successfully' : 'WebAuthn key registration failed',
-      messageKey: result.success ? 'settings.security.webauthn.register_success' : 'settings.security.webauthn.register_failed',
+      message: result.success
+        ? 'WebAuthn key registered successfully'
+        : 'WebAuthn key registration failed',
+      messageKey: result.success
+        ? 'settings.security.webauthn.register_success'
+        : 'settings.security.webauthn.register_failed',
     };
   } catch (error) {
     throw new Error(
@@ -526,9 +530,7 @@ export const deleteCredential = async (
     return {
       success: false,
       message:
-        error instanceof Error
-          ? error.message
-          : 'WebAuthn key deletion failed',
+        error instanceof Error ? error.message : 'WebAuthn key deletion failed',
       messageKey: 'settings.security.webauthn.delete_failed',
     };
   }
@@ -575,10 +577,7 @@ export const updateCredentialAlias = async (
   } catch (error) {
     return {
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : 'Alias update failed',
+      message: error instanceof Error ? error.message : 'Alias update failed',
       messageKey: 'settings.security.webauthn.alias_update_failed',
     };
   }
@@ -596,16 +595,18 @@ export const disableCredential = async (
     const result = await WebAuthnAPI.disableCredential(token, credentialId);
     return {
       success: result.success,
-      message: result.success ? 'WebAuthn key disabled successfully' : 'WebAuthn key disable failed',
-      messageKey: result.success ? 'settings.security.webauthn.disable_success' : 'settings.security.webauthn.disable_failed',
+      message: result.success
+        ? 'WebAuthn key disabled successfully'
+        : 'WebAuthn key disable failed',
+      messageKey: result.success
+        ? 'settings.security.webauthn.disable_success'
+        : 'settings.security.webauthn.disable_failed',
     };
   } catch (error) {
     return {
       success: false,
       message:
-        error instanceof Error
-          ? error.message
-          : 'WebAuthn key disable failed',
+        error instanceof Error ? error.message : 'WebAuthn key disable failed',
       messageKey: 'settings.security.webauthn.disable_failed',
     };
   }
@@ -623,16 +624,18 @@ export const enableCredential = async (
     const result = await WebAuthnAPI.enableCredential(token, credentialId);
     return {
       success: result.success,
-      message: result.success ? 'WebAuthn key enabled successfully' : 'WebAuthn key enable failed',
-      messageKey: result.success ? 'settings.security.webauthn.enable_success' : 'settings.security.webauthn.enable_failed',
+      message: result.success
+        ? 'WebAuthn key enabled successfully'
+        : 'WebAuthn key enable failed',
+      messageKey: result.success
+        ? 'settings.security.webauthn.enable_success'
+        : 'settings.security.webauthn.enable_failed',
     };
   } catch (error) {
     return {
       success: false,
       message:
-        error instanceof Error
-          ? error.message
-          : 'WebAuthn key enable failed',
+        error instanceof Error ? error.message : 'WebAuthn key enable failed',
       messageKey: 'settings.security.webauthn.enable_failed',
     };
   }

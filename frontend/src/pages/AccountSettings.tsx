@@ -83,9 +83,7 @@ export const AccountSettings: React.FC = () => {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-500">
-          {t('common.loading')}
-        </div>
+        <div className="text-gray-500">{t('common.loading')}</div>
       </div>
     );
   }
@@ -1206,9 +1204,7 @@ const ProfileSettings: React.FC = () => {
             disabled={isLoading}
             className="w-full py-4 text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-4 focus:ring-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 rounded-xl font-medium tracking-wide shadow-md hover:shadow-lg"
           >
-            {isLoading
-              ? t('common.loading')
-              : t('common.save')}
+            {isLoading ? t('common.loading') : t('common.save')}
           </button>
         </div>
       </form>

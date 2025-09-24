@@ -32,7 +32,11 @@ describe('TwoFactor API', () => {
             const authHeader = request.headers.get('Authorization');
             if (authHeader !== `Bearer ${mockToken}`) {
               return HttpResponse.json(
-                { success: false, message: 'Authentication required', messageKey: 'auth.errors.auth_token_missing' },
+                {
+                  success: false,
+                  message: 'Authentication required',
+                  messageKey: 'auth.errors.auth_token_missing',
+                },
                 { status: 401 }
               );
             }
@@ -60,7 +64,7 @@ describe('TwoFactor API', () => {
       localStorage.removeItem('auth_token');
 
       await expect(enableTwoFactor()).rejects.toThrow(
-'Authentication token is not set'
+        'Authentication token is not set'
       );
     });
   });
@@ -227,7 +231,9 @@ describe('TwoFactor API', () => {
       expect(result.success).toBe(true);
       expect(result.recovery_codes).toEqual(['new1', 'new2', 'new3']);
       expect(result.message).toBe('Recovery codes regenerated successfully');
-      expect(result.messageKey).toBe('auth.two_factor.recovery_codes_regenerate_success');
+      expect(result.messageKey).toBe(
+        'auth.two_factor.recovery_codes_regenerate_success'
+      );
     });
   });
 
@@ -267,7 +273,7 @@ describe('TwoFactor API', () => {
       localStorage.removeItem('auth_token');
 
       await expect(enableTwoFactor()).rejects.toThrow(
-'Authentication token is not set'
+        'Authentication token is not set'
       );
     });
   });
