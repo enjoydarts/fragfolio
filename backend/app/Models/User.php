@@ -38,6 +38,8 @@ class User extends Authenticatable implements MustVerifyEmail, WebAuthnAuthentic
 
     public string $password;
 
+    public bool $is_admin = false;
+
     /**
      * The attributes that are mass assignable.
      *

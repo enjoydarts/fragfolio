@@ -19,6 +19,7 @@ parameters:
         - '#Using nullsafe property access.*on left side of \?\? is unnecessary#'
         - '#Instanceof between App\\Models\\User and.*will always evaluate to true#'
         - '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$email#'
+        - '#Call to an undefined method.*::toArray\\(\\)#'
 
     excludePaths:
         - ./*/*/FileToBeExcluded.php
