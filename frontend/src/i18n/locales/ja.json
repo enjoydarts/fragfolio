@@ -260,6 +260,9 @@
         "new": "新しいパスワード",
         "confirm": "パスワード確認",
         "update": "パスワードを更新",
+        "updating": "変更中...",
+        "success": "パスワードが正常に変更されました",
+        "error": "パスワード変更に失敗しました",
         "current_password_placeholder": "現在のパスワードを入力",
         "new_password_placeholder": "8文字以上（英数大小文字・記号含む）",
         "confirm_password_placeholder": "新しいパスワードを再入力"
@@ -296,6 +299,8 @@
     "save": "保存",
     "cancel": "キャンセル",
     "edit": "編集",
+    "show": "表示",
+    "hide": "隠す",
     "back_to_dashboard": "ダッシュボードに戻る"
   }
 }

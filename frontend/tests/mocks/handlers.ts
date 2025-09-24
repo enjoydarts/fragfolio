@@ -182,6 +182,60 @@ export const handlers = [
     });
   }),
 
+  // Password Change API
+  http.put('http://localhost:8002/api/auth/password', async ({ request }) => {
+    const body = await request.json() as {
+      current_password: string;
+      new_password: string;
+      new_password_confirmation: string;
+    };
+
+    // 現在のパスワードが間違っている場合
+    if (body.current_password === 'WrongPassword123!') {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: '現在のパスワードが正しくありません',
+        },
+        { status: 422 }
+      );
+    }
+
+    // パスワードが弱い場合
+    if (body.new_password === 'weak') {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: 'パスワードに正しい形式を指定してください。',
+          errors: {
+            new_password: ['パスワードに正しい形式を指定してください。'],
+          },
+        },
+        { status: 422 }
+      );
+    }
+
+    // パスワード確認が一致しない場合
+    if (body.new_password !== body.new_password_confirmation) {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: 'パスワードの確認が一致しません',
+          errors: {
+            new_password: ['パスワードの確認が一致しません'],
+          },
+        },
+        { status: 422 }
+      );
+    }
+
+    // 正常な場合
+    return HttpResponse.json({
+      success: true,
+      message: 'パスワードが正常に変更されました',
+    });
+  }),
+
   // Two Factor API
   http.post('http://localhost:8002/api/two-factor/enable', () => {
     return HttpResponse.json({

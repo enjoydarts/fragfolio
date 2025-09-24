@@ -260,6 +260,9 @@
         "new": "New Password",
         "confirm": "Confirm Password",
         "update": "Update Password",
+        "updating": "Updating...",
+        "success": "Password has been successfully changed",
+        "error": "Failed to change password",
         "current_password_placeholder": "Enter current password",
         "new_password_placeholder": "8+ chars (upper, lower, number, symbol)",
         "confirm_password_placeholder": "Re-enter new password"
@@ -296,6 +299,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "edit": "Edit",
+    "show": "Show",
+    "hide": "Hide",
     "back_to_dashboard": "Back to Dashboard"
   }
 }

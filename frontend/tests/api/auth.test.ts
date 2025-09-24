@@ -107,4 +107,51 @@ describe('AuthAPI', () => {
       expect(result.token).toBe('new-refresh-token');
     });
   });
+
+  describe('changePassword', () => {
+    it('パスワード変更ができる', async () => {
+      const result = await AuthAPI.changePassword('mock-jwt-token', {
+        current_password: 'Password123!',
+        new_password: 'NewPassword123!',
+        new_password_confirmation: 'NewPassword123!',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.message).toBe('パスワードが正常に変更されました');
+    });
+
+    it('現在のパスワードが間違っている場合はエラー', async () => {
+      // MSWでエラーレスポンスをモック
+      const result = await AuthAPI.changePassword('mock-jwt-token', {
+        current_password: 'WrongPassword123!',
+        new_password: 'NewPassword123!',
+        new_password_confirmation: 'NewPassword123!',
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.message).toBe('現在のパスワードが正しくありません');
+    });
+
+    it('弱いパスワードの場合はバリデーションエラー', async () => {
+      const result = await AuthAPI.changePassword('mock-jwt-token', {
+        current_password: 'Password123!',
+        new_password: 'weak',
+        new_password_confirmation: 'weak',
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.errors?.new_password).toBeDefined();
+    });
+
+    it('パスワード確認が一致しない場合はバリデーションエラー', async () => {
+      const result = await AuthAPI.changePassword('mock-jwt-token', {
+        current_password: 'Password123!',
+        new_password: 'NewPassword123!',
+        new_password_confirmation: 'DifferentPassword123!',
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.errors?.new_password).toBeDefined();
+    });
+  });
 });

@@ -20,12 +20,22 @@ abstract class TestCase extends BaseTestCase
         \DB::purge('mysql');
         \DB::reconnect('mysql');
 
+        // 接続が正しくテスト用データベースになっているか確認
+        if (\DB::connection()->getDatabaseName() !== 'fragfolio_test') {
+            throw new \RuntimeException('テスト実行時にテスト用データベースに接続されていません: '.\DB::connection()->getDatabaseName());
+        }
+
         // テスト開始前にデータをクリーンアップ
         $this->cleanupDatabase();
     }
 
     protected function tearDown(): void
     {
+        // 接続が正しくテスト用データベースになっているか確認
+        if (\DB::connection()->getDatabaseName() !== 'fragfolio_test') {
+            throw new \RuntimeException('テスト終了時にテスト用データベースに接続されていません: '.\DB::connection()->getDatabaseName());
+        }
+
         // テスト終了後にデータをクリーンアップ
         $this->cleanupDatabase();
 

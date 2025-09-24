@@ -303,4 +303,97 @@ describe('AuthController', function () {
 
         $response->assertStatus(422);
     });
+
+    test('パスワード変更ができる', function () {
+        $user = User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => Hash::make('Password123!'),
+        ]);
+
+        $response = $this->actingAs($user)->putJson('/api/auth/password', [
+            'current_password' => 'Password123!',
+            'new_password' => 'NewPassword123!',
+            'new_password_confirmation' => 'NewPassword123!',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'success',
+                'message',
+            ]);
+
+        expect($response->json('success'))->toBe(true);
+
+        // パスワードが更新されていることを確認
+        $user->refresh();
+        expect(Hash::check('NewPassword123!', $user->password))->toBe(true);
+        expect(Hash::check('Password123!', $user->password))->toBe(false);
+    });
+
+    test('現在のパスワードが間違っている場合はパスワード変更できない', function () {
+        $user = User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => Hash::make('Password123!'),
+        ]);
+
+        $response = $this->actingAs($user)->putJson('/api/auth/password', [
+            'current_password' => 'WrongPassword123!',
+            'new_password' => 'NewPassword123!',
+            'new_password_confirmation' => 'NewPassword123!',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonStructure([
+                'success',
+                'message',
+            ]);
+
+        expect($response->json('success'))->toBe(false);
+
+        // パスワードが変更されていないことを確認
+        $user->refresh();
+        expect(Hash::check('Password123!', $user->password))->toBe(true);
+    });
+
+    test('新しいパスワードの確認が一致しない場合はパスワード変更できない', function () {
+        $user = User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => Hash::make('Password123!'),
+        ]);
+
+        $response = $this->actingAs($user)->putJson('/api/auth/password', [
+            'current_password' => 'Password123!',
+            'new_password' => 'NewPassword123!',
+            'new_password_confirmation' => 'DifferentPassword123!',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['new_password']);
+    });
+
+    test('弱いパスワードではパスワード変更できない', function () {
+        $user = User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => Hash::make('Password123!'),
+        ]);
+
+        $response = $this->actingAs($user)->putJson('/api/auth/password', [
+            'current_password' => 'Password123!',
+            'new_password' => 'weak',
+            'new_password_confirmation' => 'weak',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['new_password']);
+    });
+
+    test('未認証ユーザーはパスワード変更できない', function () {
+        $response = $this->putJson('/api/auth/password', [
+            'current_password' => 'Password123!',
+            'new_password' => 'NewPassword123!',
+            'new_password_confirmation' => 'NewPassword123!',
+        ]);
+
+        $response->assertStatus(401);
+    });
 });
