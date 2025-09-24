@@ -199,20 +199,13 @@ const ProfileSettings: React.FC = () => {
 
       if (response.success) {
         await refreshUser();
-        toast.success(
-          t('auth.errors.profile_update_success')
-        );
+        toast.success(t('auth.errors.profile_update_success'));
       } else {
-        toast.error(
-          t('auth.errors.profile_update_failed')
-        );
+        toast.error(t('auth.errors.profile_update_failed'));
       }
     } catch (error) {
       console.error('Profile update failed:', error);
-      toast.error(
-        t('auth.profile_update_failed', 'プロフィール更新に失敗しました'),
-        t('auth.network_error', 'ネットワークエラーが発生しました')
-      );
+      toast.error(t('auth.errors.profile_update_failed'));
     } finally {
       setIsLoading(false);
     }
@@ -1364,9 +1357,7 @@ const SecuritySettings: React.FC = () => {
     if (!token) return;
 
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      toast.error(
-        t('auth.errors.password_mismatch')
-      );
+      toast.error(t('auth.errors.password_mismatch'));
       return;
     }
 
@@ -1375,9 +1366,7 @@ const SecuritySettings: React.FC = () => {
       passwordForm.newPassword
     );
     if (!passwordValidation.isValid) {
-      toast.error(
-        t('auth.password.weak_password')
-      );
+      toast.error(t('auth.password.weak_password'));
       return;
     }
 
@@ -1391,24 +1380,18 @@ const SecuritySettings: React.FC = () => {
       });
 
       if (response.success) {
-        toast.success(
-          t('settings.security.password.success')
-        );
+        toast.success(t('settings.security.password.success'));
         setPasswordForm({
           currentPassword: '',
           newPassword: '',
           confirmPassword: '',
         });
       } else {
-        toast.error(
-          t('settings.security.password.error')
-        );
+        toast.error(t('settings.security.password.error'));
       }
     } catch (error) {
       console.error('Password change failed:', error);
-      toast.error(
-        t('settings.security.password.error')
-      );
+      toast.error(t('settings.security.password.error'));
     } finally {
       setIsPasswordLoading(false);
     }
@@ -1702,16 +1685,11 @@ const SessionsSettings: React.FC = () => {
           )
         );
       } else {
-        toast.error(
-          t('auth.errors.registration_failed')
-        );
+        toast.error(t('auth.errors.registration_failed'));
       }
     } catch (error) {
       console.error('Logout other sessions failed:', error);
-      toast.error(
-        t('settings.sessions.logout_failed', 'ログアウトに失敗しました'),
-        t('auth.network_error', 'ネットワークエラーが発生しました')
-      );
+      toast.error(t('auth.errors.registration_failed'));
     } finally {
       setIsLoading(false);
     }
