@@ -45,10 +45,12 @@ class TwoFactorAuthController extends Controller
     public function enable(Request $request): JsonResponse
     {
         try {
-            $this->enableTwoFactorUseCase->execute($request->user());
+            $result = $this->enableTwoFactorUseCase->execute($request->user());
 
             return response()->json([
                 'success' => true,
+                'secret' => $result['secret'],
+                'qr_code_url' => $result['qr_code_url'],
                 'message' => __('auth.two_factor_setup_started')
             ]);
         } catch (\InvalidArgumentException $e) {
@@ -69,10 +71,11 @@ class TwoFactorAuthController extends Controller
         ]);
 
         try {
-            $this->confirmTwoFactorUseCase->execute($request->user(), $request->code);
+            $result = $this->confirmTwoFactorUseCase->execute($request->user(), $request->code);
 
             return response()->json([
                 'success' => true,
+                'recovery_codes' => $result['recovery_codes'],
                 'message' => __('auth.two_factor_enabled')
             ]);
         } catch (\InvalidArgumentException $e) {
@@ -111,7 +114,7 @@ class TwoFactorAuthController extends Controller
     /**
      * QRコード生成
      */
-    public function qrCode(Request $request): Response
+    public function qrCode(Request $request): Response|JsonResponse
     {
         try {
             $qrCodeSvg = $this->generateQrCodeUseCase->execute($request->user());
@@ -153,6 +156,7 @@ class TwoFactorAuthController extends Controller
             $codes = $this->getRecoveryCodesUseCase->execute($request->user());
 
             return response()->json([
+                'success' => true,
                 'recovery_codes' => $codes
             ]);
         } catch (\InvalidArgumentException $e) {

@@ -17,17 +17,12 @@
             <directory>app</directory>
         </include>
     </source>
-    <coverage>
-        <report>
-            <html outputDirectory="coverage"/>
-            <text outputFile="coverage.txt"/>
-        </report>
-    </coverage>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_KEY" value="base64:HHcXhdGoQ62ZOvGq2Hu4jFp5YqfO57O861yLZ6fMyLw="/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_DRIVER" value="array"/>
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_CONNECTION" value="mysql"/>
         <env name="DB_HOST" value="mysql"/>

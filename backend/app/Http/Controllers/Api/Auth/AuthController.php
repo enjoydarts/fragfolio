@@ -123,6 +123,14 @@ class AuthController extends Controller
             $credentials = $request->only('email', 'password');
             $remember = $request->boolean('remember');
 
+            Log::info('Login attempt', [
+                'email' => $credentials['email'],
+                'has_password' => !empty($credentials['password']),
+                'remember' => $remember,
+                'ip' => $request->ip(),
+                'user_agent' => $request->header('User-Agent')
+            ]);
+
             $result = $this->loginUserUseCase->execute($credentials, $remember);
 
             return response()->json([
@@ -133,6 +141,12 @@ class AuthController extends Controller
             ]);
 
         } catch (AuthenticationException $e) {
+            Log::warning('Login failed - invalid credentials', [
+                'email' => $credentials['email'] ?? 'unknown',
+                'ip' => $request->ip(),
+                'user_agent' => $request->header('User-Agent')
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => __('auth.invalid_credentials'),
@@ -152,9 +166,19 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
+        $user = $request->user()->load('profile', 'roles');
+
         return response()->json([
             'success' => true,
-            'user' => $request->user()->load('profile', 'roles'),
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'email_verified_at' => $user->email_verified_at,
+                'two_factor_enabled' => !is_null($user->two_factor_secret),
+                'profile' => $user->profile,
+                'roles' => $user->roles,
+            ],
         ]);
     }
 

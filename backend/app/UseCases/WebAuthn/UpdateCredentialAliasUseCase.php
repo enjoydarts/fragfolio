@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class UpdateCredentialAliasUseCase
 {
-    public function execute(User $user, string $credentialId, string $alias): void
+    public function execute(User $user, string $credentialId, string $alias): array
     {
         Log::info('UpdateCredentialAliasUseCase started', [
             'user_id' => $user->id,
@@ -40,6 +40,13 @@ class UpdateCredentialAliasUseCase
                 'alias' => $alias,
             ]);
             Log::info('Credential alias updated successfully');
+
+            return [
+                'id' => $credential->id,
+                'alias' => $credential->alias,
+                'created_at' => $credential->created_at,
+                'disabled_at' => $credential->disabled_at,
+            ];
         } catch (\Exception $e) {
             Log::error('Failed to update credential alias', [
                 'error' => $e->getMessage(),

@@ -44,6 +44,9 @@ RUN docker-php-ext-install \
 # Install Redis extension
 RUN pecl install redis && docker-php-ext-enable redis
 
+# Install Xdebug for code coverage
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -68,6 +71,10 @@ RUN rm /etc/nginx/sites-enabled/default && ln -s /etc/nginx/sites-available/defa
 
 # Copy supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Configure PHP-FPM to capture worker output
+RUN echo "catch_workers_output = yes" >> /usr/local/etc/php-fpm.d/www.conf && \
+    echo "decorate_workers_output = no" >> /usr/local/etc/php-fpm.d/www.conf
 
 # Create log directories
 RUN mkdir -p /var/log/supervisor

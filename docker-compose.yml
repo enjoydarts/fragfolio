@@ -43,6 +43,8 @@ services:
       REDIS_PORT: "6379"
       MAIL_HOST: mailpit
       MAIL_PORT: "1025"
+      LOG_CHANNEL: single
+      LOG_LEVEL: debug
     networks:
       - fragfolio
 
@@ -65,7 +67,7 @@ services:
 
   # phpMyAdmin (development only)
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
+    image: phpmyadmin:latest
     container_name: fragfolio_phpmyadmin
     restart: unless-stopped
     depends_on:
@@ -96,7 +98,7 @@ services:
     container_name: fragfolio_redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -125,7 +127,6 @@ services:
     command: php artisan queue:work --verbose --tries=3 --timeout=90 --queue=emails,default
     networks:
       - fragfolio
-
 
 volumes:
   mysql_data:

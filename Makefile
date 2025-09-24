@@ -12,7 +12,7 @@ build: ## Build all containers
 	docker-compose build
 
 up: ## Start all containers
-	docker-compose up -d
+	docker-compose up
 
 down: ## Stop all containers
 	docker-compose down

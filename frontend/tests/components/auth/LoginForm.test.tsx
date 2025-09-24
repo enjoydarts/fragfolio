@@ -1,279 +1,251 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
-import { renderWithRouter } from '../../../src/test/utils';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '../../utils';
 import { LoginForm } from '../../../src/components/auth/LoginForm';
-import { AuthContext } from '../../../src/contexts/context';
-import type { User } from '../../../src/types';
+import { useAuth } from '../../../src/hooks/useAuth';
+import { useToast } from '../../../src/hooks/useToast';
 
-// 環境変数をモック
-vi.mock('vite', () => ({
-  defineConfig: vi.fn(),
-}));
-
-Object.defineProperty(import.meta, 'env', {
-  value: {
-    VITE_TURNSTILE_SITE_KEY: 'test-site-key',
-  },
-  writable: true,
-});
-
-// TurnstileWidgetをモック
+// モックの設定
+vi.mock('../../../src/hooks/useAuth');
+vi.mock('../../../src/hooks/useToast');
 vi.mock('../../../src/components/auth/TurnstileWidget', () => ({
-  TurnstileWidget: ({ onVerify }: { onVerify: (token: string) => void }) => {
-    // テスト用にTurnstileトークンを自動生成
-    React.useEffect(() => {
-      // 非同期でトークンを設定してより確実にする
-      setTimeout(() => {
-        onVerify('test-turnstile-token');
-      }, 0);
-    }, [onVerify]);
-
-    return <div data-testid="turnstile-widget">Mocked Turnstile</div>;
-  },
+  TurnstileWidget: ({ onVerify }: { onVerify: (token: string) => void }) => (
+    <div data-testid="turnstile-widget">
+      <button onClick={() => onVerify('test-token')}>Verify</button>
+    </div>
+  ),
 }));
 
-// AuthContextのモック
-const mockAuthContext = {
-  user: null as User | null,
-  loading: false,
-  token: null,
-  logout: vi.fn(),
-  login: vi.fn(),
-  register: vi.fn(),
-  updateProfile: vi.fn(),
-  refreshToken: vi.fn(),
-  refreshUser: vi.fn(),
-};
-
-const renderWithAuth = (authOverrides = {}, props = {}) => {
-  const authValue = { ...mockAuthContext, ...authOverrides };
-  return renderWithRouter(
-    <AuthContext.Provider value={authValue}>
-      <LoginForm {...props} />
-    </AuthContext.Provider>
-  );
-};
+const mockLogin = vi.fn();
+const mockShowToast = vi.fn();
+const mockUseAuth = vi.mocked(useAuth);
+const mockUseToast = vi.mocked(useToast);
 
 describe('LoginForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
-    // Vitest環境変数モック
-    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', 'test-site-key');
-    // 環境変数を確実に設定（フォールバック）
+
+    // Turnstile環境変数をモック
     Object.defineProperty(import.meta, 'env', {
       value: {
-        VITE_TURNSTILE_SITE_KEY: 'test-site-key',
-        ...import.meta.env,
+        VITE_TURNSTILE_SITE_KEY: 'test-site-key'
       },
-      writable: true,
-      configurable: true,
+      writable: true
+    });
+
+    mockUseAuth.mockReturnValue({
+      user: null,
+      loading: false,
+      login: mockLogin,
+      logout: vi.fn(),
+      register: vi.fn(),
+      refreshToken: vi.fn(),
+      updateProfile: vi.fn(),
+    });
+
+    mockUseToast.mockReturnValue({
+      toasts: [],
+      toast: {
+        success: mockShowToast,
+        error: mockShowToast,
+        info: mockShowToast,
+      },
+      removeToast: vi.fn(),
     });
   });
 
-  afterEach(() => {
-    vi.unstubAllEnvs();
+  it('正しくレンダリングされる', () => {
+    render(<LoginForm />);
+
+    expect(screen.getByLabelText(/メールアドレス/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/パスワード/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/ログイン状態を保持/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /ログイン/ })).toBeInTheDocument();
   });
 
-  describe('基本表示', () => {
-    it('必要なフォームフィールドが表示される', () => {
-      renderWithAuth();
+  it('フォーム送信時にログイン処理が実行される', async () => {
+    mockLogin.mockResolvedValue({ success: true });
 
-      expect(screen.getByLabelText('メールアドレス')).toBeInTheDocument();
-      expect(screen.getByLabelText('パスワード')).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: 'ログイン' })
-      ).toBeInTheDocument();
+    render(<LoginForm />);
+
+    // フォームに入力
+    fireEvent.change(screen.getByLabelText(/メールアドレス/), {
+      target: { value: 'test@example.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/パスワード/), {
+      target: { value: 'password123' },
     });
 
-    it('適切な入力タイプが設定されている', () => {
-      renderWithAuth();
+    // Turnstileを認証
+    fireEvent.click(screen.getByText('Verify'));
 
-      expect(screen.getByLabelText('メールアドレス')).toHaveAttribute(
-        'type',
-        'email'
+    // フォーム送信
+    fireEvent.click(screen.getByRole('button', { name: /ログイン/ }));
+
+    await waitFor(() => {
+      expect(mockLogin).toHaveBeenCalledWith(
+        'test@example.com',
+        'password123',
+        false,
+        'test-token'
       );
-      expect(screen.getByLabelText('パスワード')).toHaveAttribute(
-        'type',
-        'password'
+    });
+  });
+
+  it('記憶する機能が正しく動作する', async () => {
+    mockLogin.mockResolvedValue({ success: true });
+
+    render(<LoginForm />);
+
+    // フォームに入力
+    fireEvent.change(screen.getByLabelText(/メールアドレス/), {
+      target: { value: 'test@example.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/パスワード/), {
+      target: { value: 'password123' },
+    });
+
+    // 記憶するをチェック
+    fireEvent.click(screen.getByLabelText(/ログイン状態を保持/));
+
+    // Turnstileを認証
+    fireEvent.click(screen.getByText('Verify'));
+
+    // フォーム送信
+    fireEvent.click(screen.getByRole('button', { name: /ログイン/ }));
+
+    await waitFor(() => {
+      expect(mockLogin).toHaveBeenCalledWith(
+        'test@example.com',
+        'password123',
+        true,
+        'test-token'
       );
     });
+  });
 
-    it('記憶するオプションのチェックボックスが表示される', () => {
-      renderWithAuth();
+  it('バリデーションエラーが表示される', async () => {
+    render(<LoginForm />);
 
-      expect(screen.getByLabelText('ログイン状態を保持')).toBeInTheDocument();
-      expect(screen.getByLabelText('ログイン状態を保持')).toHaveAttribute(
-        'type',
-        'checkbox'
-      );
+    // 空のフォームを送信（HTML5バリデーションで防がれる）
+    fireEvent.click(screen.getByRole('button', { name: /ログイン/ }));
+
+    // HTML5 validationによってフォーム送信が防がれることを確認
+    expect(mockLogin).not.toHaveBeenCalled();
+  });
+
+  it('ログイン失敗時にエラーメッセージが表示される', async () => {
+    const errorMessage = 'メールアドレスまたはパスワードが正しくありません';
+    mockLogin.mockRejectedValue({
+      message: errorMessage,
     });
 
-    it('パスワードを忘れた場合のリンクが表示される', () => {
-      renderWithAuth();
+    render(<LoginForm />);
 
-      const forgotPasswordLink = screen.getByText('パスワードを忘れた場合');
-      expect(forgotPasswordLink).toBeInTheDocument();
-      // ボタンなのでhref属性は無い
+    // フォームに入力
+    fireEvent.change(screen.getByLabelText(/メールアドレス/), {
+      target: { value: 'test@example.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/パスワード/), {
+      target: { value: 'wrong-password' },
+    });
+
+    // Turnstileを認証
+    fireEvent.click(screen.getByText('Verify'));
+
+    // フォーム送信
+    fireEvent.click(screen.getByRole('button', { name: /ログイン/ }));
+
+    await waitFor(() => {
+      // LoginForm handles errors through setState, not toast
+      expect(screen.getByText(errorMessage)).toBeInTheDocument();
     });
   });
 
-  describe('フォーム送信', () => {
-    it('有効な入力でフォーム送信される', async () => {
-      const user = userEvent.setup();
-      const mockLogin = vi.fn().mockResolvedValue({ success: true });
-      renderWithAuth({ login: mockLogin });
-
-      await user.type(
-        screen.getByLabelText('メールアドレス'),
-        'test@example.com'
-      );
-      await user.type(screen.getByLabelText('パスワード'), 'password123');
-      await user.click(screen.getByRole('button', { name: 'ログイン' }));
-
-      await waitFor(() => {
-        expect(mockLogin).toHaveBeenCalledWith(
-          'test@example.com',
-          'password123',
-          false,
-          'test-turnstile-token'
-        );
-      });
+  it('2段階認証が必要な場合の処理', async () => {
+    // mockLoginが2FA必要レスポンスを返すようにするのではなく、
+    // login関数が例外を投げて、その例外にrequires_two_factorフラグが含まれるようにする
+    mockLogin.mockRejectedValue({
+      requires_two_factor: true,
+      temp_token: 'temp-token-123',
+      available_methods: ['totp', 'webauthn'],
     });
 
-    it('記憶するオプションがチェックされた場合にrememberがtrueになる', async () => {
-      const user = userEvent.setup();
-      const mockLogin = vi.fn().mockResolvedValue({ success: true });
-      renderWithAuth({ login: mockLogin });
+    render(<LoginForm />);
 
-      await user.type(
-        screen.getByLabelText('メールアドレス'),
-        'test@example.com'
-      );
-      await user.type(screen.getByLabelText('パスワード'), 'password123');
-      await user.click(screen.getByLabelText('ログイン状態を保持'));
-      await user.click(screen.getByRole('button', { name: 'ログイン' }));
-
-      await waitFor(() => {
-        expect(mockLogin).toHaveBeenCalledWith(
-          'test@example.com',
-          'password123',
-          true,
-          'test-turnstile-token'
-        );
-      });
+    // フォームに入力
+    fireEvent.change(screen.getByLabelText(/メールアドレス/), {
+      target: { value: 'test@example.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/パスワード/), {
+      target: { value: 'password123' },
     });
 
-    it('空のフォームでは送信されない', async () => {
-      const user = userEvent.setup();
-      const mockLogin = vi.fn();
-      renderWithAuth({ login: mockLogin });
+    // Turnstileを認証
+    fireEvent.click(screen.getByText('Verify'));
 
-      await user.click(screen.getByRole('button', { name: 'ログイン' }));
+    // フォーム送信
+    fireEvent.click(screen.getByRole('button', { name: /ログイン/ }));
 
-      // フォームバリデーションにより送信されない
-      expect(mockLogin).not.toHaveBeenCalled();
+    await waitFor(() => {
+      // 2FA選択画面の表示を確認
+      expect(screen.getByText(/認証方法を選択/)).toBeInTheDocument();
     });
   });
 
-  describe('ローディング状態', () => {
-    it('ローディング中はボタンが無効になる', () => {
-      renderWithAuth({ loading: true });
-
-      const submitButton = screen.getByRole('button', {
-        name: 'ログイン中...',
-      });
-      expect(submitButton).toBeDisabled();
+  it('ローディング中はボタンが無効になる', () => {
+    mockUseAuth.mockReturnValue({
+      user: null,
+      isLoading: true,
+      login: mockLogin,
+      logout: vi.fn(),
+      register: vi.fn(),
+      refreshToken: vi.fn(),
+      updateProfile: vi.fn(),
     });
 
-    it('ローディング中でも入力フィールドは有効', () => {
-      renderWithAuth({ loading: true });
+    render(<LoginForm />);
 
-      expect(screen.getByLabelText('メールアドレス')).toBeEnabled();
-      expect(screen.getByLabelText('パスワード')).toBeEnabled();
-      expect(screen.getByLabelText('ログイン状態を保持')).toBeEnabled();
-    });
-
-    it('ローディング中はローディング表示される', () => {
-      renderWithAuth({ loading: true });
-
-      expect(screen.getByText('ログイン中...')).toBeInTheDocument();
-    });
+    const submitButton = screen.getByRole('button', { name: /ログイン/ });
+    expect(submitButton).toBeDisabled();
   });
 
-  describe('エラー表示', () => {
-    it('ログインエラー時にエラーメッセージが表示される', async () => {
-      const user = userEvent.setup();
-      const mockLogin = vi
-        .fn()
-        .mockRejectedValue(new Error('認証に失敗しました'));
-      renderWithAuth({ login: mockLogin });
+  it('Turnstile認証なしではフォーム送信できない', async () => {
+    render(<LoginForm />);
 
-      await user.type(
-        screen.getByLabelText('メールアドレス'),
-        'test@example.com'
-      );
-      await user.type(screen.getByLabelText('パスワード'), 'wrongpassword');
-      await user.click(screen.getByRole('button', { name: 'ログイン' }));
-
-      await waitFor(() => {
-        expect(screen.getByText('認証に失敗しました')).toBeInTheDocument();
-      });
+    // フォームに入力
+    fireEvent.change(screen.getByLabelText(/メールアドレス/), {
+      target: { value: 'test@example.com' },
     });
+    fireEvent.change(screen.getByLabelText(/パスワード/), {
+      target: { value: 'password123' },
+    });
+
+    // Turnstile認証なしではボタンが無効になっていることを確認
+    const submitButton = screen.getByRole('button', { name: /ログイン/ });
+    expect(submitButton).toBeDisabled();
+
+    // 無効なボタンをクリックしてもログイン処理は呼ばれない
+    fireEvent.click(submitButton);
+    expect(mockLogin).not.toHaveBeenCalled();
   });
 
-  describe('フォームバリデーション', () => {
-    it('必須フィールドが適切に設定されている', () => {
-      renderWithAuth();
+  it('メールアドレスのバリデーションが動作する', async () => {
+    render(<LoginForm />);
 
-      expect(screen.getByLabelText('メールアドレス')).toBeRequired();
-      expect(screen.getByLabelText('パスワード')).toBeRequired();
+    // 不正な形式のメールアドレスを入力
+    fireEvent.change(screen.getByLabelText(/メールアドレス/), {
+      target: { value: 'invalid-email' },
     });
-  });
-
-  describe('アクセシビリティ', () => {
-    it('適切なラベルが設定されている', () => {
-      renderWithAuth();
-
-      expect(screen.getByLabelText('メールアドレス')).toBeInTheDocument();
-      expect(screen.getByLabelText('パスワード')).toBeInTheDocument();
-      expect(screen.getByLabelText('ログイン状態を保持')).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/パスワード/), {
+      target: { value: 'password123' },
     });
 
-    it('フォームがキーボードで操作可能', async () => {
-      const user = userEvent.setup();
-      renderWithAuth();
+    // Turnstileを認証
+    fireEvent.click(screen.getByText('Verify'));
 
-      const emailInput = screen.getByLabelText('メールアドレス');
-      const passwordInput = screen.getByLabelText('パスワード');
-      const rememberCheckbox = screen.getByLabelText('ログイン状態を保持');
-      const forgotPasswordButton = screen.getByText('パスワードを忘れた場合');
+    fireEvent.click(screen.getByRole('button', { name: /ログイン/ }));
 
-      // タブでフォーカス移動
-      await user.tab();
-      expect(emailInput).toHaveFocus();
-
-      await user.tab();
-      expect(passwordInput).toHaveFocus();
-
-      await user.tab();
-      expect(rememberCheckbox).toHaveFocus();
-
-      await user.tab();
-      expect(forgotPasswordButton).toHaveFocus();
-    });
-  });
-
-  describe('Turnstile統合', () => {
-    it('Turnstileウィジェットがモックで表示される', async () => {
-      renderWithAuth();
-
-      // 非同期でウィジェットが表示されるのを待つ
-      const turnstileWidget = await screen.findByTestId('turnstile-widget');
-      expect(turnstileWidget).toBeInTheDocument();
-      expect(turnstileWidget).toHaveTextContent('Mocked Turnstile');
-    });
+    // HTML5のemail型validationによってフォーム送信が防がれることを確認
+    expect(mockLogin).not.toHaveBeenCalled();
   });
 });

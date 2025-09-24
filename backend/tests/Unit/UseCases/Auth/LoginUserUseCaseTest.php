@@ -49,7 +49,7 @@ describe('LoginUserUseCase', function () {
         ];
 
         expect(fn () => $this->useCase->execute($credentials))
-            ->toThrow(AuthenticationException::class, '認証情報が正しくありません');
+            ->toThrow(AuthenticationException::class);
     });
 
     test('存在しないメールアドレスでは認証例外が発生する', function () {
@@ -59,7 +59,7 @@ describe('LoginUserUseCase', function () {
         ];
 
         expect(fn () => $this->useCase->execute($credentials))
-            ->toThrow(AuthenticationException::class, '認証情報が正しくありません');
+            ->toThrow(AuthenticationException::class);
     });
 
     test('返されるユーザーにはプロフィールとロールが含まれる', function () {

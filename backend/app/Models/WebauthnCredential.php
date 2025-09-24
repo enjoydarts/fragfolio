@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laragear\WebAuthn\Models\WebAuthnCredential as BaseWebAuthnCredential;
 
 class WebAuthnCredential extends BaseWebAuthnCredential
 {
+    use HasFactory;
+
     protected $fillable = [
         'alias',
         'counter',

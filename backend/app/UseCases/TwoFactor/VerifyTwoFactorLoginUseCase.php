@@ -16,7 +16,7 @@ class VerifyTwoFactorLoginUseCase
         $tempData = Cache::get("two_factor_pending:{$tempToken}");
 
         if (!$tempData) {
-            throw new \InvalidArgumentException(__('auth.session_invalid'));
+            throw new \InvalidArgumentException(__('auth.two_factor_token_expired'));
         }
 
         $user = User::find($tempData['user_id']);
@@ -39,7 +39,7 @@ class VerifyTwoFactorLoginUseCase
         }
 
         if (!$valid) {
-            throw new \InvalidArgumentException(__('auth.two_factor_code_invalid'));
+            throw new \InvalidArgumentException(__('auth.two_factor_failed'));
         }
 
         // ログイン完了処理
@@ -55,7 +55,7 @@ class VerifyTwoFactorLoginUseCase
                 'name' => $user->name,
                 'email' => $user->email,
                 'email_verified_at' => $user->email_verified_at,
-                'two_factor_confirmed_at' => $user->two_factor_confirmed_at,
+                'two_factor_enabled' => !is_null($user->two_factor_secret),
                 'profile' => [
                     'language' => $user->profile?->language ?? 'ja',
                     'timezone' => $user->profile?->timezone ?? 'Asia/Tokyo',
@@ -72,10 +72,14 @@ class VerifyTwoFactorLoginUseCase
 
     private function validateRecoveryCode(User $user, string $code): bool
     {
+        if (empty($user->two_factor_recovery_codes)) {
+            return false;
+        }
+
         $recoveryCodes = json_decode(decrypt($user->two_factor_recovery_codes), true) ?? [];
 
         foreach ($recoveryCodes as $index => $recoveryCode) {
-            if (hash_equals($recoveryCode, $code)) {
+            if ($recoveryCode === $code) {
                 // 使用済みリカバリコードを削除
                 unset($recoveryCodes[$index]);
                 $user->two_factor_recovery_codes = encrypt(json_encode(array_values($recoveryCodes)));

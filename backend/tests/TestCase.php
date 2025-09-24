@@ -34,24 +34,31 @@ abstract class TestCase extends BaseTestCase
 
     private function cleanupDatabase(): void
     {
-        // テスト用データベースの主要テーブルをトランケート
-        \DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        try {
+            // テスト用データベースの主要テーブルをトランケート
+            \DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
-        $tables = [
-            'personal_access_tokens',
-            'user_profiles',
-            'users',
-            'roles',
-            'permissions',
-            'model_has_roles',
-            'model_has_permissions',
-            'role_has_permissions',
-        ];
+            $tables = [
+                'user_profiles',
+                'webauthn_credentials',
+                'users',
+                'roles',
+                'permissions',
+                'model_has_roles',
+                'model_has_permissions',
+                'role_has_permissions',
+            ];
 
-        foreach ($tables as $table) {
-            \DB::table($table)->truncate();
+            foreach ($tables as $table) {
+                // テーブルが存在する場合のみトランケート
+                if (\Schema::hasTable($table)) {
+                    \DB::table($table)->truncate();
+                }
+            }
+
+            \DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        } catch (\Exception $e) {
+            // データベースエラーは無視（テーブルが存在しない場合など）
         }
-
-        \DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
 }

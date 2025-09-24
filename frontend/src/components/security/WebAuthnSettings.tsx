@@ -146,9 +146,33 @@ export const WebAuthnSettings: React.FC = () => {
         }));
       }
     } catch (error: unknown) {
+      let errorMessage = t('settings.security.webauthn.registration_failed');
+
+      if (error instanceof Error) {
+        // WebAuthnの特定エラーをハンドリング
+        if (error.name === 'NotAllowedError') {
+          // ユーザーがキャンセルした場合
+          errorMessage = t('settings.security.webauthn.registration_cancelled', '登録がキャンセルされました');
+        } else if (error.name === 'TimeoutError') {
+          // タイムアウトの場合
+          errorMessage = t('settings.security.webauthn.registration_timeout', '登録がタイムアウトしました');
+        } else if (error.name === 'InvalidStateError') {
+          // 既に登録済みの認証器の場合
+          errorMessage = t('settings.security.webauthn.registration_invalid_state', '認証器の状態が無効です。別の認証器をお試しください');
+        } else if (error.name === 'NotSupportedError') {
+          // サポートされていない場合
+          errorMessage = t('settings.security.webauthn.registration_not_supported', 'この認証器はサポートされていません');
+        } else if (error.message.includes('Invalid base64url string')) {
+          // base64url変換エラーの場合
+          errorMessage = t('settings.security.webauthn.invalid_response', 'サーバーからの応答が無効です');
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
       setState(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : t('settings.security.webauthn.registration_failed'),
+        error: errorMessage,
         isRegistering: false,
       }));
     }

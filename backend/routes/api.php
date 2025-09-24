@@ -81,8 +81,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/register/options', [WebAuthnRegisterController::class, 'options']);
             Route::post('/register', [WebAuthnRegisterController::class, 'register']);
             Route::get('/credentials', [WebAuthnManagementController::class, 'index']);
-            Route::delete('/credentials/{credentialId}', [WebAuthnManagementController::class, 'disable']);
-            Route::delete('/credentials/{credentialId}/destroy', [WebAuthnManagementController::class, 'destroy']);
+            Route::delete('/credentials/{credentialId}', [WebAuthnManagementController::class, 'destroy']);
+            Route::post('/credentials/{credentialId}/disable', [WebAuthnManagementController::class, 'disable']);
             Route::post('/credentials/{credentialId}/enable', [WebAuthnManagementController::class, 'enable']);
             Route::put('/credentials/{credentialId}', [WebAuthnManagementController::class, 'updateAlias']);
         });

@@ -25,14 +25,14 @@ describe('PasswordResetUseCase', function () {
             $result = $this->useCase->sendResetLinkEmail('test@example.com');
 
             expect($result['success'])->toBeTrue();
-            expect($result['message'])->toBe('パスワードリセットメールを送信しました');
+            expect($result['message'])->toBe(__('auth.reset_link_sent'));
         });
 
         test('存在しないメールアドレスではリセットリンク送信が失敗する', function () {
             $result = $this->useCase->sendResetLinkEmail('nonexistent@example.com');
 
             expect($result['success'])->toBeFalse();
-            expect($result['message'])->toBe('指定されたメールアドレスのユーザーが見つかりません');
+            expect($result['message'])->toBe(__('auth.user_not_found'));
         });
 
         test('Password::sendResetLinkが失敗した場合はエラーを返す', function () {
@@ -48,7 +48,7 @@ describe('PasswordResetUseCase', function () {
             $result = $this->useCase->sendResetLinkEmail('test@example.com');
 
             expect($result['success'])->toBeFalse();
-            expect($result['message'])->toBe('パスワードリセットメールの送信に失敗しました');
+            expect($result['message'])->toBe(__('auth.reset_link_failed'));
         });
     });
 
@@ -71,7 +71,7 @@ describe('PasswordResetUseCase', function () {
             $result = $this->useCase->resetPassword($data);
 
             expect($result['success'])->toBeTrue();
-            expect($result['message'])->toBe('パスワードをリセットしました');
+            expect($result['message'])->toBe(__('auth.password_reset_success'));
         });
 
         test('無効なトークンではパスワードリセットが失敗する', function () {
@@ -89,7 +89,7 @@ describe('PasswordResetUseCase', function () {
             $result = $this->useCase->resetPassword($data);
 
             expect($result['success'])->toBeFalse();
-            expect($result['message'])->toBe('パスワードリセットに失敗しました');
+            expect($result['message'])->toBe(__('auth.password_reset_failed'));
         });
 
         test('パスワードリセット時にハッシュ化とトークン更新が実行される', function () {

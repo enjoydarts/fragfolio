@@ -33,6 +33,8 @@ return [
     'two_factor_enabled' => '2要素認証が正常に有効化されました',
     'two_factor_disabled' => '2要素認証が無効化されました',
     'two_factor_code_invalid' => '認証コードが正しくありません',
+    'two_factor_failed' => '2要素認証に失敗しました',
+    'two_factor_token_expired' => '2要素認証トークンが無効です。再度ログインしてください。',
     'two_factor_not_enabled' => '2要素認証が有効化されていません',
     'two_factor_already_enabled' => '2要素認証は既に有効化されています',
     'two_factor_already_disabled' => '2要素認証は無効化されています',
@@ -95,4 +97,6 @@ return [
     'verify_email_expire_notice' => 'この確認リンクは24時間で期限切れとなります。',
     'email_footer' => 'このメールは fragfolio から送信されました',
     'no_reply_notice' => 'このメールは送信専用です。返信しないでください。',
+    'email_same_as_current' => '現在のメールアドレスと同じです',
+    'email_already_taken' => 'このメールアドレスは既に使用されています',
 ];

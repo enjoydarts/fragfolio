@@ -47,7 +47,7 @@ class TwoFactorLoginController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], $e->getMessage() === __('auth.session_invalid') ? 401 : 422);
+            ], 422);
         }
     }
 

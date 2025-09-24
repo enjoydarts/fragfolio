@@ -101,7 +101,7 @@ class WebAuthnManagementController extends Controller
         ]);
 
         try {
-            $this->updateCredentialAliasUseCase->execute(
+            $credential = $this->updateCredentialAliasUseCase->execute(
                 $request->user(),
                 $credentialId,
                 $request->alias
@@ -110,6 +110,7 @@ class WebAuthnManagementController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => __('auth.webauthn_alias_updated'),
+                'credential' => $credential,
             ]);
         } catch (\InvalidArgumentException $e) {
             return response()->json([

@@ -421,7 +421,8 @@ CREATE TABLE webauthn_credentials (
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
     PRIMARY KEY (id),
-    INDEX webauthn_user_index (authenticatable_type, authenticatable_id)
+    INDEX webauthn_user_index (authenticatable_type, authenticatable_id),
+    INDEX idx_webauthn_credentials_user_id (user_id)
 );
 
 -- AI normalization logs

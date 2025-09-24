@@ -144,3 +144,91 @@ export class TwoFactorAPI {
     return response.json();
   }
 }
+
+// テスト用の関数エクスポート
+export const enableTwoFactor = async (): Promise<TwoFactorResponse> => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    throw new Error('認証トークンが設定されていません');
+  }
+  return TwoFactorAPI.enable(token);
+};
+
+export const confirmTwoFactor = async (code: string): Promise<TwoFactorResponse> => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    throw new Error('認証トークンが設定されていません');
+  }
+  return TwoFactorAPI.confirm(token, code);
+};
+
+export const disableTwoFactor = async (): Promise<TwoFactorResponse> => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    throw new Error('認証トークンが設定されていません');
+  }
+  return TwoFactorAPI.disable(token);
+};
+
+export const getQrCode = async (): Promise<{ success: boolean; qr_code_url?: string; secret?: string; message?: string }> => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    throw new Error('認証トークンが設定されていません');
+  }
+
+  try {
+    const qrCode = await TwoFactorAPI.getQRCode(token);
+    const secretKey = await TwoFactorAPI.getSecretKey(token);
+    return {
+      success: true,
+      qr_code_url: qrCode,
+      secret: secretKey.secret_key
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '2段階認証が有効化されていません'
+    };
+  }
+};
+
+export const getRecoveryCodes = async (): Promise<{ success: boolean; recovery_codes?: string[]; message?: string }> => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    throw new Error('認証トークンが設定されていません');
+  }
+
+  try {
+    const result = await TwoFactorAPI.getRecoveryCodes(token);
+    return {
+      success: true,
+      recovery_codes: result.recovery_codes
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'リカバリーコードの取得に失敗しました'
+    };
+  }
+};
+
+export const regenerateRecoveryCodes = async (): Promise<{ success: boolean; recovery_codes?: string[]; message?: string }> => {
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    throw new Error('認証トークンが設定されていません');
+  }
+
+  try {
+    const result = await TwoFactorAPI.regenerateRecoveryCodes(token);
+    return {
+      success: true,
+      recovery_codes: result.recovery_codes,
+      message: 'リカバリーコードを再生成しました'
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'リカバリーコードの再生成に失敗しました'
+    };
+  }
+};

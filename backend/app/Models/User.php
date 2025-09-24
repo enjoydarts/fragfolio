@@ -105,4 +105,16 @@ class User extends Authenticatable implements MustVerifyEmail, WebAuthnAuthentic
     {
         $this->notify(new \App\Notifications\QueuedVerifyEmail());
     }
+
+    /**
+     * WebAuthn用のユーザー識別子をUUID形式で返す
+     */
+    public function webAuthnId(): \Ramsey\Uuid\UuidInterface
+    {
+        // ユーザーIDをベースにした決定論的UUID（バージョン5）を生成
+        return \Ramsey\Uuid\Uuid::uuid5(
+            \Ramsey\Uuid\Uuid::NAMESPACE_OID,
+            'user-' . $this->getAuthIdentifier()
+        );
+    }
 }

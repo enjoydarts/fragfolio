@@ -104,7 +104,7 @@ describe('AuthAPI', () => {
       const result = await AuthAPI.refreshToken('mock-jwt-token');
 
       expect(result.success).toBe(true);
-      expect(result.token).toBe('new-mock-jwt-token');
+      expect(result.token).toBe('new-refresh-token');
     });
   });
 });

@@ -13,9 +13,19 @@ class RequestEmailChangeUseCase
 {
     public function execute(User $user, string $newEmail): EmailChangeRequest
     {
+        // メールアドレス形式の検証
+        if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            throw new \InvalidArgumentException(__('validation.email'));
+        }
+
+        // 現在のメールアドレスと同じかチェック
+        if ($user->email === $newEmail) {
+            throw new \InvalidArgumentException(__('auth.email_same_as_current'));
+        }
+
         // 新しいメールアドレスが既に他のユーザーで使用されていないかチェック
         if (User::where('email', $newEmail)->where('id', '!=', $user->id)->exists()) {
-            throw new \InvalidArgumentException(__('auth.email_exists'));
+            throw new \InvalidArgumentException(__('auth.email_already_taken'));
         }
 
         return DB::transaction(function () use ($user, $newEmail) {
