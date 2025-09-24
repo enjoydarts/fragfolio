@@ -100,10 +100,7 @@ export class WebAuthnAPI {
     const data = await response.json();
 
     if (!data.success || !data.options) {
-      throw new Error(
-        'WebAuthn登録オプションの取得に失敗しました: ' +
-          (data.message || 'Unknown error')
-      );
+      throw new Error('WebAuthn registration options failed');
     }
 
     return data.options;
@@ -466,13 +463,13 @@ export const registerCredential = async (
     );
     return {
       success: result.success,
-      message: result.message || 'WebAuthnキーを登録しました',
+      message: result.success ? 'WebAuthn key registered successfully' : 'WebAuthn key registration failed',
     };
   } catch (error) {
     throw new Error(
       error instanceof Error
         ? error.message
-        : 'WebAuthnキーの登録に失敗しました'
+        : 'WebAuthn key registration failed'
     );
   }
 };
@@ -517,11 +514,9 @@ export const deleteCredential = async (
     const result = await WebAuthnAPI.deleteCredential(token, credentialId);
     return {
       success: result.success,
-      message:
-        result.message ||
-        (result.success
-          ? 'WebAuthnキーを削除しました'
-          : 'クレデンシャルが見つかりません'),
+      message: result.success
+        ? 'WebAuthn key deleted successfully'
+        : 'WebAuthn credential not found',
     };
   } catch (error) {
     return {
@@ -529,7 +524,7 @@ export const deleteCredential = async (
       message:
         error instanceof Error
           ? error.message
-          : 'WebAuthnキーの削除に失敗しました',
+          : 'WebAuthn key deletion failed',
     };
   }
 };
@@ -564,9 +559,9 @@ export const updateCredentialAlias = async (
             disabled_at: null,
           }
         : undefined,
-      message:
-        result.message ||
-        (result.success ? 'エイリアスを更新しました' : 'エイリアスは必須です'),
+      message: result.success
+        ? 'Alias updated successfully'
+        : 'Alias is required',
       errors: result.errors,
     };
   } catch (error) {
@@ -575,7 +570,7 @@ export const updateCredentialAlias = async (
       message:
         error instanceof Error
           ? error.message
-          : 'エイリアスの更新に失敗しました',
+          : 'Alias update failed',
     };
   }
 };
@@ -592,7 +587,7 @@ export const disableCredential = async (
     const result = await WebAuthnAPI.disableCredential(token, credentialId);
     return {
       success: result.success,
-      message: result.message || 'WebAuthnキーを無効化しました',
+      message: result.success ? 'WebAuthn key disabled successfully' : 'WebAuthn key disable failed',
     };
   } catch (error) {
     return {
@@ -600,7 +595,7 @@ export const disableCredential = async (
       message:
         error instanceof Error
           ? error.message
-          : 'WebAuthnキーの無効化に失敗しました',
+          : 'WebAuthn key disable failed',
     };
   }
 };
@@ -617,7 +612,7 @@ export const enableCredential = async (
     const result = await WebAuthnAPI.enableCredential(token, credentialId);
     return {
       success: result.success,
-      message: result.message || 'WebAuthnキーを有効化しました',
+      message: result.success ? 'WebAuthn key enabled successfully' : 'WebAuthn key enable failed',
     };
   } catch (error) {
     return {
@@ -625,7 +620,7 @@ export const enableCredential = async (
       message:
         error instanceof Error
           ? error.message
-          : 'WebAuthnキーの有効化に失敗しました',
+          : 'WebAuthn key enable failed',
     };
   }
 };

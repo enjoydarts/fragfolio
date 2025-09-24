@@ -156,7 +156,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   const handleTwoFactorWebAuthn = useCallback(async () => {
     if (!webAuthnSupported || !tempToken) {
       setError(
-        t('auth.webauthn.not_supported', 'WebAuthnがサポートされていません')
+        t('webauthn.not_supported')
       );
       return;
     }
@@ -199,7 +199,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 
       if (!credential) {
         throw new Error(
-          t('auth.webauthn.cancelled', '認証がキャンセルされました')
+          t('webauthn.cancelled')
         );
       }
 
@@ -279,7 +279,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           </h2>
           <p className="text-gray-500 text-sm font-light">
             {requiresTwoFactor
-              ? t('auth.two_factor.subtitle', '認証コードを入力してください')
+              ? t('auth.two_factor.subtitle')
               : t('auth.login.subtitle')}
           </p>
         </div>
