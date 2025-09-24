@@ -47,6 +47,21 @@ export const handlers = [
   // Login API
   http.post('http://localhost:8002/api/login', async ({ request }) => {
     const body = await request.json();
+
+    // 2FA必要なユーザーのケース
+    if (body.email === '2fa-user@example.com') {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: '2要素認証が必要です',
+          requires_two_factor: true,
+          temp_token: 'temp-token-123',
+          available_methods: ['totp'],
+        },
+        { status: 422 }
+      );
+    }
+
     if (
       body.email === 'invalid@example.com' &&
       body.password === 'wrong-password'
@@ -294,6 +309,28 @@ export const handlers = [
 
   // WebAuthn API
   http.get('http://localhost:8002/api/webauthn/registration-options', () => {
+    return HttpResponse.json({
+      success: true,
+      options: {
+        challenge: 'Y2hhbGxlbmdl',
+        rp: { name: 'fragfolio', id: 'localhost' },
+        user: {
+          id: 'dGVzdHVzZXI=',
+          name: 'test@example.com',
+          displayName: 'Test User',
+        },
+        pubKeyCredParams: [
+          { type: 'public-key', alg: -7 },
+          { type: 'public-key', alg: -257 },
+        ],
+        timeout: 60000,
+        attestation: 'none',
+      },
+    });
+  }),
+
+  // WebAuthn Registration Options (POST)
+  http.post('http://localhost:8002/api/auth/webauthn/register/options', () => {
     return HttpResponse.json({
       success: true,
       options: {
