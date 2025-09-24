@@ -47,7 +47,6 @@ export const TOTPSettings: React.FC = () => {
     type: null,
   });
 
-
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);

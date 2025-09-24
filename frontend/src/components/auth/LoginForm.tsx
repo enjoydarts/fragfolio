@@ -44,7 +44,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     setWebAuthnSupported(isSupported);
   }, []);
 
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
