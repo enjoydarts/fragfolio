@@ -87,13 +87,12 @@ describe('AuthPage', () => {
       const user = userEvent.setup();
       renderWithAuth();
 
-      // アカウントをお持ちでない方はこちらリンクをクリック（実際のコンポーネントに応じて調整が必要）
-      const registerLink =
-        screen.getByText('アカウントをお持ちでない方はこちら');
+      // 新規登録リンクをクリック（実際のテキストは「新規登録はこちら」）
+      const registerLink = screen.getByText('新規登録はこちら');
       await user.click(registerLink);
 
-      // アカウントをお持ちでない方はこちらフォームの要素が表示される
-      expect(screen.getByLabelText('名前')).toBeInTheDocument();
+      // 新規登録フォームの要素が表示される（実際のラベルに合わせる）
+      expect(screen.getByLabelText('お名前')).toBeInTheDocument();
       expect(screen.getByLabelText('パスワード確認')).toBeInTheDocument();
       expect(
         screen.getByRole('button', { name: 'アカウント作成' })
@@ -104,15 +103,12 @@ describe('AuthPage', () => {
       const user = userEvent.setup();
       renderWithAuth();
 
-      // アカウントをお持ちでない方はこちらモードに切り替え
-      const registerLink =
-        screen.getByText('アカウントをお持ちでない方はこちら');
+      // 新規登録モードに切り替え
+      const registerLink = screen.getByText('新規登録はこちら');
       await user.click(registerLink);
 
       // ログインリンクをクリック
-      const loginLink = screen.getByText(
-        '既にアカウントをお持ちですか？ログインする'
-      );
+      const loginLink = screen.getByText('ログインはこちら');
       await user.click(loginLink);
 
       // ログインフォームに戻る
@@ -148,13 +144,12 @@ describe('AuthPage', () => {
       const user = userEvent.setup();
       renderWithAuth();
 
-      // アカウントをお持ちでない方はこちらモードに切り替え
-      const registerLink =
-        screen.getByText('アカウントをお持ちでない方はこちら');
+      // 新規登録モードに切り替え
+      const registerLink = screen.getByText('新規登録はこちら');
       await user.click(registerLink);
 
       // 新規登録フォームが表示される
-      expect(screen.getByLabelText('名前')).toBeInTheDocument();
+      expect(screen.getByLabelText('お名前')).toBeInTheDocument();
       expect(screen.getByLabelText('パスワード確認')).toBeInTheDocument();
       expect(
         screen.getByRole('button', { name: 'アカウント作成' })

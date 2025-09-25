@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AuthAPI } from '../api/auth';
 import type { User, AuthContextType, RegisterData } from '../types/auth';
 import { AuthContext } from './context';
@@ -8,6 +9,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -66,11 +68,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.success && response.user && response.token) {
         setToken(response.token);
         setUser(response.user);
+      } else if (response.requires_two_factor) {
+        // 2FA要求エラーオブジェクトを作成
+        const error = new Error(
+          t('auth.two_factor.two_factor_required')
+        ) as Error & {
+          requires_two_factor?: boolean;
+          temp_token?: string;
+          available_methods?: string[];
+        };
+        error.requires_two_factor = true;
+        error.temp_token = response.temp_token;
+        error.available_methods = response.available_methods;
+        throw error;
       } else {
-        throw new Error(response.message || 'ログインに失敗しました');
+        throw new Error(t('auth.errors.login_failed'));
       }
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch (error: unknown) {
+      // 2FA要求の場合はエラーログを出さない
+      const authError = error as { requires_two_factor?: boolean };
+      if (!authError?.requires_two_factor) {
+        console.error('Login failed:', error);
+      }
       throw error;
     }
   };
@@ -85,7 +104,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else {
         // レスポンスデータをそのまま含むエラーオブジェクトを作成
         const error = new Error(
-          response.message || 'ユーザー登録に失敗しました'
+          t('auth.errors.registration_failed')
         ) as Error & { response?: { data: unknown } };
         error.response = { data: response };
         throw error;
@@ -115,7 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const refreshToken = async (): Promise<void> => {
     const token = getToken();
     if (!token) {
-      throw new Error('認証トークンがありません');
+      throw new Error(t('auth.errors.auth_token_missing'));
     }
 
     try {
@@ -124,7 +143,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(response.token);
         setUser(response.user);
       } else {
-        throw new Error('トークンリフレッシュに失敗しました');
+        throw new Error(t('auth.errors.token_refresh_failed'));
       }
     } catch (error) {
       console.error('Token refresh failed:', error);
@@ -138,7 +157,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const updateProfile = async (data: Partial<User>): Promise<void> => {
     const token = getToken();
     if (!token) {
-      throw new Error('認証トークンがありません');
+      throw new Error(t('auth.errors.auth_token_missing'));
     }
 
     try {
@@ -146,7 +165,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.success && response.user) {
         setUser(response.user);
       } else {
-        throw new Error(response.message || 'プロフィール更新に失敗しました');
+        throw new Error(t('auth.errors.profile_update_failed'));
       }
     } catch (error) {
       console.error('Profile update failed:', error);

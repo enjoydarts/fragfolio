@@ -60,7 +60,7 @@ class FragranceNormalizationController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'AI正規化に失敗しました: '.$e->getMessage(),
+                'message' => __('auth.ai_normalization_failed').': '.$e->getMessage(),
             ], 500);
         }
     }

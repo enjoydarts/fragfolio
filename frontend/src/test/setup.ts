@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { beforeAll, afterEach, afterAll, beforeEach } from 'vitest';
-import { server } from './mocks/server';
+import { server } from '../../tests/mocks/server';
 import i18n from '../i18n';
 
 // テスト開始前にMSWサーバーを起動

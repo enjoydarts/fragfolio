@@ -54,7 +54,7 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'channels' => explode(',', (string) env('LOG_STACK', 'stderr')),
             'ignore_exceptions' => false,
         ],
 
@@ -92,6 +92,15 @@ return [
                 'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
             ],
             'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'stdout' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => StreamHandler::class,
+            'handler_with' => [
+                'stream' => 'php://stdout',
+            ],
         ],
 
         'stderr' => [

@@ -70,6 +70,58 @@ describe('TurnstileService', function () {
             });
         });
 
+        test('Turnstileサーバーがtimeout_or_duplicateエラーを返した場合', function () {
+            Http::fake([
+                'challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
+                    'success' => false,
+                    'error-codes' => ['timeout-or-duplicate'],
+                ]),
+            ]);
+
+            $result = $this->service->verify('expired-token');
+
+            expect($result)->toBe('timeout_or_duplicate');
+        });
+
+        test('Turnstileサーバーがinvalid_input_responseエラーを返した場合', function () {
+            Http::fake([
+                'challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
+                    'success' => false,
+                    'error-codes' => ['invalid-input-response'],
+                ]),
+            ]);
+
+            $result = $this->service->verify('invalid-token');
+
+            expect($result)->toBe('invalid_input_response');
+        });
+
+        test('Turnstileサーバーがmissing_input_responseエラーを返した場合', function () {
+            Http::fake([
+                'challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
+                    'success' => false,
+                    'error-codes' => ['missing-input-response'],
+                ]),
+            ]);
+
+            $result = $this->service->verify('missing-token');
+
+            expect($result)->toBe('missing_input_response');
+        });
+
+        test('Turnstileサーバーが未知のエラーを返した場合', function () {
+            Http::fake([
+                'challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
+                    'success' => false,
+                    'error-codes' => ['unknown-error'],
+                ]),
+            ]);
+
+            $result = $this->service->verify('invalid-token');
+
+            expect($result)->toBe('verification_failed');
+        });
+
         test('Turnstileサーバーが失敗レスポンスを返した場合はfalseを返す', function () {
             Http::fake([
                 'challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response([
@@ -80,7 +132,7 @@ describe('TurnstileService', function () {
 
             $result = $this->service->verify('invalid-token');
 
-            expect($result)->toBeFalse();
+            expect($result)->toBe('invalid_input_response');
         });
 
         test('HTTPリクエストが失敗した場合はfalseを返す', function () {

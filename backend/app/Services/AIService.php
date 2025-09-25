@@ -9,9 +9,9 @@ class AIService
 {
     private string $defaultProvider;
 
-    private string $openaiApiKey;
+    private ?string $openaiApiKey;
 
-    private string $anthropicApiKey;
+    private ?string $anthropicApiKey;
 
     private string $gptModel;
 

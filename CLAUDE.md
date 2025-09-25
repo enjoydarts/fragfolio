@@ -87,14 +87,18 @@ npm run format
 ### データベース管理
 
 ```bash
-# スキーマ適用（sqldef使用）
-sqldef mysql -u root -p fragfolio < database/schema.sql
+# スキーマ適用（Docker内でmysqldef使用）
+docker-compose exec backend mysqldef -u root -prootpassword -h mysql fragfolio < /var/www/html/sqldef/schema.sql
 
 # スキーマドライラン（変更確認）
-sqldef mysql -u root -p fragfolio --dry-run < database/schema.sql
+docker-compose exec backend mysqldef -u root -prootpassword -h mysql fragfolio --dry-run < /var/www/html/sqldef/schema.sql
 
 # シーダー実行
-php artisan db:seed
+docker-compose exec backend php artisan db:seed
+
+# キューワーカー管理
+docker-compose restart queue-worker
+docker-compose logs queue-worker
 ```
 
 ### 品質管理
@@ -138,13 +142,30 @@ REACT_APP_API_URL=http://localhost:8002/api
 REACT_APP_TURNSTILE_SITE_KEY=your_turnstile_site_key
 ```
 
+## 翻訳ファイル
+
+### 多言語対応の翻訳ファイル場所
+
+#### フロントエンド (React i18next)
+- **日本語**: `frontend/src/i18n/locales/ja.json`
+- **英語**: `frontend/src/i18n/locales/en.json`
+
+#### バックエンド (Laravel)
+- **日本語**: `backend/lang/ja/` ディレクトリ内
+  - `auth.php` - 認証関連メッセージ
+  - `validation.php` - バリデーションメッセージ
+  - `turnstile.php` - Turnstile関連メッセージ
+- **英語**: `backend/lang/en/` ディレクトリ内（同様の構成）
+
+**重要**: 新しい翻訳キーを使用する際は、必ず対応する翻訳ファイルに追加すること。
+
 ## 主要機能
 
 - 香水コレクション管理
 - AIを活用したブランド・香水名正規化
 - マルチ言語対応（日英）
 - 管理者・一般ユーザー権限管理
-- セキュアな認証システム
+- セキュアな認証システム（WebAuthn/FIDO2対応）
 - 香りノート管理システム
 - 着用ログ追跡
 - 他言語対応（日本語・英語）
@@ -169,10 +190,11 @@ REACT_APP_TURNSTILE_SITE_KEY=your_turnstile_site_key
 ## 開発規約（必須遵守）
 
 ### コーディング規約
-- **他言語対応**: 全てのユーザー向けテキストは翻訳キー（t()）を使用。ハードコーディング禁止
+- **多言語対応**: 全てのユーザー向けテキストは翻訳キー（t()）を使用。ハードコーディング禁止
 - **UseCase分離**: ビジネスロジックは必ずUseCaseクラスに分離。Controllerに直接記述禁止
 - **use文**: 可読性のため全てのインポート文を明示。省略禁止
 - **設定外部化**: URL等の設定値はconfig/envから取得。ハードコーディング禁止
+- フロントで確認や通知、アラートなどは共通のダイアログ・トーストなどを使うこと
 
 ### 開発環境規約
 - **Docker使用**: 開発環境はDocker Compose使用。ローカルコマンド実行禁止

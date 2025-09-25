@@ -8,6 +8,9 @@ describe('RefreshTokenUseCase', function () {
     beforeEach(function () {
         $this->useCase = new RefreshTokenUseCase;
         $this->user = User::factory()->create();
+
+        // 既存のトークンをクリア
+        $this->user->tokens()->delete();
     });
 
     test('トークンを正常にリフレッシュできる', function () {

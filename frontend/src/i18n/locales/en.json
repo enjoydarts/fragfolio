@@ -8,7 +8,8 @@
     "login": "Login",
     "register": "Sign Up",
     "profile": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "settings": "Settings"
   },
   "features": {
     "collection": {
@@ -24,38 +25,103 @@
       "description": "Keep wearing records and analyze your fragrance usage patterns."
     }
   },
+  "home": {
+    "welcome": "Welcome, {{name}}",
+    "subtitle": "Manage your fragrance collection"
+  },
   "auth": {
-    "email": "Email",
-    "password": "Password",
-    "name": "Name",
-    "confirm_password": "Confirm Password",
-    "language": "Language",
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "confirm_password": "Confirm Password",
+      "language": "Language"
+    },
+    "placeholders": {
+      "email": "your@email.com",
+      "password": "Enter password",
+      "password_new": "8+ characters",
+      "confirm_password": "Re-enter password",
+      "name": "John Doe"
+    },
+    "languages": {
+      "ja": "🇯🇵 日本語",
+      "en": "🇺🇸 English"
+    },
     "remember_me": "Remember me",
+    "forgot_password": "Forgot password?",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "register_here": "Sign up here",
+    "login_here": "Sign in here",
+    "two_factor": {
+      "title": "Two-Factor Authentication",
+      "subtitle": "Please enter your verification code",
+      "code_label": "Verification Code",
+      "code_hint": "Enter code from your authenticator app or recovery code",
+      "verify_button": "Verify Code",
+      "verifying": "Verifying...",
+      "back_to_login": "← Back to Login",
+      "choose_method": "Please select authentication method",
+      "choose_method_hint": "Complete authentication using one of the methods",
+      "totp_method": "Authenticator App (TOTP)",
+      "webauthn_method": "Biometric Authentication (FIDO2)",
+      "change_method": "Change authentication method",
+      "webauthn_title": "Biometric Authentication",
+      "webauthn_prompt": "Touch your biometric authenticator to complete authentication",
+      "two_factor_required": "Two-factor authentication is required",
+      "not_enabled": "2FA is not enabled",
+      "recovery_codes_get_failed": "Failed to get recovery codes",
+      "recovery_codes_regenerate_success": "Recovery codes regenerated successfully",
+      "recovery_codes_regenerate_failed": "Failed to regenerate recovery codes",
+      "enable_success": "2FA enabled successfully",
+      "disable_success": "2FA disabled successfully",
+      "confirm_success": "2FA confirmed successfully"
+    },
     "login": {
       "title": "Sign In",
-      "submit": "Sign In",
-      "link": "Already have an account? Sign in"
+      "subtitle": "Welcome to your fragrance world",
+      "button": "Sign In"
     },
     "register": {
-      "title": "Sign Up",
-      "submit": "Create Account",
-      "link": "Don't have an account? Sign up"
+      "title": "Create Account",
+      "subtitle": "Begin your fragrance journey",
+      "button": "Create Account"
     },
     "logging_in": "Signing in...",
-    "registering": "Creating account...",
+    "creating_account": "Creating account...",
     "errors": {
       "validation": "Please check your input",
       "registration_failed": "Registration failed",
       "login_failed": "Login failed",
       "password_mismatch": "Passwords do not match",
-      "turnstile_required": "Please complete verification",
+      "turnstile_required": "Turnstile authentication required",
       "turnstile_failed": "Verification failed",
       "email_required": "Email is required",
       "email_invalid": "Please enter a valid email address",
       "email_exists": "This email address is already in use",
       "password_min": "Password must be at least 8 characters",
+      "two_factor_required": "Please enter verification code",
+      "two_factor_invalid": "Verification code is incorrect",
+      "two_factor_failed": "Two-factor authentication failed",
       "name_required": "Name is required",
-      "name_max": "Name must be within 255 characters"
+      "name_max": "Name must be within 255 characters",
+      "auth_token_missing": "Authentication token is missing",
+      "token_refresh_failed": "Token refresh failed",
+      "profile_update_failed": "Profile update failed",
+      "profile_update_success": "Profile updated successfully",
+      "logout_failed": "Logout failed",
+      "password_reset_failed": "Password reset failed",
+      "email_verification_failed": "Email verification failed",
+      "email_change_failed": "Email change failed"
+    },
+    "password": {
+      "weak_password": "Password does not meet requirements",
+      "min_length": "Minimum 8 characters required",
+      "lowercase": "Must include lowercase letters",
+      "uppercase": "Must include uppercase letters",
+      "number": "Must include numbers",
+      "symbol": "Must include symbols"
     }
   },
   "email_verification": {
@@ -90,6 +156,26 @@
     "invalid_link": "Invalid reset link",
     "redirecting_login": "Redirecting to login in 5 seconds..."
   },
+  "webauthn": {
+    "login_button": "Login with Biometrics",
+    "authenticating": "Authenticating...",
+    "authenticate_button": "Authenticate with Biometrics",
+    "not_supported": "WebAuthn is not supported",
+    "cancelled": "Authentication was cancelled",
+    "login_failed": "WebAuthn login failed",
+    "not_allowed": "Authentication was denied",
+    "invalid_state": "Authenticator state is invalid"
+  },
+  "or": "or",
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "complete": "Complete",
+    "copy": "Copy",
+    "back_to_dashboard": "Back to Dashboard"
+  },
   "verification": {
     "success": {
       "title": "Verification Complete",
@@ -103,5 +189,145 @@
       "resend_email": "Resend verification email",
       "back_to_login": "Back to login"
     }
+  },
+  "settings": {
+    "security": {
+      "title": "Security Settings",
+      "description": "Enhance your account security",
+      "twofa": {
+        "title": "Two-Factor Authentication (TOTP)",
+        "enabled_desc": "2FA is enabled",
+        "enabled": "Enabled",
+        "description": "Enhance your account security using TOTP apps",
+        "enable": "Enable 2FA",
+        "enable_failed": "Failed to enable 2FA",
+        "disable": "Disable 2FA",
+        "disable_confirm": "Do you want to disable 2FA? This may reduce security.",
+        "disable_failed": "Failed to disable 2FA",
+        "invalid_code": "Invalid verification code",
+        "verification_failed": "Verification failed",
+        "show_recovery": "Show Recovery Codes",
+        "regenerate_recovery": "Regenerate Recovery Codes",
+        "regenerate_confirm": "Generate new recovery codes? Old codes will no longer be usable.",
+        "recovery_codes": "Recovery Codes",
+        "recovery_desc": "Store these codes in a safe place. You can use them if you cannot access your authenticator app.",
+        "recovery_usage_warning": "Important: When you use a recovery code, new codes will be automatically generated for security and old codes will become invalid.",
+        "recovery_fetch_failed": "Failed to fetch recovery codes",
+        "recovery_regenerate_failed": "Failed to regenerate recovery codes",
+        "click_to_copy": "Click to copy",
+        "copy_all": "Copy All",
+        "code_copied": "Recovery code copied",
+        "all_codes_copied": "All recovery codes copied",
+        "copy_failed": "Copy failed",
+        "setup_step1": "Step 1: Scan QR code with authenticator app",
+        "setup_step2": "Step 2: Enter verification code",
+        "setup_apps": "Use authenticator apps like Google Authenticator, Authy, 1Password, etc.",
+        "manual_entry": "Manual Entry Key",
+        "verify": "Verify",
+        "enabled_success": "2FA has been successfully enabled!",
+        "disable_confirm_title": "Disable Two-Factor Authentication",
+        "regenerate_confirm_title": "Regenerate Recovery Codes",
+        "regenerate": "Regenerate"
+      },
+      "webauthn": {
+        "title": "WebAuthn / FIDO2",
+        "not_supported": "Your browser does not support WebAuthn",
+        "description": "Use security keys or biometric authentication for passwordless login",
+        "register_new": "Register New Authenticator",
+        "alias": "Authenticator Name (Optional)",
+        "alias_placeholder": "e.g. iPhone Touch ID, YubiKey",
+        "register": "Register Authenticator",
+        "registering": "Registering...",
+        "platform_available": "Biometric authentication is available on this device",
+        "registered_credentials": "Registered Authenticators",
+        "no_credentials": "No registered authenticators",
+        "unnamed_credential": "Unnamed Authenticator",
+        "active": "Active",
+        "registered_on": "Registered",
+        "disabled_on": "Disabled",
+        "disabled_status": "Disabled",
+        "disable": "Disable",
+        "enable": "Enable",
+        "delete": "Delete",
+        "disable_confirm_title": "Disable Authenticator",
+        "disable_confirm_message": "Do you want to disable \"{{credentialName}}\"? You can enable it later.",
+        "delete_confirm_title": "Delete Authenticator",
+        "delete_confirm_message": "Do you want to permanently delete \"{{credentialName}}\"? This action cannot be undone.",
+        "disabling": "Disabling...",
+        "deleting": "Deleting...",
+        "fetch_failed": "Failed to fetch WebAuthn authenticators",
+        "registration_cancelled": "Authenticator registration was cancelled",
+        "registration_timeout": "Authenticator registration timed out",
+        "registration_not_supported": "This authenticator is not supported",
+        "registration_invalid_state": "Authenticator state is invalid. Please try a different authenticator",
+        "invalid_response": "Invalid response from server",
+        "registration_failed": "Failed to register WebAuthn authenticator",
+        "disable_failed": "Failed to disable authenticator",
+        "enable_failed": "Failed to enable WebAuthn authenticator",
+        "delete_failed": "Failed to delete authenticator",
+        "alias_update_failed": "Failed to update alias",
+        "register_success": "WebAuthn authenticator registered successfully",
+        "delete_success": "WebAuthn authenticator deleted successfully",
+        "enable_success": "WebAuthn authenticator enabled successfully",
+        "disable_success": "WebAuthn authenticator disabled successfully",
+        "alias_update_success": "Authenticator alias updated successfully",
+        "alias_update_failed": "Failed to update authenticator alias",
+        "alias_required": "Authenticator alias is required"
+      },
+      "password": {
+        "title": "Change Password",
+        "current": "Current Password",
+        "new": "New Password",
+        "confirm": "Confirm Password",
+        "update": "Update Password",
+        "updating": "Updating...",
+        "success": "Password has been successfully changed",
+        "error": "Failed to change password",
+        "current_incorrect": "Current password is incorrect",
+        "current_password_placeholder": "Enter current password",
+        "new_password_placeholder": "8+ chars (upper, lower, number, symbol)",
+        "confirm_password_placeholder": "Re-enter new password"
+      }
+    },
+    "tabs": {
+      "profile": "Profile",
+      "security": "Security",
+      "sessions": "Sessions"
+    },
+    "title": "Account Settings",
+    "description": "Manage your account information and security settings",
+    "email_change_success": "Email address change completed",
+    "email_change_error": "Email address change error",
+    "profile": {
+      "title": "Profile Information",
+      "description": "Configure your basic account information",
+      "language": "Language",
+      "timezone": "Timezone",
+      "email_change_note": "Email address changes require separate procedures for security purposes",
+      "change_email": "Change Email Address",
+      "email_change_title": "Change Email Address",
+      "send_verification": "Send Verification Email",
+      "email_same_error": "Error"
+    },
+    "sessions": {
+      "title": "Active Sessions",
+      "description": "Manage currently logged in devices",
+      "current": "Current Session",
+      "active": "Active",
+      "logout_all": "Log out all other sessions",
+      "logout_confirm": "Logout"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "close": "Close",
+    "copy": "Copy",
+    "complete": "Complete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "show": "Show",
+    "hide": "Hide",
+    "back_to_dashboard": "Back to Dashboard"
   }
 }

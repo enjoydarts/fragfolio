@@ -26,6 +26,10 @@ RUN wget -O sqldef.tar.gz https://github.com/k0kubun/sqldef/releases/latest/down
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Install Redis extension dependencies
+RUN apt-get update && apt-get install -y \
+    libhiredis-dev
+
 # Install PHP extensions
 RUN docker-php-ext-install \
     pdo_mysql \
@@ -36,6 +40,12 @@ RUN docker-php-ext-install \
     gd \
     zip \
     intl
+
+# Install Redis extension
+RUN pecl install redis && docker-php-ext-enable redis
+
+# Install Xdebug for code coverage
+RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -61,6 +71,10 @@ RUN rm /etc/nginx/sites-enabled/default && ln -s /etc/nginx/sites-available/defa
 
 # Copy supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Configure PHP-FPM to capture worker output
+RUN echo "catch_workers_output = yes" >> /usr/local/etc/php-fpm.d/www.conf && \
+    echo "decorate_workers_output = no" >> /usr/local/etc/php-fpm.d/www.conf
 
 # Create log directories
 RUN mkdir -p /var/log/supervisor

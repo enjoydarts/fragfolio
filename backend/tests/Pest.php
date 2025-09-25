@@ -45,10 +45,10 @@ expect()->extend('toBeOne', function () {
 
 function createDefaultRoles()
 {
-    if (! \Spatie\Permission\Models\Role::where('name', 'user')->exists()) {
-        \Spatie\Permission\Models\Role::create(['name' => 'user']);
+    if (! \Spatie\Permission\Models\Role::where('name', 'user')->where('guard_name', 'web')->exists()) {
+        \Spatie\Permission\Models\Role::create(['name' => 'user', 'guard_name' => 'web']);
     }
-    if (! \Spatie\Permission\Models\Role::where('name', 'admin')->exists()) {
-        \Spatie\Permission\Models\Role::create(['name' => 'admin']);
+    if (! \Spatie\Permission\Models\Role::where('name', 'admin')->where('guard_name', 'web')->exists()) {
+        \Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => 'web']);
     }
 }

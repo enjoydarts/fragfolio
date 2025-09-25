@@ -16,13 +16,13 @@ describe('ユーザーログイン', function () {
     test('正常なログインができる', function () {
         $user = User::factory()->create([
             'email' => 'test@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('Password123!'),
         ]);
 
-        $response = $this->postJson('/api/auth/login', [
+        $response = $this->postJson('/api/login', [
             'email' => 'test@example.com',
-            'password' => 'password123',
-            'turnstile_token' => 'test_token',
+            'password' => 'Password123!',
+            'cf-turnstile-response' => 'test_token',
         ]);
 
         $response->assertStatus(200)
@@ -44,14 +44,14 @@ describe('ユーザーログイン', function () {
     test('記憶するオプション付きでログインができる', function () {
         $user = User::factory()->create([
             'email' => 'test@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('Password123!'),
         ]);
 
-        $response = $this->postJson('/api/auth/login', [
+        $response = $this->postJson('/api/login', [
             'email' => 'test@example.com',
-            'password' => 'password123',
+            'password' => 'Password123!',
             'remember' => true,
-            'turnstile_token' => 'test_token',
+            'cf-turnstile-response' => 'test_token',
         ]);
 
         $response->assertStatus(200)
@@ -64,31 +64,31 @@ describe('ユーザーログイン', function () {
     test('間違ったパスワードではログインできない', function () {
         User::factory()->create([
             'email' => 'test@example.com',
-            'password' => Hash::make('password123'),
+            'password' => Hash::make('Password123!'),
         ]);
 
-        $response = $this->postJson('/api/auth/login', [
+        $response = $this->postJson('/api/login', [
             'email' => 'test@example.com',
             'password' => 'wrongpassword',
-            'turnstile_token' => 'test_token',
+            'cf-turnstile-response' => 'test_token',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
     });
 
     test('存在しないメールアドレスではログインできない', function () {
-        $response = $this->postJson('/api/auth/login', [
+        $response = $this->postJson('/api/login', [
             'email' => 'nonexistent@example.com',
-            'password' => 'password123',
-            'turnstile_token' => 'test_token',
+            'password' => 'Password123!',
+            'cf-turnstile-response' => 'test_token',
         ]);
 
-        $response->assertStatus(401);
+        $response->assertStatus(422);
     });
 
     test('必須フィールドが不足している場合はログインできない', function () {
-        $response = $this->postJson('/api/auth/login', [
-            'turnstile_token' => 'test_token',
+        $response = $this->postJson('/api/login', [
+            'cf-turnstile-response' => 'test_token',
         ]);
 
         $response->assertStatus(422)
@@ -96,10 +96,10 @@ describe('ユーザーログイン', function () {
     });
 
     test('無効なメールアドレスではログインできない', function () {
-        $response = $this->postJson('/api/auth/login', [
+        $response = $this->postJson('/api/login', [
             'email' => 'invalid-email',
-            'password' => 'password123',
-            'turnstile_token' => 'test_token',
+            'password' => 'Password123!',
+            'cf-turnstile-response' => 'test_token',
         ]);
 
         $response->assertStatus(422)

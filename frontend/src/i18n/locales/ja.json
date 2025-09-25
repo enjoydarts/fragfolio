@@ -8,7 +8,8 @@
     "login": "ログイン",
     "register": "新規登録",
     "profile": "プロフィール",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "settings": "設定"
   },
   "features": {
     "collection": {
@@ -24,38 +25,103 @@
       "description": "着用記録を残して、香水の使用パターンを分析できます。"
     }
   },
+  "home": {
+    "welcome": "ようこそ、{{name}}さん",
+    "subtitle": "あなたの香水コレクションを管理しましょう"
+  },
   "auth": {
-    "email": "メールアドレス",
-    "password": "パスワード",
-    "name": "名前",
-    "confirm_password": "パスワード確認",
-    "language": "言語",
+    "fields": {
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "name": "お名前",
+      "confirm_password": "パスワード確認",
+      "language": "言語設定"
+    },
+    "placeholders": {
+      "email": "your@email.com",
+      "password": "パスワードを入力",
+      "password_new": "8文字以上",
+      "confirm_password": "パスワードを再入力",
+      "name": "田中 太郎"
+    },
+    "languages": {
+      "ja": "🇯🇵 日本語",
+      "en": "🇺🇸 English"
+    },
     "remember_me": "ログイン状態を保持",
+    "forgot_password": "パスワードを忘れた場合",
+    "no_account": "まだアカウントをお持ちでない方",
+    "have_account": "既にアカウントをお持ちの方",
+    "register_here": "新規登録はこちら",
+    "login_here": "ログインはこちら",
+    "two_factor": {
+      "title": "2要素認証",
+      "subtitle": "認証コードを入力してください",
+      "code_label": "認証コード",
+      "code_hint": "認証アプリまたはリカバリコードを入力してください",
+      "verify_button": "認証コードを確認",
+      "verifying": "認証中...",
+      "back_to_login": "← ログインに戻る",
+      "choose_method": "認証方法を選択してください",
+      "choose_method_hint": "どちらか一つの方法で認証を完了してください",
+      "totp_method": "認証アプリ（TOTP）",
+      "webauthn_method": "生体認証（FIDO2）",
+      "change_method": "認証方法を変更",
+      "webauthn_title": "生体認証",
+      "webauthn_prompt": "生体認証器をタッチして認証を完了してください",
+      "two_factor_required": "2要素認証が必要です",
+      "not_enabled": "2段階認証が有効化されていません",
+      "recovery_codes_get_failed": "リカバリーコードの取得に失敗しました",
+      "recovery_codes_regenerate_success": "リカバリーコードを再生成しました",
+      "recovery_codes_regenerate_failed": "リカバリーコードの再生成に失敗しました",
+      "enable_success": "2段階認証を有効化しました",
+      "disable_success": "2段階認証を無効化しました",
+      "confirm_success": "2段階認証を確認しました"
+    },
     "login": {
       "title": "ログイン",
-      "submit": "ログイン",
-      "link": "既にアカウントをお持ちですか？ログインする"
+      "subtitle": "あなたの香りの世界へ",
+      "button": "ログイン"
     },
     "register": {
-      "title": "新規登録",
-      "submit": "アカウント作成",
-      "link": "アカウントをお持ちでない方はこちら"
+      "title": "アカウント作成",
+      "subtitle": "あなたの香りの旅を始めましょう",
+      "button": "アカウント作成"
     },
     "logging_in": "ログイン中...",
-    "registering": "登録中...",
+    "creating_account": "アカウント作成中...",
     "errors": {
       "validation": "入力内容を確認してください",
       "registration_failed": "ユーザー登録に失敗しました",
       "login_failed": "ログインに失敗しました",
       "password_mismatch": "パスワードが一致しません",
-      "turnstile_required": "認証を完了してください",
+      "turnstile_required": "Turnstile認証が必要です",
       "turnstile_failed": "認証に失敗しました",
       "email_required": "メールアドレスは必須です",
       "email_invalid": "正しいメールアドレスを入力してください",
       "email_exists": "このメールアドレスは既に使用されています",
       "password_min": "パスワードは8文字以上で入力してください",
+      "two_factor_required": "認証コードを入力してください",
+      "two_factor_invalid": "認証コードが正しくありません",
+      "two_factor_failed": "2要素認証に失敗しました",
       "name_required": "名前は必須です",
-      "name_max": "名前は255文字以内で入力してください"
+      "name_max": "名前は255文字以内で入力してください",
+      "auth_token_missing": "認証トークンがありません",
+      "token_refresh_failed": "トークンリフレッシュに失敗しました",
+      "profile_update_failed": "プロフィール更新に失敗しました",
+      "profile_update_success": "プロフィールを更新しました",
+      "logout_failed": "ログアウトに失敗しました",
+      "password_reset_failed": "パスワードリセットに失敗しました",
+      "email_verification_failed": "メール認証に失敗しました",
+      "email_change_failed": "メールアドレス変更に失敗しました"
+    },
+    "password": {
+      "weak_password": "パスワードが要件を満たしていません",
+      "min_length": "8文字以上必要です",
+      "lowercase": "小文字を含む必要があります",
+      "uppercase": "大文字を含む必要があります",
+      "number": "数字を含む必要があります",
+      "symbol": "記号を含む必要があります"
     }
   },
   "email_verification": {
@@ -90,6 +156,26 @@
     "invalid_link": "無効なリセットリンクです",
     "redirecting_login": "5秒後にログイン画面に自動でリダイレクトします..."
   },
+  "webauthn": {
+    "login_button": "生体認証でログイン",
+    "authenticating": "認証中...",
+    "authenticate_button": "生体認証で認証",
+    "not_supported": "WebAuthnがサポートされていません",
+    "cancelled": "認証がキャンセルされました",
+    "login_failed": "WebAuthnログインに失敗しました",
+    "not_allowed": "認証が拒否されました",
+    "invalid_state": "認証器の状態が無効です"
+  },
+  "or": "または",
+  "common": {
+    "loading": "読み込み中...",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "complete": "完了",
+    "copy": "コピー",
+    "back_to_dashboard": "ダッシュボードに戻る"
+  },
   "verification": {
     "success": {
       "title": "認証完了",
@@ -103,5 +189,146 @@
       "resend_email": "認証メールを再送信",
       "back_to_login": "ログイン画面に戻る"
     }
+  },
+  "settings": {
+    "security": {
+      "title": "セキュリティ設定",
+      "description": "アカウントのセキュリティを強化します",
+      "twofa": {
+        "title": "2要素認証 (TOTP)",
+        "enabled_desc": "2要素認証が有効になっています",
+        "enabled": "有効",
+        "description": "TOTPアプリを使用してアカウントのセキュリティを強化します",
+        "enable": "2要素認証を有効化",
+        "enable_failed": "2要素認証の有効化に失敗しました",
+        "disable": "2要素認証を無効化",
+        "disable_confirm": "2要素認証を無効化しますか？セキュリティが低下する可能性があります。",
+        "disable_failed": "2要素認証の無効化に失敗しました",
+        "invalid_code": "認証コードが正しくありません",
+        "verification_failed": "認証に失敗しました",
+        "show_recovery": "リカバリコードを表示",
+        "regenerate_recovery": "リカバリコードを再生成",
+        "regenerate_confirm": "新しいリカバリコードを生成しますか？古いコードは使用できなくなります。",
+        "recovery_codes": "リカバリコード",
+        "recovery_desc": "これらのコードを安全な場所に保存してください。認証アプリにアクセスできない場合に使用できます。",
+        "recovery_usage_warning": "重要: リカバリーコードを使用すると、セキュリティのため自動的に新しいコードが生成され、古いコードは無効になります。",
+        "recovery_fetch_failed": "リカバリコードの取得に失敗しました",
+        "recovery_regenerate_failed": "リカバリコードの再生成に失敗しました",
+        "click_to_copy": "クリックしてコピー",
+        "copy_all": "すべてコピー",
+        "code_copied": "リカバリコードをコピーしました",
+        "all_codes_copied": "すべてのリカバリコードをコピーしました",
+        "copy_failed": "コピーに失敗しました",
+        "setup_step1": "ステップ1: 認証アプリでQRコードをスキャン",
+        "setup_step2": "ステップ2: 認証コードを入力",
+        "setup_apps": "Google Authenticator、Authy、1Passwordなどの認証アプリを使用してください",
+        "manual_entry": "手動入力用キー",
+        "verify": "確認",
+        "enabled_success": "2要素認証が正常に有効化されました！",
+        "disable_confirm_title": "2要素認証の無効化",
+        "regenerate_confirm_title": "リカバリコードの再生成",
+        "regenerate": "再生成"
+      },
+      "webauthn": {
+        "title": "WebAuthn / FIDO2",
+        "not_supported": "お使いのブラウザはWebAuthnをサポートしていません",
+        "description": "セキュリティキーや生体認証でパスワードレス認証が利用できます",
+        "register_new": "新しい認証器を登録",
+        "alias": "認証器名 (任意)",
+        "alias_placeholder": "例: iPhone Touch ID、YubiKey",
+        "register": "認証器を登録",
+        "registering": "登録中...",
+        "platform_available": "このデバイスの生体認証が利用可能です",
+        "registered_credentials": "登録済み認証器",
+        "no_credentials": "登録済みの認証器がありません",
+        "unnamed_credential": "名前なし認証器",
+        "active": "アクティブ",
+        "registered_on": "登録日",
+        "disabled_on": "無効化日",
+        "disabled_status": "無効化済み",
+        "disable": "無効化",
+        "enable": "有効化",
+        "delete": "削除",
+        "disable_confirm_title": "認証器の無効化",
+        "disable_confirm_message": "「{{credentialName}}」を無効化しますか？後で有効化することができます。",
+        "disabling": "無効化中...",
+        "fetch_failed": "WebAuthn認証器の取得に失敗しました",
+        "registration_cancelled": "認証器の登録がキャンセルされました",
+        "registration_timeout": "認証器の登録がタイムアウトしました",
+        "registration_not_supported": "この認証器はサポートされていません",
+        "registration_invalid_state": "認証器の状態が無効です。別の認証器をお試しください",
+        "invalid_response": "サーバーからの応答が無効です",
+        "registration_failed": "WebAuthn認証器の登録に失敗しました",
+        "disable_failed": "認証器の無効化に失敗しました",
+        "enable_failed": "WebAuthn認証器の有効化に失敗しました",
+        "alias_update_failed": "エイリアスの更新に失敗しました",
+        "delete_confirm_title": "認証器の削除",
+        "delete_confirm_message": "「{{credentialName}}」を完全に削除しますか？この操作は取り消せません。",
+        "deleting": "削除中...",
+        "delete_failed": "認証器の削除に失敗しました",
+        "register_success": "WebAuthn認証器を登録しました",
+        "register_failed": "WebAuthn認証器の登録に失敗しました",
+        "delete_success": "WebAuthn認証器を削除しました",
+        "enable_success": "WebAuthn認証器を有効化しました",
+        "disable_success": "WebAuthn認証器を無効化しました",
+        "alias_update_success": "認証器名を更新しました",
+        "alias_update_failed": "認証器名の更新に失敗しました",
+        "alias_required": "認証器名は必須です"
+      },
+      "password": {
+        "title": "パスワード変更",
+        "current": "現在のパスワード",
+        "new": "新しいパスワード",
+        "confirm": "パスワード確認",
+        "update": "パスワードを更新",
+        "updating": "変更中...",
+        "success": "パスワードが正常に変更されました",
+        "error": "パスワード変更に失敗しました",
+        "current_incorrect": "現在のパスワードが正しくありません",
+        "current_password_placeholder": "現在のパスワードを入力",
+        "new_password_placeholder": "8文字以上（英数大小文字・記号含む）",
+        "confirm_password_placeholder": "新しいパスワードを再入力"
+      }
+    },
+    "tabs": {
+      "profile": "プロフィール",
+      "security": "セキュリティ",
+      "sessions": "セッション"
+    },
+    "title": "アカウント設定",
+    "description": "アカウント情報とセキュリティ設定を管理します",
+    "email_change_success": "メールアドレス変更完了",
+    "email_change_error": "メールアドレス変更エラー",
+    "profile": {
+      "title": "プロフィール情報",
+      "description": "基本的なアカウント情報を設定します",
+      "language": "言語",
+      "timezone": "タイムゾーン",
+      "email_change_note": "メールアドレスの変更は安全性のため、別途お手続きが必要です",
+      "change_email": "メールアドレスを変更",
+      "email_change_title": "メールアドレス変更",
+      "send_verification": "確認メール送信",
+      "email_same_error": "エラー"
+    },
+    "sessions": {
+      "title": "アクティブセッション",
+      "description": "現在ログインしているデバイスを管理します",
+      "current": "現在のセッション",
+      "active": "アクティブ",
+      "logout_all": "他のセッションをすべてログアウト",
+      "logout_confirm": "ログアウト"
+    }
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "close": "閉じる",
+    "copy": "コピー",
+    "complete": "完了",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "edit": "編集",
+    "show": "表示",
+    "hide": "隠す",
+    "back_to_dashboard": "ダッシュボードに戻る"
   }
 }

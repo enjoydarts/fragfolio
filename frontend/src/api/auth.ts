@@ -5,6 +5,7 @@ export interface User {
   name: string;
   email: string;
   email_verified_at: string | null;
+  two_factor_confirmed_at: string | null;
   profile: {
     language: string;
     timezone: string;
@@ -19,9 +20,13 @@ export interface User {
 export interface AuthResponse {
   success: boolean;
   message?: string;
+  messageKey?: string;
   user?: User;
   token?: string;
   errors?: Record<string, string[]>;
+  requires_two_factor?: boolean;
+  temp_token?: string;
+  available_methods?: string[];
 }
 
 const API_BASE_URL =
@@ -38,6 +43,10 @@ export class AuthAPI {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    // i18nの言語設定をヘッダーに追加
+    const currentLanguage = localStorage.getItem('i18nextLng') || 'ja';
+    headers['Accept-Language'] = currentLanguage;
+
     return headers;
   }
 
@@ -52,8 +61,9 @@ export class AuthAPI {
     const requestData = {
       ...data,
       password_confirmation: data.password,
+      'cf-turnstile-response': data.turnstile_token,
     };
-    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+    const response = await fetch(`${API_BASE_URL}/api/register`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify(requestData),
@@ -68,17 +78,21 @@ export class AuthAPI {
     remember?: boolean;
     turnstile_token?: string | null;
   }): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    const requestData = {
+      ...data,
+      'cf-turnstile-response': data.turnstile_token,
+    };
+    const response = await fetch(`${API_BASE_URL}/api/login`, {
       method: 'POST',
       headers: this.getHeaders(),
-      body: JSON.stringify(data),
+      body: JSON.stringify(requestData),
     });
 
     return response.json();
   }
 
   static async logout(token: string): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+    const response = await fetch(`${API_BASE_URL}/api/logout`, {
       method: 'POST',
       headers: this.getHeaders(token),
     });
@@ -144,7 +158,7 @@ export class AuthAPI {
   }
 
   static async forgotPassword(email: string): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+    const response = await fetch(`${API_BASE_URL}/api/forgot-password`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify({ email }),
@@ -159,11 +173,67 @@ export class AuthAPI {
     password: string;
     password_confirmation: string;
   }): Promise<AuthResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+    const response = await fetch(`${API_BASE_URL}/api/reset-password`, {
       method: 'POST',
       headers: this.getHeaders(),
       body: JSON.stringify(data),
     });
+
+    return response.json();
+  }
+
+  static async changePassword(
+    token: string,
+    data: {
+      current_password: string;
+      new_password: string;
+      new_password_confirmation: string;
+    }
+  ): Promise<AuthResponse> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/password`, {
+      method: 'PUT',
+      headers: this.getHeaders(token),
+      body: JSON.stringify(data),
+    });
+
+    return response.json();
+  }
+
+  static async logoutOtherSessions(token: string): Promise<AuthResponse> {
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/sessions/logout-others`,
+      {
+        method: 'POST',
+        headers: this.getHeaders(token),
+      }
+    );
+
+    return response.json();
+  }
+
+  static async getSessions(
+    token: string
+  ): Promise<AuthResponse & { sessions?: unknown[] }> {
+    const response = await fetch(`${API_BASE_URL}/api/auth/sessions`, {
+      method: 'GET',
+      headers: this.getHeaders(token),
+    });
+
+    return response.json();
+  }
+
+  static async requestEmailChange(
+    token: string,
+    data: { new_email: string }
+  ): Promise<AuthResponse> {
+    const response = await fetch(
+      `${API_BASE_URL}/api/auth/email/change-request`,
+      {
+        method: 'POST',
+        headers: this.getHeaders(token),
+        body: JSON.stringify(data),
+      }
+    );
 
     return response.json();
   }

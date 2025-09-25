@@ -11,7 +11,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // WebAuthn Custom Challenge Repository
+        $this->app->bind(
+            \Laragear\WebAuthn\Contracts\WebAuthnChallengeRepository::class,
+            \App\WebAuthn\CacheChallengeRepository::class
+        );
     }
 
     /**
@@ -19,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Use custom WebAuthn credential model
+        $this->app->bind(
+            \Laragear\WebAuthn\Models\WebAuthnCredential::class,
+            \App\Models\WebAuthnCredential::class
+        );
     }
 }

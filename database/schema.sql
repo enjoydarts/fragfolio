@@ -1,7 +1,7 @@
 -- fragfolio Database Schema
 -- Created with sqldef for Laravel 12 project
 
--- Users table with roles
+-- Users table with roles and 2FA support
 CREATE TABLE users (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
@@ -9,6 +9,9 @@ CREATE TABLE users (
     email_verified_at TIMESTAMP NULL,
     password VARCHAR(255) NOT NULL,
     role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
+    two_factor_secret TEXT NULL,
+    two_factor_recovery_codes TEXT NULL,
+    two_factor_confirmed_at TIMESTAMP NULL,
     remember_token VARCHAR(100) NULL,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
@@ -52,6 +55,23 @@ CREATE TABLE sessions (
     PRIMARY KEY (id),
     INDEX idx_sessions_user_id (user_id),
     INDEX idx_sessions_last_activity (last_activity)
+);
+
+-- Email change requests for secure email address changes
+CREATE TABLE email_change_requests (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NOT NULL,
+    new_email VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    verified BOOLEAN NOT NULL DEFAULT FALSE,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_email_change_requests_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_email_change_requests_token (token),
+    INDEX idx_email_change_requests_user_id (user_id),
+    INDEX idx_email_change_requests_expires_at (expires_at)
 );
 
 -- Personal Access Tokens
@@ -382,19 +402,26 @@ CREATE TABLE reaction_logs (
     INDEX idx_reaction_logs_reaction_type (reaction_type)
 );
 
--- WebAuthn credentials for FIDO2 authentication
+-- WebAuthn credentials for FIDO2 authentication (Laragear/WebAuthn)
 CREATE TABLE webauthn_credentials (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    user_id BIGINT UNSIGNED NOT NULL,
-    credential_id VARCHAR(255) NOT NULL UNIQUE,
+    id VARCHAR(510) NOT NULL,
+    authenticatable_type VARCHAR(255) NOT NULL,
+    authenticatable_id BIGINT UNSIGNED NOT NULL,
+    user_id VARCHAR(255) NOT NULL,
+    alias VARCHAR(255) NULL,
+    counter BIGINT UNSIGNED NULL,
+    rp_id VARCHAR(255) NOT NULL,
+    origin VARCHAR(255) NOT NULL,
+    transports JSON NULL,
+    aaguid CHAR(36) NULL,
     public_key TEXT NOT NULL,
-    counter BIGINT UNSIGNED NOT NULL DEFAULT 0,
-    device_name VARCHAR(255) NULL,
-    last_used_at TIMESTAMP NULL,
+    attestation_format VARCHAR(255) NOT NULL DEFAULT 'none',
+    certificates JSON NULL,
+    disabled_at TIMESTAMP NULL,
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL,
     PRIMARY KEY (id),
-    CONSTRAINT fk_webauthn_credentials_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX webauthn_user_index (authenticatable_type, authenticatable_id),
     INDEX idx_webauthn_credentials_user_id (user_id)
 );
 

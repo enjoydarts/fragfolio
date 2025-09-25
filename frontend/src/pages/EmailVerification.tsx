@@ -22,12 +22,12 @@ export const EmailVerification: React.FC = () => {
     try {
       const response = await AuthAPI.resendVerificationEmail(token);
       if (response.success) {
-        setMessage(response.message || t('email_verification.success'));
+        setMessage(t('email_verification.success'));
       } else {
-        setError(response.message || t('auth.errors.registration_failed'));
+        setError(t('auth.errors.email_verification_failed'));
       }
     } catch {
-      setError(t('auth.errors.registration_failed'));
+      setError(t('auth.errors.email_verification_failed'));
     } finally {
       setIsResending(false);
     }

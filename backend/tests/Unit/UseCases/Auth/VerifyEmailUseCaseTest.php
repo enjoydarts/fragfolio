@@ -21,7 +21,7 @@ describe('VerifyEmailUseCase', function () {
             $result = $this->useCase->execute($user);
 
             expect($result['success'])->toBeTrue();
-            expect($result['message'])->toBe('メールアドレスが認証されました');
+            expect($result['message'])->toBe(__('auth.email_verified'));
 
             $user->refresh();
             expect($user->email_verified_at)->not->toBeNull();
@@ -38,7 +38,7 @@ describe('VerifyEmailUseCase', function () {
             $result = $this->useCase->execute($user);
 
             expect($result['success'])->toBeFalse();
-            expect($result['message'])->toBe('メールアドレスは既に認証済みです');
+            expect($result['message'])->toBe(__('auth.email_already_verified'));
 
             Event::assertNotDispatched(Verified::class);
         });
@@ -53,7 +53,7 @@ describe('VerifyEmailUseCase', function () {
             $result = $this->useCase->verifyFromLink($user->id, sha1($user->email));
 
             expect($result['success'])->toBeTrue();
-            expect($result['message'])->toBe('メールアドレスが認証されました');
+            expect($result['message'])->toBe(__('auth.email_verified'));
 
             $user->refresh();
             expect($user->hasVerifiedEmail())->toBeTrue();
@@ -67,7 +67,7 @@ describe('VerifyEmailUseCase', function () {
             $result = $this->useCase->verifyFromLink($user->id, 'invalid-hash');
 
             expect($result['success'])->toBeFalse();
-            expect($result['message'])->toBe('無効な認証リンクです');
+            expect($result['message'])->toBe(__('auth.invalid_verification_link'));
         });
 
         test('既に認証済みのユーザーでは認証済みメッセージを返す', function () {
@@ -78,7 +78,7 @@ describe('VerifyEmailUseCase', function () {
             $result = $this->useCase->verifyFromLink($user->id, sha1($user->email));
 
             expect($result['success'])->toBeTrue();
-            expect($result['message'])->toBe('メールアドレスは既に認証済みです');
+            expect($result['message'])->toBe(__('auth.email_already_verified'));
         });
     });
 
@@ -91,7 +91,7 @@ describe('VerifyEmailUseCase', function () {
             $result = $this->useCase->resendVerificationEmail($user);
 
             expect($result['success'])->toBeTrue();
-            expect($result['message'])->toBe('認証メールを再送信しました');
+            expect($result['message'])->toBe(__('auth.verification_email_resent'));
         });
 
         test('既に認証済みのユーザーでは再送信しない', function () {
@@ -102,7 +102,7 @@ describe('VerifyEmailUseCase', function () {
             $result = $this->useCase->resendVerificationEmail($user);
 
             expect($result['success'])->toBeFalse();
-            expect($result['message'])->toBe('メールアドレスは既に認証済みです');
+            expect($result['message'])->toBe(__('auth.email_already_verified'));
         });
     });
 });

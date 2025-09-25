@@ -17,7 +17,7 @@ class TurnstileService
         $this->siteKey = config('services.turnstile.site_key') ?? '';
     }
 
-    public function verify(string $token, ?string $remoteIp = null): bool
+    public function verify(string $token, ?string $remoteIp = null): bool|string
     {
         if (! $this->secretKey) {
             Log::warning('Turnstile secret key is not configured');
@@ -50,12 +50,25 @@ class TurnstileService
             }
 
             if (! $data['success']) {
+                $errorCodes = $data['error-codes'] ?? [];
+
                 Log::warning('Turnstile verification failed', [
-                    'error_codes' => $data['error-codes'] ?? [],
+                    'error_codes' => $errorCodes,
                     'token' => substr($token, 0, 10).'...',
                 ]);
 
-                return false;
+                // 特定のエラーコードを返す
+                if (in_array('timeout-or-duplicate', $errorCodes)) {
+                    return 'timeout_or_duplicate';
+                }
+                if (in_array('invalid-input-response', $errorCodes)) {
+                    return 'invalid_input_response';
+                }
+                if (in_array('missing-input-response', $errorCodes)) {
+                    return 'missing_input_response';
+                }
+
+                return 'verification_failed';
             }
 
             Log::info('Turnstile verification successful', [

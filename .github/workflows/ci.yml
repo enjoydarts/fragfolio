@@ -58,7 +58,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
@@ -145,7 +145,7 @@ jobs:
           # CI環境用のphpunit.xml設定を上書き
           sed -i 's/<env name="DB_HOST" value="mysql"\/>/<env name="DB_HOST" value="127.0.0.1"\/>/g' phpunit.xml
           php artisan config:clear
-          composer test-coverage
+          vendor/bin/pest -v --coverage
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
@@ -167,7 +167,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
@@ -177,7 +177,7 @@ jobs:
 
       - name: Run tests with coverage
         working-directory: ./frontend
-        run: npm run test:coverage
+        run: npm run test:coverage -- --reporter=verbose --no-color --maxWorkers=1
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
@@ -200,7 +200,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 

@@ -12,7 +12,7 @@ class VerifyEmailUseCase
         if ($user->hasVerifiedEmail()) {
             return [
                 'success' => false,
-                'message' => 'メールアドレスは既に認証済みです',
+                'message' => __('auth.email_already_verified'),
             ];
         }
 
@@ -22,7 +22,7 @@ class VerifyEmailUseCase
 
         return [
             'success' => true,
-            'message' => 'メールアドレスが認証されました',
+            'message' => __('auth.email_verified'),
         ];
     }
 
@@ -31,7 +31,7 @@ class VerifyEmailUseCase
         if ($user->hasVerifiedEmail()) {
             return [
                 'success' => false,
-                'message' => 'メールアドレスは既に認証済みです',
+                'message' => __('auth.email_already_verified'),
             ];
         }
 
@@ -39,7 +39,7 @@ class VerifyEmailUseCase
 
         return [
             'success' => true,
-            'message' => '認証メールを再送信しました',
+            'message' => __('auth.verification_email_resent'),
         ];
     }
 
@@ -50,7 +50,7 @@ class VerifyEmailUseCase
         if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
             return [
                 'success' => false,
-                'message' => '無効な認証リンクです',
+                'message' => __('auth.invalid_verification_link'),
                 'status_code' => 403,
             ];
         }
@@ -58,7 +58,7 @@ class VerifyEmailUseCase
         if ($user->hasVerifiedEmail()) {
             return [
                 'success' => true,
-                'message' => 'メールアドレスは既に認証済みです',
+                'message' => __('auth.email_already_verified'),
             ];
         }
 
@@ -68,7 +68,7 @@ class VerifyEmailUseCase
 
         return [
             'success' => true,
-            'message' => 'メールアドレスが認証されました',
+            'message' => __('auth.email_verified'),
         ];
     }
 }

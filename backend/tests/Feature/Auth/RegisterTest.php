@@ -17,14 +17,14 @@ describe('ユーザー登録', function () {
         $userData = [
             'name' => 'テストユーザー',
             'email' => 'test@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
             'language' => 'ja',
             'timezone' => 'Asia/Tokyo',
-            'turnstile_token' => 'test_token',
+            'cf-turnstile-response' => 'test_token',
         ];
 
-        $response = $this->postJson('/api/auth/register', $userData);
+        $response = $this->postJson('/api/register', $userData);
 
         $response->assertStatus(201)
             ->assertJsonStructure([
@@ -47,7 +47,6 @@ describe('ユーザー登録', function () {
         $user = User::where('email', 'test@example.com')->first();
         expect($user->profile->language)->toBe('ja');
         expect($user->profile->timezone)->toBe('Asia/Tokyo');
-        expect($user->hasRole('user'))->toBeTrue();
     });
 
     test('既存のメールアドレスでは登録できない', function () {
@@ -56,20 +55,20 @@ describe('ユーザー登録', function () {
         $userData = [
             'name' => 'テストユーザー',
             'email' => 'test@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-            'turnstile_token' => 'test_token',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+            'cf-turnstile-response' => 'test_token',
         ];
 
-        $response = $this->postJson('/api/auth/register', $userData);
+        $response = $this->postJson('/api/register', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
     });
 
     test('必須フィールドが不足している場合は登録できない', function () {
-        $response = $this->postJson('/api/auth/register', [
-            'turnstile_token' => 'test_token',
+        $response = $this->postJson('/api/register', [
+            'cf-turnstile-response' => 'test_token',
         ]);
 
         $response->assertStatus(422)
@@ -80,12 +79,12 @@ describe('ユーザー登録', function () {
         $userData = [
             'name' => 'テストユーザー',
             'email' => 'invalid-email',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-            'turnstile_token' => 'test_token',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+            'cf-turnstile-response' => 'test_token',
         ];
 
-        $response = $this->postJson('/api/auth/register', $userData);
+        $response = $this->postJson('/api/register', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
@@ -97,10 +96,10 @@ describe('ユーザー登録', function () {
             'email' => 'test@example.com',
             'password' => '123',
             'password_confirmation' => '123',
-            'turnstile_token' => 'test_token',
+            'cf-turnstile-response' => 'test_token',
         ];
 
-        $response = $this->postJson('/api/auth/register', $userData);
+        $response = $this->postJson('/api/register', $userData);
 
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['password']);

@@ -28,9 +28,9 @@ export const ResetPassword: React.FC = () => {
     }));
 
     if (!token || !email) {
-      setError('無効なリセットリンクです');
+      setError(t('password_reset.invalid_link'));
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,17 +56,15 @@ export const ResetPassword: React.FC = () => {
       const response = await AuthAPI.resetPassword(formData);
 
       if (response.success) {
-        setMessage(
-          response.message || t('password_reset.password_reset_success')
-        );
+        setMessage(t('password_reset.password_reset_success'));
         setTimeout(() => {
           navigate('/auth');
         }, 2000);
       } else {
-        setError(response.message || t('auth.errors.registration_failed'));
+        setError(t('auth.errors.password_reset_failed'));
       }
     } catch {
-      setError(t('auth.errors.registration_failed'));
+      setError(t('auth.errors.password_reset_failed'));
     } finally {
       setIsLoading(false);
     }

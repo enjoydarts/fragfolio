@@ -6,11 +6,14 @@ import {
   Navigate,
 } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ToastProvider } from './contexts/ToastContext';
 import { useAuth } from './hooks/useAuth';
 import { Header } from './components/layout/Header';
 import { LoadingSpinner } from './components/layout/LoadingSpinner';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { HomePage } from './pages/HomePage';
 import { AuthPage } from './pages/AuthPage';
+import { AccountSettings } from './pages/AccountSettings';
 import { EmailVerification } from './pages/EmailVerification';
 import { EmailVerificationSuccess } from './pages/EmailVerificationSuccess';
 import { EmailVerificationError } from './pages/EmailVerificationError';
@@ -32,6 +35,14 @@ const AppContent: React.FC = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <AccountSettings />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/email-verification" element={<EmailVerification />} />
         <Route
           path="/email-verification-success"
@@ -54,9 +65,11 @@ const AppContent: React.FC = () => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
+      <ToastProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </ToastProvider>
     </AuthProvider>
   );
 }
