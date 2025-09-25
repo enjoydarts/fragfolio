@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AI\CompletionController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\TwoFactorLoginController;
 use App\Http\Controllers\Api\Auth\WebAuthnManagementController;
@@ -41,10 +42,17 @@ Route::prefix('auth')->group(function () {
 // Turnstile configuration
 Route::get('/turnstile/config', [TurnstileController::class, 'config']);
 
-// AI normalization routes (public for auto-completion)
+// AI routes
 Route::prefix('ai')->group(function () {
+    // Public routes for auto-completion (no authentication required for basic completion)
+    Route::post('/complete', [CompletionController::class, 'complete']);
+    Route::post('/batch-complete', [CompletionController::class, 'batchComplete']);
+    Route::get('/providers', [CompletionController::class, 'providers']);
+    Route::get('/health', [CompletionController::class, 'health']);
+
+    // Legacy normalization route
     Route::post('/normalize', [FragranceNormalizationController::class, 'normalize']);
-    Route::get('/providers', [FragranceNormalizationController::class, 'getAvailableProviders']);
+    Route::get('/legacy-providers', [FragranceNormalizationController::class, 'getAvailableProviders']);
 });
 
 // Protected routes
