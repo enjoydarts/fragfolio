@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use App\Models\WebauthnCredential;
+use App\Models\WebAuthnCredential;
 use Illuminate\Support\Facades\Auth;
 
 describe('WebAuthnManagementController', function () {
