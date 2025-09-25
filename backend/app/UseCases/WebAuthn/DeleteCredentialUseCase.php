@@ -3,7 +3,7 @@
 namespace App\UseCases\WebAuthn;
 
 use App\Models\User;
-use Laragear\WebAuthn\Models\WebAuthnCredential;
+use App\Models\WebAuthnCredential;
 
 class DeleteCredentialUseCase
 {
