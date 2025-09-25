@@ -15,12 +15,12 @@ describe('WebAuthnManagementController', function () {
 
     test('WebAuthnクレデンシャル一覧を取得できる', function () {
         // ユーザーのクレデンシャルを作成
-        $activeCredential = WebauthnCredential::factory()->forUser($this->user)->create([
+        $activeCredential = WebAuthnCredential::factory()->forUser($this->user)->create([
             'alias' => 'My Security Key',
             'disabled_at' => null,
         ]);
 
-        $disabledCredential = WebauthnCredential::factory()->forUser($this->user)->create([
+        $disabledCredential = WebAuthnCredential::factory()->forUser($this->user)->create([
             'alias' => 'Old Security Key',
             'disabled_at' => now(),
         ]);
@@ -68,7 +68,7 @@ describe('WebAuthnManagementController', function () {
     });
 
     test('WebAuthnクレデンシャルを削除できる', function () {
-        $credential = WebauthnCredential::factory()->forUser($this->user)->create();
+        $credential = WebAuthnCredential::factory()->forUser($this->user)->create();
 
         $response = $this->deleteJson("/api/auth/webauthn/credentials/{$credential->id}");
 
@@ -79,7 +79,7 @@ describe('WebAuthnManagementController', function () {
             ]);
 
         // クレデンシャルが削除されている
-        expect(WebauthnCredential::find($credential->id))->toBeNull();
+        expect(WebAuthnCredential::find($credential->id))->toBeNull();
     });
 
     test('存在しないクレデンシャルの削除でエラー', function () {
@@ -94,7 +94,7 @@ describe('WebAuthnManagementController', function () {
 
     test('他のユーザーのクレデンシャルは削除できない', function () {
         $otherUser = User::factory()->create();
-        $credential = WebauthnCredential::factory()->forUser($otherUser)->create();
+        $credential = WebAuthnCredential::factory()->forUser($otherUser)->create();
 
         $response = $this->deleteJson("/api/auth/webauthn/credentials/{$credential->id}");
 
@@ -105,11 +105,11 @@ describe('WebAuthnManagementController', function () {
             ]);
 
         // クレデンシャルは削除されていない
-        expect(WebauthnCredential::find($credential->id))->not()->toBeNull();
+        expect(WebAuthnCredential::find($credential->id))->not()->toBeNull();
     });
 
     test('WebAuthnクレデンシャルのエイリアスを更新できる', function () {
-        $credential = WebauthnCredential::factory()->forUser($this->user)->create([
+        $credential = WebAuthnCredential::factory()->forUser($this->user)->create([
             'alias' => 'Old Name',
         ]);
 
@@ -137,7 +137,7 @@ describe('WebAuthnManagementController', function () {
     });
 
     test('空のエイリアスでバリデーションエラー', function () {
-        $credential = WebauthnCredential::factory()->forUser($this->user)->create();
+        $credential = WebAuthnCredential::factory()->forUser($this->user)->create();
 
         $response = $this->putJson("/api/auth/webauthn/credentials/{$credential->id}", [
             'alias' => '',
@@ -148,7 +148,7 @@ describe('WebAuthnManagementController', function () {
     });
 
     test('WebAuthnクレデンシャルを無効化できる', function () {
-        $credential = WebauthnCredential::factory()->forUser($this->user)->create([
+        $credential = WebAuthnCredential::factory()->forUser($this->user)->create([
             'disabled_at' => null,
         ]);
 
@@ -166,7 +166,7 @@ describe('WebAuthnManagementController', function () {
     });
 
     test('WebAuthnクレデンシャルを有効化できる', function () {
-        $credential = WebauthnCredential::factory()->forUser($this->user)->create([
+        $credential = WebAuthnCredential::factory()->forUser($this->user)->create([
             'disabled_at' => now(),
         ]);
 

@@ -10,7 +10,7 @@ describe('WebAuthn ログイン', function () {
         ]);
 
         // WebAuthnクレデンシャルを作成
-        $this->credential = WebauthnCredential::factory()->forUser($this->user)->create();
+        $this->credential = WebAuthnCredential::factory()->forUser($this->user)->create();
     });
 
     test('WebAuthnチャレンジオプションを取得できる', function () {
