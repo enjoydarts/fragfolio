@@ -15,7 +15,6 @@ class SuggestNotesUseCase
 
     private AIProviderFactory $providerFactory;
 
-    private CostTrackingService $costTracker;
 
     private const DAILY_LIMIT = 100;
 
@@ -25,12 +24,10 @@ class SuggestNotesUseCase
 
     public function __construct(
         NoteSuggestionService $noteSuggestionService,
-        AIProviderFactory $providerFactory,
-        CostTrackingService $costTracker
+        AIProviderFactory $providerFactory
     ) {
         $this->noteSuggestionService = $noteSuggestionService;
         $this->providerFactory = $providerFactory;
-        $this->costTracker = $costTracker;
     }
 
     public function execute(string $brandName, string $fragranceName, array $options = []): array

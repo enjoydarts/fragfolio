@@ -398,7 +398,7 @@ class CostController extends Controller
     /**
      * レポートをCSV形式でエクスポート
      */
-    private function exportReportAsCsv(array $report, string $reportType): \Symfony\Component\HttpFoundation\Response
+    private function exportReportAsCsv(array $report, string $reportType): \Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         $fileName = "ai_usage_report_{$reportType}_".now()->format('Y_m_d').'.csv';
 
