@@ -45,10 +45,5 @@ expect()->extend('toBeOne', function () {
 
 function createDefaultRoles()
 {
-    if (! \Spatie\Permission\Models\Role::where('name', 'user')->where('guard_name', 'web')->exists()) {
-        \Spatie\Permission\Models\Role::create(['name' => 'user', 'guard_name' => 'web']);
-    }
-    if (! \Spatie\Permission\Models\Role::where('name', 'admin')->where('guard_name', 'web')->exists()) {
-        \Spatie\Permission\Models\Role::create(['name' => 'admin', 'guard_name' => 'web']);
-    }
+    // No longer needed since we use simple role field instead of spatie/permission
 }

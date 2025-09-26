@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\AI\CompletionController;
+use App\Http\Controllers\Api\AI\CostController;
+use App\Http\Controllers\Api\AI\NormalizationController;
+use App\Http\Controllers\Api\AI\NoteSuggestionController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\TwoFactorLoginController;
 use App\Http\Controllers\Api\Auth\WebAuthnManagementController;
@@ -41,10 +45,31 @@ Route::prefix('auth')->group(function () {
 // Turnstile configuration
 Route::get('/turnstile/config', [TurnstileController::class, 'config']);
 
-// AI normalization routes (public for auto-completion)
+// AI routes
 Route::prefix('ai')->group(function () {
-    Route::post('/normalize', [FragranceNormalizationController::class, 'normalize']);
-    Route::get('/providers', [FragranceNormalizationController::class, 'getAvailableProviders']);
+    // Public routes for auto-completion (no authentication required for basic completion)
+    Route::post('/complete', [CompletionController::class, 'complete']);
+    Route::post('/batch-complete', [CompletionController::class, 'batchComplete']);
+    Route::get('/providers', [CompletionController::class, 'providers']);
+    Route::get('/health', [CompletionController::class, 'health']);
+
+    // New normalization routes
+    Route::post('/normalize', [NormalizationController::class, 'normalize']);
+    Route::post('/batch-normalize', [NormalizationController::class, 'batchNormalize']);
+    Route::get('/normalization/providers', [NormalizationController::class, 'providers']);
+    Route::get('/normalization/health', [NormalizationController::class, 'health']);
+
+    // Note suggestion routes
+    Route::post('/suggest-notes', [NoteSuggestionController::class, 'suggest']);
+    Route::post('/batch-suggest-notes', [NoteSuggestionController::class, 'batchSuggest']);
+    Route::get('/note-suggestion/providers', [NoteSuggestionController::class, 'providers']);
+    Route::get('/note-suggestion/health', [NoteSuggestionController::class, 'health']);
+    Route::get('/note-categories', [NoteSuggestionController::class, 'noteCategories']);
+    Route::post('/similar-fragrances', [NoteSuggestionController::class, 'similarFragrances']);
+
+    // Legacy normalization route (for backward compatibility)
+    Route::post('/legacy-normalize', [FragranceNormalizationController::class, 'normalize']);
+    Route::get('/legacy-providers', [FragranceNormalizationController::class, 'getAvailableProviders']);
 });
 
 // Protected routes
@@ -93,4 +118,25 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // AI normalization history
     Route::get('/ai/history', [FragranceNormalizationController::class, 'getNormalizationHistory']);
+
+    // AI feedback routes (authenticated)
+    Route::post('/ai/normalization/feedback/{user}', [NormalizationController::class, 'feedback']);
+    Route::post('/ai/note-suggestion/feedback/{user}', [NoteSuggestionController::class, 'feedback']);
+
+    // AI cost management routes (authenticated)
+    Route::prefix('ai/cost')->group(function () {
+        Route::get('/usage', [CostController::class, 'usage']);
+        Route::get('/limits', [CostController::class, 'limits']);
+        Route::get('/patterns', [CostController::class, 'patterns']);
+        Route::get('/efficiency', [CostController::class, 'efficiency']);
+        Route::get('/prediction', [CostController::class, 'prediction']);
+        Route::get('/history', [CostController::class, 'history']);
+        Route::post('/report', [CostController::class, 'generateReport']);
+
+        // Admin only routes
+        Route::middleware('admin')->group(function () {
+            Route::get('/global-stats', [CostController::class, 'globalStats']);
+            Route::get('/top-users', [CostController::class, 'topUsers']);
+        });
+    });
 });

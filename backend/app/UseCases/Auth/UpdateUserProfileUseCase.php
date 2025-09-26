@@ -24,7 +24,7 @@ class UpdateUserProfileUseCase
                 $user->profile->update($profileData);
             }
 
-            return $user->fresh()->load('profile', 'roles');
+            return $user->fresh()->load('profile');
         });
     }
 }

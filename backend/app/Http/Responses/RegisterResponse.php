@@ -34,7 +34,7 @@ class RegisterResponse implements RegisterResponseContract, Responsable
                     'gender' => $user->profile?->gender ?? null,
                     'country' => $user->profile?->country ?? null,
                 ],
-                'roles' => $user->getRoleNames()->toArray(),
+                'roles' => $user->role,
             ],
             'token' => $token,
         ], 201);

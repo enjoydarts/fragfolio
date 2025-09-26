@@ -33,7 +33,7 @@ describe('RegisterUserUseCase', function () {
         expect($user->profile->timezone)->toBe('Asia/Tokyo');
 
         // ユーザーロールが割り当てられることを確認
-        expect($user->hasRole('user'))->toBeTrue();
+        expect($user->role)->toBe('user');
     });
 
     test('デフォルト値でユーザーを登録できる', function () {
@@ -60,7 +60,6 @@ describe('RegisterUserUseCase', function () {
 
         // リレーションが正しく読み込まれることを確認
         expect($user->relationLoaded('profile'))->toBeTrue();
-        expect($user->relationLoaded('roles'))->toBeTrue();
     });
 
     test('パスワードがハッシュ化されて保存される', function () {

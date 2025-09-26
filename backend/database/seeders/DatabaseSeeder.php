@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,14 +12,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // まずロールと権限を作成
-        $this->call(RoleSeeder::class);
-
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // 将来的にマスターデータのSeederを追加予定
+        // $this->call([
+        //     ConcentrationTypeSeeder::class,
+        //     FragranceCategorySeeder::class,
+        //     FragranceNoteSeeder::class,
+        //     SceneSeeder::class,
+        //     SeasonSeeder::class,
+        // ]);
     }
 }

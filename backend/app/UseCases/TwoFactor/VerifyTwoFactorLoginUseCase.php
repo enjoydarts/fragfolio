@@ -64,7 +64,7 @@ class VerifyTwoFactorLoginUseCase
                     'gender' => $user->profile->gender ?? null,
                     'country' => $user->profile->country ?? null,
                 ],
-                'roles' => $user->getRoleNames()->toArray(),
+                'role' => $user->role,
             ],
             'token' => $token,
         ];

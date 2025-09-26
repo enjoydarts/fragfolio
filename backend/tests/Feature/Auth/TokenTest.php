@@ -23,7 +23,7 @@ describe('トークン管理', function () {
                     'name',
                     'email',
                     'profile',
-                    'roles',
+
                 ],
                 'token',
             ]);

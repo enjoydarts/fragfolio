@@ -18,7 +18,7 @@ class LoginUserUseCase
         $token = $user->createToken($tokenName)->plainTextToken;
 
         return [
-            'user' => $user->load('profile', 'roles'),
+            'user' => $user->load('profile'),
             'token' => $token,
         ];
     }

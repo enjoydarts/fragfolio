@@ -493,3 +493,41 @@ CREATE TABLE role_has_permissions (
     CONSTRAINT fk_role_has_permissions_role_id FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
     PRIMARY KEY (permission_id, role_id)
 );
+
+-- AI cost tracking for usage monitoring and billing
+CREATE TABLE ai_cost_tracking (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NULL,
+    provider ENUM('openai', 'anthropic') NOT NULL,
+    operation_type VARCHAR(50) NOT NULL,
+    tokens_used INT UNSIGNED NOT NULL DEFAULT 0,
+    estimated_cost DECIMAL(8,4) NOT NULL DEFAULT 0.0000,
+    api_response_time_ms INT UNSIGNED NOT NULL DEFAULT 0,
+    metadata JSON NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_ai_cost_tracking_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_ai_cost_tracking_user_id_created_at (user_id, created_at),
+    INDEX idx_ai_cost_tracking_provider_operation (provider, operation_type),
+    INDEX idx_ai_cost_tracking_created_at (created_at)
+);
+
+-- AI note suggestion feedback for learning and improvement
+CREATE TABLE ai_note_suggestion_feedback (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NOT NULL,
+    suggestion_id VARCHAR(255) NOT NULL,
+    rating TINYINT UNSIGNED NOT NULL,
+    feedback_type ENUM('accuracy', 'completeness', 'relevance') NOT NULL,
+    comments TEXT NULL,
+    corrected_notes JSON NULL,
+    corrected_attributes JSON NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_ai_note_suggestion_feedback_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_ai_note_suggestion_feedback_user_id (user_id),
+    INDEX idx_ai_note_suggestion_feedback_suggestion_id (suggestion_id),
+    INDEX idx_ai_note_suggestion_feedback_rating (rating),
+    INDEX idx_ai_note_suggestion_feedback_created_at (created_at)
+);

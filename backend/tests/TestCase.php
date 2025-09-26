@@ -58,14 +58,10 @@ abstract class TestCase extends BaseTestCase
             \DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
             $tables = [
+                'ai_cost_tracking',
                 'user_profiles',
                 'webauthn_credentials',
                 'users',
-                'roles',
-                'permissions',
-                'model_has_roles',
-                'model_has_permissions',
-                'role_has_permissions',
             ];
 
             foreach ($tables as $table) {

@@ -72,7 +72,7 @@ describe('LoginUserUseCase', function () {
 
         $user = $result['user'];
         expect($user->relationLoaded('profile'))->toBeTrue();
-        expect($user->relationLoaded('roles'))->toBeTrue();
+
     });
 
     test('記憶するオプションによってトークン名が変わる', function () {
