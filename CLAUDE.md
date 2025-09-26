@@ -86,12 +86,17 @@ npm run format
 
 ### データベース管理
 
+**重要: データベースエラーが発生した場合は必ずsqldefを実行すること**
+
 ```bash
-# スキーマ適用（Docker内でmysqldef使用）
-docker-compose exec backend mysqldef -u root -prootpassword -h mysql fragfolio < /var/www/html/sqldef/schema.sql
+# スキーマ適用（正しいコマンド）
+docker-compose exec backend sh -c "mysqldef -u root -prootpassword -h mysql fragfolio < /var/www/html/sqldef/schema.sql"
+
+# テスト用データベースのスキーマ適用
+docker-compose exec backend sh -c "mysqldef -u root -prootpassword -h mysql fragfolio_test < /var/www/html/sqldef/schema.sql"
 
 # スキーマドライラン（変更確認）
-docker-compose exec backend mysqldef -u root -prootpassword -h mysql fragfolio --dry-run < /var/www/html/sqldef/schema.sql
+docker-compose exec backend sh -c "mysqldef -u root -prootpassword -h mysql fragfolio --dry-run < /var/www/html/sqldef/schema.sql"
 
 # シーダー実行
 docker-compose exec backend php artisan db:seed
