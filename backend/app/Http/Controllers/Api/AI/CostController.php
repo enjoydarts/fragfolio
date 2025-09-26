@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\AI\CostTrackingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class CostController extends Controller
@@ -30,6 +31,9 @@ class CostController extends Controller
         try {
             $userId = $request->user()->id;
             $month = $validated['month'] ?? null;
+
+            // 自分のデータのみアクセス可能（管理者は全ユーザーのデータにアクセス可能）
+            Gate::authorize('view-ai-usage', $userId);
 
             // 基本的な使用量情報
             $monthlyUsage = $this->costTrackingService->getMonthlyUsage($userId, $month);
@@ -211,12 +215,7 @@ class CostController extends Controller
     public function globalStats(Request $request): JsonResponse
     {
         // 管理者権限チェック
-        if (! $request->user() || $request->user()->role !== 'admin') {
-            return response()->json([
-                'success' => false,
-                'message' => __('auth.unauthorized'),
-            ], 403);
-        }
+        Gate::authorize('view-global-stats');
 
         $validated = $request->validate([
             'start_date' => 'sometimes|date_format:Y-m-d',
@@ -249,12 +248,7 @@ class CostController extends Controller
     public function topUsers(Request $request): JsonResponse
     {
         // 管理者権限チェック
-        if (! $request->user() || $request->user()->role !== 'admin') {
-            return response()->json([
-                'success' => false,
-                'message' => __('auth.unauthorized'),
-            ], 403);
-        }
+        Gate::authorize('view-global-stats');
 
         $validated = $request->validate([
             'limit' => 'sometimes|integer|min:1|max:100',

@@ -133,8 +133,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/history', [CostController::class, 'history']);
         Route::post('/report', [CostController::class, 'generateReport']);
 
-        // Admin only routes - Note: Admin check is now handled in the controller
-        Route::get('/global-stats', [CostController::class, 'globalStats']);
-        Route::get('/top-users', [CostController::class, 'topUsers']);
+        // Admin only routes
+        Route::middleware('admin')->group(function () {
+            Route::get('/global-stats', [CostController::class, 'globalStats']);
+            Route::get('/top-users', [CostController::class, 'topUsers']);
+        });
     });
 });

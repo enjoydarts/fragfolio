@@ -101,4 +101,10 @@ return [
     'no_reply_notice' => 'このメールは送信専用です。返信しないでください。',
     'email_same_as_current' => '現在のメールアドレスと同じです',
     'email_already_taken' => 'このメールアドレスは既に使用されています',
+
+    // 認可関連
+    'unauthorized_admin' => '管理者権限が必要です',
+    'unauthorized_action' => 'このアクションを実行する権限がありません',
+    'insufficient_permissions' => '権限が不足しています',
+    'access_denied' => 'アクセスが拒否されました',
 ];

@@ -94,4 +94,10 @@ return [
     'two_factor_required' => 'Two-factor authentication is required. Please enter your authentication code.',
     'two_factor_login_required' => 'Please enter your two-factor authentication code',
     'session_invalid' => 'Authentication session is invalid. Please log in again.',
+
+    // Authorization related
+    'unauthorized_admin' => 'Administrator privileges required',
+    'unauthorized_action' => 'You do not have permission to perform this action',
+    'insufficient_permissions' => 'Insufficient permissions',
+    'access_denied' => 'Access denied',
 ];
