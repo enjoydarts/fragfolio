@@ -3,7 +3,6 @@
 namespace App\UseCases\AI;
 
 use App\Services\AI\AIProviderFactory;
-use App\Services\AI\CostTrackingService;
 use App\Services\AI\NoteSuggestionService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +13,6 @@ class SuggestNotesUseCase
     private NoteSuggestionService $noteSuggestionService;
 
     private AIProviderFactory $providerFactory;
-
 
     private const DAILY_LIMIT = 100;
 
