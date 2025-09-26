@@ -167,7 +167,7 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user()->load('profile', 'roles');
+        $user = $request->user()->load('profile');
 
         return response()->json([
             'success' => true,
@@ -178,7 +178,7 @@ class AuthController extends Controller
                 'email_verified_at' => $user->email_verified_at,
                 'two_factor_enabled' => ! is_null($user->two_factor_secret),
                 'profile' => $user->profile,
-                'roles' => $user->roles,
+                'role' => $user->role,
             ],
         ]);
     }

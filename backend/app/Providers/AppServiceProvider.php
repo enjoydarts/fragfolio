@@ -21,7 +21,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\AI\AIProviderFactory::class);
         $this->app->singleton(\App\Services\AI\CostTrackingService::class);
         $this->app->bind(\App\Services\AI\CompletionService::class);
+        $this->app->bind(\App\Services\AI\NormalizationService::class);
         $this->app->bind(\App\UseCases\AI\CompleteFragranceUseCase::class);
+        $this->app->bind(\App\UseCases\AI\NormalizeFragranceUseCase::class);
     }
 
     /**

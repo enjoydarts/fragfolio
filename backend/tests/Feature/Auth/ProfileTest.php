@@ -25,7 +25,7 @@ describe('プロフィール管理', function () {
                         'gender',
                         'country',
                     ],
-                    'roles',
+
                 ],
             ])
             ->assertJson([
@@ -61,7 +61,7 @@ describe('プロフィール管理', function () {
                     'name',
                     'email',
                     'profile',
-                    'roles',
+
                 ],
             ]);
 

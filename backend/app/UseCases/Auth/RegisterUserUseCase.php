@@ -26,12 +26,12 @@ class RegisterUserUseCase
             ]);
 
             // デフォルトで一般ユーザー権限を付与
-            $user->assignRole('user');
+            $user->update(['role' => 'user']);
 
             // メール認証通知を送信
             $user->sendEmailVerificationNotification();
 
-            return $user->load('profile', 'roles');
+            return $user->load('profile');
         });
     }
 }

@@ -18,7 +18,7 @@ class RefreshTokenUseCase
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return [
-            'user' => $user->load('profile', 'roles'),
+            'user' => $user->load('profile'),
             'token' => $token,
         ];
     }

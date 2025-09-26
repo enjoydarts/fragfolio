@@ -65,7 +65,7 @@ describe('RefreshTokenUseCase', function () {
 
         $user = $result['user'];
         expect($user->relationLoaded('profile'))->toBeTrue();
-        expect($user->relationLoaded('roles'))->toBeTrue();
+
     });
 
     test('複数のトークンがある場合、現在のトークンのみが削除される', function () {

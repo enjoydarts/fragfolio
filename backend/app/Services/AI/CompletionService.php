@@ -2,14 +2,13 @@
 
 namespace App\Services\AI;
 
-use App\Services\AI\AIProviderFactory;
-use App\Services\AI\CostTrackingService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class CompletionService
 {
     private AIProviderFactory $providerFactory;
+
     private CostTrackingService $costTracker;
 
     public function __construct(
@@ -23,8 +22,8 @@ class CompletionService
     /**
      * リアルタイム補完機能
      *
-     * @param string $query 検索クエリ
-     * @param array $options オプション設定
+     * @param  string  $query  検索クエリ
+     * @param  array  $options  オプション設定
      * @return array 補完結果
      */
     public function complete(string $query, array $options = []): array
@@ -94,8 +93,8 @@ class CompletionService
     /**
      * 複数クエリの一括補完
      *
-     * @param array $queries クエリ配列
-     * @param array $options オプション設定
+     * @param  array  $queries  クエリ配列
+     * @param  array  $options  オプション設定
      * @return array 結果配列
      */
     public function batchComplete(array $queries, array $options = []): array
@@ -116,8 +115,8 @@ class CompletionService
     /**
      * 補完候補の品質評価
      *
-     * @param string $query 元のクエリ
-     * @param array $suggestions 補完候補
+     * @param  string  $query  元のクエリ
+     * @param  array  $suggestions  補完候補
      * @return array 評価済み候補
      */
     private function processSuggestions(array $suggestions, string $query): array
@@ -140,10 +139,6 @@ class CompletionService
 
     /**
      * 文字列類似度の計算
-     *
-     * @param string $str1
-     * @param string $str2
-     * @return float
      */
     private function calculateSimilarity(string $str1, string $str2): float
     {
@@ -163,27 +158,16 @@ class CompletionService
 
     /**
      * キャッシュキー生成
-     *
-     * @param string $operation
-     * @param string $query
-     * @param string $type
-     * @param string|null $provider
-     * @param string $language
-     * @return string
      */
     private function generateCacheKey(string $operation, string $query, string $type, ?string $provider, string $language): string
     {
         $provider = $provider ?: $this->providerFactory->getDefaultProvider();
-        return "ai:{$operation}:" . md5("{$query}:{$type}:{$provider}:{$language}");
+
+        return "ai:{$operation}:".md5("{$query}:{$type}:{$provider}:{$language}");
     }
 
     /**
      * 補完失敗時のフォールバック処理
-     *
-     * @param string $query
-     * @param string $type
-     * @param string $language
-     * @return array
      */
     private function handleCompletionFallback(string $query, string $type, string $language): array
     {
@@ -201,10 +185,6 @@ class CompletionService
 
     /**
      * フォールバック用の簡易補完候補生成
-     *
-     * @param string $query
-     * @param string $type
-     * @return array
      */
     private function generateFallbackSuggestions(string $query, string $type): array
     {

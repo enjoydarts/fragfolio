@@ -511,3 +511,23 @@ CREATE TABLE ai_cost_tracking (
     INDEX idx_ai_cost_tracking_provider_operation (provider, operation_type),
     INDEX idx_ai_cost_tracking_created_at (created_at)
 );
+
+-- AI note suggestion feedback for learning and improvement
+CREATE TABLE ai_note_suggestion_feedback (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NOT NULL,
+    suggestion_id VARCHAR(255) NOT NULL,
+    rating TINYINT UNSIGNED NOT NULL,
+    feedback_type ENUM('accuracy', 'completeness', 'relevance') NOT NULL,
+    comments TEXT NULL,
+    corrected_notes JSON NULL,
+    corrected_attributes JSON NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT fk_ai_note_suggestion_feedback_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_ai_note_suggestion_feedback_user_id (user_id),
+    INDEX idx_ai_note_suggestion_feedback_suggestion_id (suggestion_id),
+    INDEX idx_ai_note_suggestion_feedback_rating (rating),
+    INDEX idx_ai_note_suggestion_feedback_created_at (created_at)
+);

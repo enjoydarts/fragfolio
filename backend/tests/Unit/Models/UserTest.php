@@ -84,19 +84,17 @@ describe('User Model', function () {
 
     describe('role management', function () {
         test('デフォルトでuserロールが割り当てられる', function () {
-            $user = User::factory()->create();
-            $user->assignRole('user');
+            $user = User::factory()->create(['role' => 'user']);
 
-            expect($user->hasRole('user'))->toBeTrue();
-            expect($user->hasRole('admin'))->toBeFalse();
+            expect($user->role)->toBe('user');
+            expect($user->role)->not->toBe('admin');
         });
 
         test('adminロールを割り当てできる', function () {
-            $user = User::factory()->create();
-            $user->assignRole('admin');
+            $user = User::factory()->create(['role' => 'admin']);
 
-            expect($user->hasRole('admin'))->toBeTrue();
-            expect($user->hasRole('user'))->toBeFalse();
+            expect($user->role)->toBe('admin');
+            expect($user->role)->not->toBe('user');
         });
     });
 

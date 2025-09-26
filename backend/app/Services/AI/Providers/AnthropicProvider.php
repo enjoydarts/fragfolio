@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Log;
 class AnthropicProvider implements AIProviderInterface
 {
     private string $apiKey;
+
     private string $model;
+
     private array $costPerToken;
 
     public function __construct()
@@ -17,11 +19,11 @@ class AnthropicProvider implements AIProviderInterface
         $this->apiKey = config('services.anthropic.api_key');
         $this->model = config('services.ai.claude_model', 'claude-3-sonnet-20240229');
         $this->costPerToken = [
-            'claude-3-sonnet-20240229' => ['input' => 0.003/1000, 'output' => 0.015/1000],
-            'claude-3-haiku-20240307' => ['input' => 0.00025/1000, 'output' => 0.00125/1000],
+            'claude-3-sonnet-20240229' => ['input' => 0.003 / 1000, 'output' => 0.015 / 1000],
+            'claude-3-haiku-20240307' => ['input' => 0.00025 / 1000, 'output' => 0.00125 / 1000],
         ];
 
-        if (!$this->apiKey) {
+        if (! $this->apiKey) {
             throw new \Exception('Anthropic API key is not configured');
         }
     }
@@ -68,11 +70,11 @@ class AnthropicProvider implements AIProviderInterface
         ];
     }
 
-    public function suggestNotes(string $fragranceName, array $options = []): array
+    public function suggestNotes(string $brandName, string $fragranceName, array $options = []): array
     {
         $language = $options['language'] ?? 'ja';
 
-        $prompt = $this->buildNotesSuggestionPrompt($fragranceName, $language);
+        $prompt = $this->buildNotesSuggestionPrompt($brandName, $fragranceName, $language);
 
         $startTime = microtime(true);
         $response = $this->makeRequest($prompt, ['max_tokens' => 800]);
@@ -141,8 +143,8 @@ class AnthropicProvider implements AIProviderInterface
                 ],
             ]);
 
-            if (!$response->successful()) {
-                throw new \Exception('Anthropic API request failed: ' . $response->body());
+            if (! $response->successful()) {
+                throw new \Exception('Anthropic API request failed: '.$response->body());
             }
 
             return $response->json();
@@ -170,7 +172,7 @@ class AnthropicProvider implements AIProviderInterface
         $data = json_decode($jsonString, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('Failed to parse AI response as JSON: ' . json_last_error_msg());
+            throw new \Exception('Failed to parse AI response as JSON: '.json_last_error_msg());
         }
 
         return $data;
@@ -179,6 +181,7 @@ class AnthropicProvider implements AIProviderInterface
     private function estimateCost(array $response): float
     {
         $usage = $response['usage'] ?? [];
+
         return $this->calculateCost([
             'model' => $this->model,
             'input_tokens' => $usage['input_tokens'] ?? 0,
@@ -245,10 +248,11 @@ class AnthropicProvider implements AIProviderInterface
 - 信頼度スコアを0.0-1.0で設定";
     }
 
-    private function buildNotesSuggestionPrompt(string $fragranceName, string $language): string
+    private function buildNotesSuggestionPrompt(string $brandName, string $fragranceName, string $language): string
     {
         return "香水の香りノートを推定してください。
 
+ブランド名: {$brandName}
 香水名: {$fragranceName}
 言語: {$language}
 

@@ -2,15 +2,17 @@
 
 namespace App\UseCases\AI;
 
-use App\Services\AI\CompletionService;
 use App\Services\AI\AIProviderFactory;
+use App\Services\AI\CompletionService;
 use App\Services\AI\CostTrackingService;
 use Illuminate\Support\Facades\Log;
 
 class CompleteFragranceUseCase
 {
     private CompletionService $completionService;
+
     private AIProviderFactory $providerFactory;
+
     private CostTrackingService $costTracker;
 
     public function __construct(
@@ -26,8 +28,8 @@ class CompleteFragranceUseCase
     /**
      * 香水補完を実行
      *
-     * @param string $query 検索クエリ
-     * @param array $options オプション設定
+     * @param  string  $query  検索クエリ
+     * @param  array  $options  オプション設定
      * @return array 補完結果
      */
     public function execute(string $query, array $options = []): array
@@ -45,7 +47,7 @@ class CompleteFragranceUseCase
         }
 
         // プロバイダーの可用性チェック
-        if (isset($options['provider']) && !$this->providerFactory->isProviderAvailable($options['provider'])) {
+        if (isset($options['provider']) && ! $this->providerFactory->isProviderAvailable($options['provider'])) {
             throw new \InvalidArgumentException("Provider {$options['provider']} is not available");
         }
 
@@ -75,8 +77,8 @@ class CompleteFragranceUseCase
     /**
      * 一括補完を実行
      *
-     * @param array $queries クエリ配列
-     * @param array $options オプション設定
+     * @param  array  $queries  クエリ配列
+     * @param  array  $options  オプション設定
      * @return array 補完結果
      */
     public function executeBatch(array $queries, array $options = []): array
@@ -111,8 +113,6 @@ class CompleteFragranceUseCase
 
     /**
      * 利用可能なプロバイダー一覧を取得
-     *
-     * @return array
      */
     public function getAvailableProviders(): array
     {
@@ -128,9 +128,6 @@ class CompleteFragranceUseCase
 
     /**
      * プロバイダーのヘルスチェック
-     *
-     * @param string|null $provider
-     * @return array
      */
     public function healthCheck(?string $provider = null): array
     {
@@ -173,34 +170,28 @@ class CompleteFragranceUseCase
     /**
      * ユーザーの利用制限をチェック
      *
-     * @param int $userId
      * @throws \Exception
      */
     private function validateUserLimits(int $userId): void
     {
         // 日次制限チェック
-        if (!$this->costTracker->checkDailyLimit($userId)) {
+        if (! $this->costTracker->checkDailyLimit($userId)) {
             throw new \Exception('Daily AI usage limit exceeded');
         }
 
         // 月次制限チェック
-        if (!$this->costTracker->checkMonthlyLimit($userId)) {
+        if (! $this->costTracker->checkMonthlyLimit($userId)) {
             throw new \Exception('Monthly AI usage limit exceeded');
         }
 
         // レート制限チェック
-        if (!$this->costTracker->checkRateLimit($userId)) {
+        if (! $this->costTracker->checkRateLimit($userId)) {
             throw new \Exception('Rate limit exceeded. Please wait before making another request');
         }
     }
 
     /**
      * 結果の後処理
-     *
-     * @param array $result
-     * @param string $query
-     * @param array $options
-     * @return array
      */
     private function postProcessResult(array $result, string $query, array $options): array
     {
@@ -226,10 +217,6 @@ class CompleteFragranceUseCase
 
     /**
      * 補完ログを記録
-     *
-     * @param string $query
-     * @param array $options
-     * @param array $result
      */
     private function logCompletion(string $query, array $options, array $result): void
     {
@@ -247,9 +234,6 @@ class CompleteFragranceUseCase
 
     /**
      * 全体的な健康状態を判定
-     *
-     * @param array $results
-     * @return string
      */
     private function determineOverallHealth(array $results): string
     {

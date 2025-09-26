@@ -34,7 +34,7 @@ describe('AuthController', function () {
                     'email_verified_at',
                     'two_factor_enabled',
                     'profile',
-                    'roles',
+
                 ],
             ]);
 
@@ -190,7 +190,7 @@ describe('AuthController', function () {
                     'name',
                     'email',
                     'profile',
-                    'roles',
+
                 ],
                 'token',
                 'message',

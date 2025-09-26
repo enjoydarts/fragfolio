@@ -19,9 +19,6 @@ class CompletionController extends Controller
 
     /**
      * リアルタイム補完API
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function complete(Request $request): JsonResponse
     {
@@ -80,9 +77,6 @@ class CompletionController extends Controller
 
     /**
      * 一括補完API
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function batchComplete(Request $request): JsonResponse
     {
@@ -137,8 +131,6 @@ class CompletionController extends Controller
 
     /**
      * 利用可能なプロバイダー一覧取得
-     *
-     * @return JsonResponse
      */
     public function providers(): JsonResponse
     {
@@ -161,9 +153,6 @@ class CompletionController extends Controller
 
     /**
      * ヘルスチェック
-     *
-     * @param Request $request
-     * @return JsonResponse
      */
     public function health(Request $request): JsonResponse
     {

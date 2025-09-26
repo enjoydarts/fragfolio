@@ -1,9 +1,5 @@
 <?php
 
-use App\Services\AI\AIProviderFactory;
-use App\Services\AI\CompletionService;
-use App\Services\AI\CostTrackingService;
-use App\UseCases\AI\CompleteFragranceUseCase;
 use Illuminate\Support\Facades\Config;
 
 describe('AI補完API', function () {

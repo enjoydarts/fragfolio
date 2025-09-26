@@ -107,7 +107,7 @@ describe('UpdateUserProfileUseCase', function () {
         $updatedUser = $this->useCase->execute($this->user, $data);
 
         expect($updatedUser->relationLoaded('profile'))->toBeTrue();
-        expect($updatedUser->relationLoaded('roles'))->toBeTrue();
+
     });
 
     test('更新はトランザクション内で実行される', function () {

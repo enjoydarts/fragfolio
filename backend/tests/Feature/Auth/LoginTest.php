@@ -32,7 +32,7 @@ describe('ユーザーログイン', function () {
                     'name',
                     'email',
                     'profile',
-                    'roles',
+
                 ],
                 'token',
             ]);

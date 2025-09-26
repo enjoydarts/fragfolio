@@ -37,7 +37,7 @@ describe('ユーザー登録', function () {
                         'language',
                         'timezone',
                     ],
-                    'roles',
+
                 ],
                 'token',
             ]);
