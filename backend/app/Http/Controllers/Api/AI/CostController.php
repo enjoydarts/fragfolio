@@ -288,7 +288,7 @@ class CostController extends Controller
     /**
      * 使用状況レポート生成
      */
-    public function generateReport(Request $request): JsonResponse
+    public function generateReport(Request $request): JsonResponse|\Symfony\Component\HttpFoundation\Response
     {
         $validated = $request->validate([
             'report_type' => ['required', 'string', Rule::in(['monthly', 'quarterly', 'yearly'])],
