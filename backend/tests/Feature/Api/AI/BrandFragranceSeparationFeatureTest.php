@@ -3,13 +3,11 @@
 namespace Tests\Feature\Api\AI;
 
 use App\UseCases\AI\CompleteFragranceUseCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;
 
 class BrandFragranceSeparationFeatureTest extends TestCase
 {
-    use RefreshDatabase;
 
     protected function setUp(): void
     {

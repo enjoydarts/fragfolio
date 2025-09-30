@@ -4,13 +4,11 @@ namespace Tests\Unit\Database\Seeders;
 
 use App\Models\AIFeedback;
 use Database\Seeders\AIFeedbackSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class AIFeedbackSeederTest extends TestCase
 {
-    use RefreshDatabase;
 
     public function test_seeder_creates_ai_feedback_records(): void
     {

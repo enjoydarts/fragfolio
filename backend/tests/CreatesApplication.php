@@ -16,6 +16,14 @@ trait CreatesApplication
 
         $app->make(Kernel::class)->bootstrap();
 
+        // テスト環境用のデータベース設定を強制適用
+        if ($app->environment('testing')) {
+            config([
+                'database.connections.mysql.database' => 'fragfolio_test',
+                'database.default' => 'mysql'
+            ]);
+        }
+
         return $app;
     }
 }
