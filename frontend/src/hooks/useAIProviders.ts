@@ -14,8 +14,8 @@ export const useAIProviders = () => {
 
           if (data.success && data.data) {
             const availableProviders = data.data.providers
-              .filter((provider: any) => provider.available)
-              .map((provider: any) => provider.name);
+              .filter((provider: { available: boolean }) => provider.available)
+              .map((provider: { name: string }) => provider.name);
 
             setAvailableProviders(availableProviders);
 

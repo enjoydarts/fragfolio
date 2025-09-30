@@ -41,7 +41,7 @@ vi.mock('../../../src/hooks/useAIProviders', () => ({
 
 // 動的インポートのモック
 vi.mock('../../../src/components/ai/SmartFragranceInput', () => ({
-  default: ({ value, onChange, placeholder }: any) => (
+  default: ({ value, onChange, placeholder }: { value: string; onChange: (value: string) => void; placeholder: string }) => (
     <div data-testid="smart-fragrance-input">
       <input
         data-testid="fragrance-input"

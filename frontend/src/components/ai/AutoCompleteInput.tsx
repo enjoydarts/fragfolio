@@ -134,7 +134,25 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
 
       if (data.success && data.data.suggestions) {
         // ストアを直接更新するのではなく、APIから取得したデータを処理
-        const suggestions: CompletionSuggestion[] = data.data.suggestions.map((s: any) => ({
+        const suggestions: CompletionSuggestion[] = data.data.suggestions.map((s: {
+          text: string;
+          text_en?: string;
+          textEn?: string;
+          brand_name?: string;
+          brandName?: string;
+          brand_name_en?: string;
+          brandNameEn?: string;
+          confidence?: number;
+          adjusted_confidence?: number;
+          type?: string;
+          source?: string;
+          metadata?: {
+            english_name?: string;
+            brand_name?: string;
+            brand_name_en?: string;
+            provider?: string;
+          };
+        }) => ({
           text: s.text,
           textEn: s.text_en || s.textEn || (s.metadata?.english_name), // 英語名も含める
           brandName: s.brand_name || s.brandName || (s.metadata?.brand_name), // ブランド名
@@ -170,7 +188,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     } finally {
       useAIStore.getState().setCompletionLoading(false);
     }
-  }, [type, minChars, clearAllSuggestions]);
+  }, [type, minChars, clearAllSuggestions, contextBrand, detectLanguage, expectedLanguage]);
 
   // 入力値変更時の処理
   useEffect(() => {

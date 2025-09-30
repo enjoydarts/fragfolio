@@ -37,7 +37,7 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
   it('香水補完APIが分離されたブランド・香水名を返す', async () => {
     server.use(
       http.post('/api/ai/complete', async ({ request }) => {
-        const body = await request.json() as any;
+        const body = await request.json() as { query: string; type: string; limit?: number; language?: string; provider?: string };
 
         if (body.query === 'シャネル' && body.type === 'fragrance') {
           return HttpResponse.json({
@@ -82,7 +82,7 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
     expect(result.data.suggestions).toHaveLength(2);
 
     // 各候補がブランド・香水名分離構造を持つことを確認
-    result.data.suggestions.forEach((suggestion: any) => {
+    result.data.suggestions.forEach((suggestion: { text: string; brand_name: string; type: string }) => {
       expect(suggestion).toHaveProperty('text');
       expect(suggestion).toHaveProperty('text_en');
       expect(suggestion).toHaveProperty('brand_name');
@@ -103,7 +103,7 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
   it('ブランド補完APIが適切な構造を返す', async () => {
     server.use(
       http.post('/api/ai/complete', async ({ request }) => {
-        const body = await request.json() as any;
+        const body = await request.json() as { query: string; type: string; limit?: number; language?: string; provider?: string };
 
         if (body.query === 'シャン' && body.type === 'brand') {
           return HttpResponse.json({
@@ -147,7 +147,7 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
     expect(result.success).toBe(true);
     expect(result.data.suggestions).toHaveLength(2);
 
-    result.data.suggestions.forEach((suggestion: any) => {
+    result.data.suggestions.forEach((suggestion: { text: string; brand_name: string; type: string }) => {
       expect(suggestion.type).toBe('brand');
       // ブランドの場合、brand_nameはnullまたは自分自身と同じ
       expect(suggestion.brand_name === null || suggestion.brand_name === suggestion.text).toBe(true);
@@ -157,7 +157,7 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
   it('複数のNo.5バリエーションが正しく分離される', async () => {
     server.use(
       http.post('/api/ai/complete', async ({ request }) => {
-        const body = await request.json() as any;
+        const body = await request.json() as { query: string; type: string; limit?: number; language?: string; provider?: string };
 
         if (body.query === 'No.5' && body.type === 'fragrance') {
           return HttpResponse.json({
@@ -212,7 +212,7 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
     expect(result.data.suggestions).toHaveLength(3);
 
     // すべて同じブランドであることを確認
-    result.data.suggestions.forEach((suggestion: any) => {
+    result.data.suggestions.forEach((suggestion: { text: string; brand_name: string; type: string }) => {
       expect(suggestion.brand_name).toBe('シャネル');
       expect(suggestion.brand_name_en).toBe('Chanel');
       expect(suggestion.type).toBe('fragrance');
@@ -227,7 +227,7 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
     });
 
     // 各バリエーションが異なることを確認
-    const fragranceNames = result.data.suggestions.map((s: any) => s.text);
+    const fragranceNames = result.data.suggestions.map((s: { text: string }) => s.text);
     expect(new Set(fragranceNames).size).toBe(3); // 重複なし
   });
 
@@ -256,7 +256,7 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
   it('バリデーションエラーを適切に処理する', async () => {
     server.use(
       http.post('/api/ai/complete', async ({ request }) => {
-        const body = await request.json() as any;
+        const body = await request.json() as { query: string; type: string; limit?: number; language?: string; provider?: string };
 
         // 短すぎるクエリの場合
         if (body.query && body.query.length < 2) {
@@ -299,7 +299,7 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
   it('言語パラメータが正しく処理される', async () => {
     server.use(
       http.post('/api/ai/complete', async ({ request }) => {
-        const body = await request.json() as any;
+        const body = await request.json() as { query: string; type: string; limit?: number; language?: string; provider?: string };
 
         if (body.language === 'en') {
           return HttpResponse.json({

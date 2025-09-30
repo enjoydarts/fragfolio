@@ -1,9 +1,29 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAIStore, useNormalizationState } from '../../stores/aiStore';
 import { useAIProviders } from '../../hooks/useAIProviders';
 import type { CompletionSuggestion } from '../../stores/aiStore';
 import ConfidenceIndicator from './ConfidenceIndicator';
+
+interface ApiSuggestion {
+  text: string;
+  text_en?: string;
+  textEn?: string;
+  brand_name?: string;
+  brandName?: string;
+  brand_name_en?: string;
+  brandNameEn?: string;
+  confidence?: number;
+  type?: string;
+  source?: string;
+}
+
+interface CacheItem {
+  data: {
+    suggestions: ApiSuggestion[];
+  };
+  timestamp: number;
+}
 
 interface SmartFragranceInputProps {
   value: string;
@@ -46,7 +66,7 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoadingCompletions, setIsLoadingCompletions] = useState(false);
-  const [lastCompletionResponse, setLastCompletionResponse] = useState<any>(null);
+  const [lastCompletionResponse, setLastCompletionResponse] = useState<{ suggestions: ApiSuggestion[]; provider?: string; response_time_ms?: number; cost_estimate?: number } | null>(null);
   const debounceTimeout = useRef<NodeJS.Timeout>();
   const completionTimeout = useRef<NodeJS.Timeout>();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -54,7 +74,7 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
   const [userInteractingWithDropdown, setUserInteractingWithDropdown] = useState(false);
 
   // LRUキャッシュの実装
-  const cacheRef = useRef<Map<string, { data: any; timestamp: number }>>(new Map());
+  const cacheRef = useRef<Map<string, CacheItem>>(new Map());
   const cacheMaxSize = 50; // 最大キャッシュサイズ
   const cacheMaxAge = 5 * 60 * 1000; // 5分間有効
 
@@ -97,7 +117,7 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
   }, [showSuggestions]);
 
   // AI正規化を実行
-  const performNormalization = async (query: string) => {
+  const performNormalization = useCallback(async (query: string) => {
     if (query.length < minChars || query === lastNormalized || !currentProvider) {
       return;
     }
@@ -149,10 +169,10 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
       setIsNormalizing(false);
       setNormalizationLoading(false);
     }
-  };
+  }, [minChars, lastNormalized, currentProvider, setIsNormalizing, setNormalizationLoading, setLastNormalized, setNormalizationResult, setNormalizationError, onNormalizationResult, t]);
 
   // キャッシュヘルパー関数
-  const getCachedResult = (query: string) => {
+  const getCachedResult = useCallback((query: string) => {
     const cacheKey = `${currentProvider}-${query.toLowerCase()}`;
     const cached = cacheRef.current.get(cacheKey);
 
@@ -166,9 +186,9 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
     }
 
     return null;
-  };
+  }, [currentProvider, cacheMaxAge]);
 
-  const setCachedResult = (query: string, data: any) => {
+  const setCachedResult = useCallback((query: string, data: { suggestions: ApiSuggestion[] }) => {
     const cacheKey = `${currentProvider}-${query.toLowerCase()}`;
 
     // キャッシュサイズ制限
@@ -184,10 +204,10 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
       data,
       timestamp: Date.now()
     });
-  };
+  }, [currentProvider, cacheMaxSize]);
 
   // 補完機能（キャッシュ対応）
-  const fetchCompletions = async (query: string) => {
+  const fetchCompletions = useCallback(async (query: string) => {
     if (query.length < 2 || !currentProvider) {
       clearAllSuggestions();
       setIsLoadingCompletions(false);
@@ -198,7 +218,7 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
     const cachedResult = getCachedResult(query);
     if (cachedResult) {
       console.log('✅ キャッシュヒット:', query);
-      const suggestions: CompletionSuggestion[] = cachedResult.suggestions.map((s: any) => ({
+      const suggestions: CompletionSuggestion[] = cachedResult.suggestions.map((s: ApiSuggestion) => ({
         text: s.text,
         textEn: s.text_en || s.textEn,
         brandName: s.brand_name || s.brandName,
@@ -247,7 +267,7 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
         // APIレスポンスを保存してフィードバック記録で使用
         setLastCompletionResponse(data.data);
 
-        const suggestions: CompletionSuggestion[] = data.data.suggestions.map((s: any) => ({
+        const suggestions: CompletionSuggestion[] = data.data.suggestions.map((s: ApiSuggestion) => ({
           text: s.text,
           textEn: s.text_en || s.textEn,
           brandName: s.brand_name || s.brandName,
@@ -278,7 +298,7 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
     } finally {
       setIsLoadingCompletions(false);
     }
-  };
+  }, [currentProvider, clearAllSuggestions, getCachedResult, setCachedResult, setFragranceSuggestions, setLastCompletionResponse, isFocused]);
 
   // デバウンス付き正規化実行
   useEffect(() => {
@@ -317,7 +337,7 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
         clearTimeout(completionTimeout.current);
       }
     };
-  }, [value, debounceMs, minChars, currentProvider]);
+  }, [value, debounceMs, minChars, currentProvider, clearAllSuggestions, fetchCompletions, lastNormalized, performNormalization, showSuggestions, userInteractingWithDropdown]);
 
   // キーボードナビゲーション
   const handleKeyDown = (e: React.KeyboardEvent) => {
