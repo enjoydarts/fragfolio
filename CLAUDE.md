@@ -199,7 +199,15 @@ REACT_APP_TURNSTILE_SITE_KEY=your_turnstile_site_key
 - **UseCase分離**: ビジネスロジックは必ずUseCaseクラスに分離。Controllerに直接記述禁止
 - **use文**: 可読性のため全てのインポート文を明示。省略禁止
 - **設定外部化**: URL等の設定値はconfig/envから取得。ハードコーディング禁止
+- **AI Function Calling**: AIプロバイダー実装では基本的にFunction Calling/Tools APIを使用。構造化レスポンスで信頼性を向上
 - フロントで確認や通知、アラートなどは共通のダイアログ・トーストなどを使うこと
+
+### AI実装規約
+- **Function Calling必須**: OpenAI・Anthropic両方でFunction Calling/Tools API使用
+- **構造化レスポンス**: JSON解析エラーを回避するため、AIからの出力は構造化されたtool callsで受信
+- **エラーハンドリング**: Tool calls失敗時のフォールバック処理を実装
+- **コスト追跡**: 全AIリクエストでトークン使用量とコスト見積もりをログ出力
+- **プロバイダー統一**: OpenAIとAnthropicで同等の機能・レスポンス形式を提供
 
 ### 開発環境規約
 - **Docker使用**: 開発環境はDocker Compose使用。ローカルコマンド実行禁止

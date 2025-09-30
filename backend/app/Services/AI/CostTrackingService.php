@@ -506,4 +506,60 @@ class CostTrackingService
 
         return $insights;
     }
+
+    /**
+     * コスト記録（新しいメソッド）
+     */
+    public function recordCost(
+        string $provider,
+        string $model,
+        string $operation,
+        int $inputTokens,
+        int $outputTokens,
+        float $cost
+    ): void {
+        try {
+            // 現在認証されているユーザーを取得（認証されていない場合はnull）
+            $userId = auth()->id();
+
+            if (! $userId) {
+                Log::info('Cost tracking for unauthenticated request', [
+                    'provider' => $provider,
+                    'model' => $model,
+                    'operation' => $operation,
+                    'cost' => $cost,
+                ]);
+            }
+
+            DB::table('ai_cost_tracking')->insert([
+                'user_id' => $userId,
+                'provider' => $provider,
+                'model' => $model,
+                'operation_type' => $operation,
+                'input_tokens' => $inputTokens,
+                'output_tokens' => $outputTokens,
+                'tokens_used' => $inputTokens + $outputTokens,
+                'estimated_cost' => $cost,
+                'api_response_time_ms' => 0, // Will be updated if available
+                'created_at' => now(),
+            ]);
+
+            Log::info('AI cost recorded', [
+                'user_id' => $userId,
+                'provider' => $provider,
+                'model' => $model,
+                'operation' => $operation,
+                'input_tokens' => $inputTokens,
+                'output_tokens' => $outputTokens,
+                'cost' => $cost,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to record AI cost', [
+                'provider' => $provider,
+                'model' => $model,
+                'operation' => $operation,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
 }

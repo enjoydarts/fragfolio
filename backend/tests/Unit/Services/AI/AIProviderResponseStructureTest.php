@@ -152,16 +152,20 @@ class AIProviderResponseStructureTest extends TestCase
         $mockCompletionResponse = [
             'suggestions' => [
                 [
-                    'text' => 'CHANEL',
+                    'text' => 'シャネル',
+                    'text_en' => 'CHANEL',
                     'confidence' => 0.95,
                     'type' => 'brand',
-                    'metadata' => ['country' => 'France'],
+                    'brand_name' => null,
+                    'brand_name_en' => null,
                 ],
                 [
-                    'text' => 'Channel',
+                    'text' => 'チャンネル',
+                    'text_en' => 'Channel',
                     'confidence' => 0.75,
                     'type' => 'brand',
-                    'metadata' => ['note' => 'similar spelling'],
+                    'brand_name' => null,
+                    'brand_name_en' => null,
                 ],
             ],
             'response_time_ms' => 850.3,
@@ -185,6 +189,7 @@ class AIProviderResponseStructureTest extends TestCase
                 'type' => 'brand',
                 'limit' => 5,
                 'language' => 'ja',
+                'contextBrand' => null,
             ])
             ->once()
             ->andReturn($mockCompletionResponse);

@@ -20,7 +20,7 @@ class FragranceNormalizationController extends Controller
         $validator = Validator::make($request->all(), [
             'brand_name' => 'required|string|max:255',
             'fragrance_name' => 'required|string|max:255',
-            'ai_provider' => 'nullable|in:openai,anthropic',
+            'ai_provider' => 'nullable|in:openai,anthropic,gemini',
         ]);
 
         if ($validator->fails()) {

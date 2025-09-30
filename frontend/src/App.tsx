@@ -20,6 +20,7 @@ import { EmailVerificationError } from './pages/EmailVerificationError';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
 import { PasswordResetError } from './pages/PasswordResetError';
+import FragranceRegistration from './pages/FragranceRegistration';
 import { Test } from './Test';
 
 const AppContent: React.FC = () => {
@@ -40,6 +41,25 @@ const AppContent: React.FC = () => {
           element={
             <ProtectedRoute>
               <AccountSettings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fragrance/register"
+          element={
+            <ProtectedRoute>
+              <FragranceRegistration />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/collection"
+          element={
+            <ProtectedRoute>
+              <div className="p-8">
+                <h1 className="text-2xl font-bold">Collection (Coming Soon)</h1>
+                <p className="mt-4 text-gray-600">Your fragrance collection will be displayed here.</p>
+              </div>
             </ProtectedRoute>
           }
         />

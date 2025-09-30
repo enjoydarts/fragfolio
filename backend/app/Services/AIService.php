@@ -13,17 +13,23 @@ class AIService
 
     private ?string $anthropicApiKey;
 
+    private ?string $geminiApiKey;
+
     private string $gptModel;
 
     private string $claudeModel;
+
+    private string $geminiModel;
 
     public function __construct()
     {
         $this->defaultProvider = config('services.ai.default_provider', 'openai');
         $this->openaiApiKey = config('services.openai.api_key');
         $this->anthropicApiKey = config('services.anthropic.api_key');
+        $this->geminiApiKey = config('services.gemini.api_key');
         $this->gptModel = config('services.ai.gpt_model', 'gpt-4');
         $this->claudeModel = config('services.ai.claude_model', 'claude-3-sonnet-20240229');
+        $this->geminiModel = config('services.ai.gemini_model', 'gemini-2.5-flash');
     }
 
     public function normalizeFragranceData(string $brandName, string $fragranceName, ?string $provider = null): array
@@ -36,6 +42,7 @@ class AIService
             $response = match ($provider) {
                 'openai' => $this->callOpenAI($prompt),
                 'anthropic' => $this->callAnthropic($prompt),
+                'gemini' => $this->callGemini($prompt),
                 default => throw new \InvalidArgumentException("Unsupported AI provider: {$provider}")
             };
 
@@ -136,6 +143,33 @@ class AIService
         return $data['content'][0]['text'] ?? '';
     }
 
+    private function callGemini(string $prompt): string
+    {
+        if (! $this->geminiApiKey) {
+            throw new \Exception('Gemini API key is not configured');
+        }
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->geminiModel}:generateContent?key={$this->geminiApiKey}", [
+            'contents' => [
+                [
+                    'parts' => [
+                        ['text' => $prompt],
+                    ],
+                ],
+            ],
+        ]);
+
+        if (! $response->successful()) {
+            throw new \Exception('Gemini API request failed: '.$response->body());
+        }
+
+        $data = $response->json();
+
+        return $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+    }
+
     private function parseNormalizationResponse(string $response): array
     {
         // JSONを抽出（マークダウンコードブロックがある場合を考慮）
@@ -166,6 +200,10 @@ class AIService
 
         if ($this->anthropicApiKey) {
             $providers[] = 'anthropic';
+        }
+
+        if ($this->geminiApiKey) {
+            $providers[] = 'gemini';
         }
 
         return $providers;

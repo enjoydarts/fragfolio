@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\AI;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class NormalizeFragranceRequest extends FormRequest
+class SmartFragranceInputRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,9 @@ class NormalizeFragranceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'brand_name' => ['required', 'string', 'min:2', 'max:100'],
-            'fragrance_name' => ['required', 'string', 'min:2', 'max:200'],
+            'input' => ['required', 'string', 'min:2', 'max:300'],
             'provider' => ['sometimes', 'string', 'in:openai,anthropic,gemini'],
-            'language' => ['sometimes', 'string', 'in:ja,en'],
+            'language' => ['sometimes', 'string', 'in:ja,en,mixed'],
         ];
     }
 
@@ -37,12 +36,9 @@ class NormalizeFragranceRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'brand_name.required' => __('validation.required', ['attribute' => __('ai.brand_name')]),
-            'brand_name.min' => __('validation.min.string', ['attribute' => __('ai.brand_name'), 'min' => 2]),
-            'brand_name.max' => __('validation.max.string', ['attribute' => __('ai.brand_name'), 'max' => 100]),
-            'fragrance_name.required' => __('validation.required', ['attribute' => __('ai.fragrance_name')]),
-            'fragrance_name.min' => __('validation.min.string', ['attribute' => __('ai.fragrance_name'), 'min' => 2]),
-            'fragrance_name.max' => __('validation.max.string', ['attribute' => __('ai.fragrance_name'), 'max' => 200]),
+            'input.required' => __('validation.required', ['attribute' => __('ai.input')]),
+            'input.min' => __('validation.min.string', ['attribute' => __('ai.input'), 'min' => 2]),
+            'input.max' => __('validation.max.string', ['attribute' => __('ai.input'), 'max' => 300]),
             'provider.in' => __('validation.in', ['attribute' => __('ai.provider')]),
             'language.in' => __('validation.in', ['attribute' => __('ai.language')]),
         ];
