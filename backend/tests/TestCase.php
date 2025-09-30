@@ -14,13 +14,13 @@ abstract class TestCase extends BaseTestCase
 
         // テスト環境であることを確認
         if (app()->environment() !== 'testing') {
-            throw new \RuntimeException('テストはtesting環境でのみ実行してください。現在の環境: ' . app()->environment());
+            throw new \RuntimeException('テストはtesting環境でのみ実行してください。現在の環境: '.app()->environment());
         }
 
         // テスト用データベースに接続されていることを確認
         $currentDatabase = \DB::connection()->getDatabaseName();
         if ($currentDatabase !== 'fragfolio_test') {
-            throw new \RuntimeException('テスト実行時にテスト用データベースに接続されていません: ' . $currentDatabase);
+            throw new \RuntimeException('テスト実行時にテスト用データベースに接続されていません: '.$currentDatabase);
         }
 
         // Clean up test database before each test
@@ -32,7 +32,7 @@ abstract class TestCase extends BaseTestCase
         // テスト後もテスト用データベースに接続されていることを確認
         $currentDatabase = \DB::connection()->getDatabaseName();
         if ($currentDatabase !== 'fragfolio_test') {
-            throw new \RuntimeException('テスト終了時にテスト用データベースに接続されていません: ' . $currentDatabase);
+            throw new \RuntimeException('テスト終了時にテスト用データベースに接続されていません: '.$currentDatabase);
         }
 
         // Clean up test database after each test

@@ -20,7 +20,7 @@ trait CreatesApplication
         if ($app->environment('testing')) {
             config([
                 'database.connections.mysql.database' => 'fragfolio_test',
-                'database.default' => 'mysql'
+                'database.default' => 'mysql',
             ]);
         }
 

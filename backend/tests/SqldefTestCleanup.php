@@ -19,7 +19,7 @@ trait SqldefTestCleanup
 
         $currentDatabase = DB::connection()->getDatabaseName();
         if ($currentDatabase !== 'fragfolio_test') {
-            throw new \RuntimeException('Not connected to test database: ' . $currentDatabase);
+            throw new \RuntimeException('Not connected to test database: '.$currentDatabase);
         }
 
         // Get all table names
@@ -34,7 +34,7 @@ trait SqldefTestCleanup
             foreach ($tables as $table) {
                 $tableName = $table->$tableColumn;
                 // Skip system tables and migration tables (if any exist)
-                if (!in_array($tableName, ['migrations', 'failed_jobs'])) {
+                if (! in_array($tableName, ['migrations', 'failed_jobs'])) {
                     DB::table($tableName)->truncate();
                 }
             }

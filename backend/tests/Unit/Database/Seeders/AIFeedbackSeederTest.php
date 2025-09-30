@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class AIFeedbackSeederTest extends TestCase
 {
-
     public function test_seeder_creates_ai_feedback_records(): void
     {
         // Seederを実行

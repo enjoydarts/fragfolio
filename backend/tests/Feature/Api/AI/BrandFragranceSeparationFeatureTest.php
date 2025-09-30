@@ -8,7 +8,6 @@ use Tests\TestCase;
 
 class BrandFragranceSeparationFeatureTest extends TestCase
 {
-
     protected function setUp(): void
     {
         parent::setUp();
