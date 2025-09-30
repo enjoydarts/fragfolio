@@ -62,88 +62,83 @@ interface AIState {
 }
 
 export const useAIStore = create<AIState>((set) => ({
-      // 初期状態
+  // 初期状態
+  completionLoading: false,
+  brandSuggestions: [],
+  fragranceSuggestions: [],
+
+  normalizationLoading: false,
+  normalizationResult: null,
+  normalizationError: null,
+
+  availableProviders: [],
+  currentProvider: '',
+
+  showSuggestions: false,
+  activeSuggestionType: null,
+
+  // 基本アクション
+  setBrandSuggestions: (suggestions) => set({ brandSuggestions: suggestions }),
+
+  setFragranceSuggestions: (suggestions) =>
+    set({ fragranceSuggestions: suggestions }),
+
+  setCompletionLoading: (loading) => set({ completionLoading: loading }),
+
+  setNormalizationResult: (result) => set({ normalizationResult: result }),
+
+  setNormalizationLoading: (loading) => set({ normalizationLoading: loading }),
+
+  setNormalizationError: (error) => set({ normalizationError: error }),
+
+  setAvailableProviders: (providers) => set({ availableProviders: providers }),
+
+  setCurrentProvider: (provider) => set({ currentProvider: provider }),
+
+  setShowSuggestions: (show) => set({ showSuggestions: show }),
+
+  setActiveSuggestionType: (type) => set({ activeSuggestionType: type }),
+
+  // 複合アクション
+  clearAllSuggestions: () =>
+    set({
+      brandSuggestions: [],
+      fragranceSuggestions: [],
+      showSuggestions: false,
+      activeSuggestionType: null,
+    }),
+
+  resetNormalization: () =>
+    set({
+      normalizationResult: null,
+      normalizationError: null,
+      normalizationLoading: false,
+    }),
+
+  resetAll: () =>
+    set({
       completionLoading: false,
       brandSuggestions: [],
       fragranceSuggestions: [],
-
       normalizationLoading: false,
       normalizationResult: null,
       normalizationError: null,
-
-      availableProviders: [],
-      currentProvider: '',
-
       showSuggestions: false,
       activeSuggestionType: null,
-
-      // 基本アクション
-      setBrandSuggestions: (suggestions) =>
-        set({ brandSuggestions: suggestions }),
-
-      setFragranceSuggestions: (suggestions) =>
-        set({ fragranceSuggestions: suggestions }),
-
-      setCompletionLoading: (loading) =>
-        set({ completionLoading: loading }),
-
-      setNormalizationResult: (result) =>
-        set({ normalizationResult: result }),
-
-      setNormalizationLoading: (loading) =>
-        set({ normalizationLoading: loading }),
-
-      setNormalizationError: (error) =>
-        set({ normalizationError: error }),
-
-      setAvailableProviders: (providers) =>
-        set({ availableProviders: providers }),
-
-      setCurrentProvider: (provider) =>
-        set({ currentProvider: provider }),
-
-      setShowSuggestions: (show) =>
-        set({ showSuggestions: show }),
-
-      setActiveSuggestionType: (type) =>
-        set({ activeSuggestionType: type }),
-
-      // 複合アクション
-      clearAllSuggestions: () =>
-        set({
-          brandSuggestions: [],
-          fragranceSuggestions: [],
-          showSuggestions: false,
-          activeSuggestionType: null,
-        }),
-
-      resetNormalization: () =>
-        set({
-          normalizationResult: null,
-          normalizationError: null,
-          normalizationLoading: false,
-        }),
-
-      resetAll: () =>
-        set({
-          completionLoading: false,
-          brandSuggestions: [],
-          fragranceSuggestions: [],
-          normalizationLoading: false,
-          normalizationResult: null,
-          normalizationError: null,
-          showSuggestions: false,
-          activeSuggestionType: null,
-        })
-    }));
+    }),
+}));
 
 // セレクターヘルパー（パフォーマンス最適化）
 export const useCompletionState = () => {
   const loading = useAIStore((state) => state.completionLoading);
   const brandSuggestions = useAIStore((state) => state.brandSuggestions);
-  const fragranceSuggestions = useAIStore((state) => state.fragranceSuggestions);
+  const fragranceSuggestions = useAIStore(
+    (state) => state.fragranceSuggestions
+  );
   const showSuggestions = useAIStore((state) => state.showSuggestions);
-  const activeSuggestionType = useAIStore((state) => state.activeSuggestionType);
+  const activeSuggestionType = useAIStore(
+    (state) => state.activeSuggestionType
+  );
 
   return {
     loading,

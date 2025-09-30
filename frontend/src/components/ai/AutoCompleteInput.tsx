@@ -61,7 +61,8 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   } = useAIStore();
 
   // 現在のタイプに応じた提案を取得
-  const suggestions = type === 'brand' ? brandSuggestions : fragranceSuggestions;
+  const suggestions =
+    type === 'brand' ? brandSuggestions : fragranceSuggestions;
   const isActive = activeSuggestionType === type;
 
   // デバウンス処理
@@ -85,110 +86,127 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     return 'ja';
   }, []);
 
-  const fetchCompletions = useCallback(async (query: string) => {
-    if (query.length < minChars) {
-      clearAllSuggestions();
-      return;
-    }
-
-    // 入力言語を検出
-    const detectedLanguage = detectLanguage(query);
-
-    // 期待言語と異なる場合の警告（mixedでない場合）
-    const languageWarning = expectedLanguage !== 'mixed' && expectedLanguage !== detectedLanguage;
-
-    // キャッシュから結果を取得（言語も含む）
-    const cacheKey = `${type}-${query.toLowerCase()}-${detectedLanguage}`;
-    const cachedResult = cache.current.get(cacheKey);
-    if (cachedResult) {
-      if (type === 'brand') {
-        useAIStore.getState().setBrandSuggestions(cachedResult);
-      } else {
-        useAIStore.getState().setFragranceSuggestions(cachedResult);
-      }
-      useAIStore.getState().setActiveSuggestionType(type);
-      useAIStore.getState().setShowSuggestions(true);
-      return;
-    }
-
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/complete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query,
-          type,
-          limit: 8,
-          language: detectedLanguage, // 検出された言語を送信
-          contextBrand, // ブランド名でフィルタ
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('AI completion request failed');
+  const fetchCompletions = useCallback(
+    async (query: string) => {
+      if (query.length < minChars) {
+        clearAllSuggestions();
+        return;
       }
 
-      const data = await response.json();
+      // 入力言語を検出
+      const detectedLanguage = detectLanguage(query);
 
-      if (data.success && data.data.suggestions) {
-        // ストアを直接更新するのではなく、APIから取得したデータを処理
-        const suggestions: CompletionSuggestion[] = data.data.suggestions.map((s: {
-          text: string;
-          text_en?: string;
-          textEn?: string;
-          brand_name?: string;
-          brandName?: string;
-          brand_name_en?: string;
-          brandNameEn?: string;
-          confidence?: number;
-          adjusted_confidence?: number;
-          type?: string;
-          source?: string;
-          metadata?: {
-            english_name?: string;
-            brand_name?: string;
-            brand_name_en?: string;
-            provider?: string;
-          };
-        }) => ({
-          text: s.text,
-          textEn: s.text_en || s.textEn || (s.metadata?.english_name), // 英語名も含める
-          brandName: s.brand_name || s.brandName || (s.metadata?.brand_name), // ブランド名
-          brandNameEn: s.brand_name_en || s.brandNameEn || (s.metadata?.brand_name_en), // ブランド名（英語）
-          confidence: s.confidence || s.adjusted_confidence || 0.5,
-          type: s.type || type,
-          source: s.source || s.metadata?.provider,
-        }));
+      // 期待言語と異なる場合の警告（mixedでない場合）
+      const languageWarning =
+        expectedLanguage !== 'mixed' && expectedLanguage !== detectedLanguage;
 
-        // 言語警告を追加
-        if (languageWarning) {
-          suggestions.forEach(s => {
-            s.languageWarning = true;
-          });
-        }
-
-        // キャッシュに保存
-        cache.current.set(cacheKey, suggestions);
-
-        // AIストアの該当メソッドを呼び出し
+      // キャッシュから結果を取得（言語も含む）
+      const cacheKey = `${type}-${query.toLowerCase()}-${detectedLanguage}`;
+      const cachedResult = cache.current.get(cacheKey);
+      if (cachedResult) {
         if (type === 'brand') {
-          useAIStore.getState().setBrandSuggestions(suggestions);
+          useAIStore.getState().setBrandSuggestions(cachedResult);
         } else {
-          useAIStore.getState().setFragranceSuggestions(suggestions);
+          useAIStore.getState().setFragranceSuggestions(cachedResult);
         }
-
         useAIStore.getState().setActiveSuggestionType(type);
         useAIStore.getState().setShowSuggestions(true);
+        return;
       }
-    } catch (err) {
-      console.error('AI completion error:', err);
-      clearAllSuggestions();
-    } finally {
-      useAIStore.getState().setCompletionLoading(false);
-    }
-  }, [type, minChars, clearAllSuggestions, contextBrand, detectLanguage, expectedLanguage]);
+
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/ai/complete`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              query,
+              type,
+              limit: 8,
+              language: detectedLanguage, // 検出された言語を送信
+              contextBrand, // ブランド名でフィルタ
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('AI completion request failed');
+        }
+
+        const data = await response.json();
+
+        if (data.success && data.data.suggestions) {
+          // ストアを直接更新するのではなく、APIから取得したデータを処理
+          const suggestions: CompletionSuggestion[] = data.data.suggestions.map(
+            (s: {
+              text: string;
+              text_en?: string;
+              textEn?: string;
+              brand_name?: string;
+              brandName?: string;
+              brand_name_en?: string;
+              brandNameEn?: string;
+              confidence?: number;
+              adjusted_confidence?: number;
+              type?: string;
+              source?: string;
+              metadata?: {
+                english_name?: string;
+                brand_name?: string;
+                brand_name_en?: string;
+                provider?: string;
+              };
+            }) => ({
+              text: s.text,
+              textEn: s.text_en || s.textEn || s.metadata?.english_name, // 英語名も含める
+              brandName: s.brand_name || s.brandName || s.metadata?.brand_name, // ブランド名
+              brandNameEn:
+                s.brand_name_en || s.brandNameEn || s.metadata?.brand_name_en, // ブランド名（英語）
+              confidence: s.confidence || s.adjusted_confidence || 0.5,
+              type: s.type || type,
+              source: s.source || s.metadata?.provider,
+            })
+          );
+
+          // 言語警告を追加
+          if (languageWarning) {
+            suggestions.forEach((s) => {
+              s.languageWarning = true;
+            });
+          }
+
+          // キャッシュに保存
+          cache.current.set(cacheKey, suggestions);
+
+          // AIストアの該当メソッドを呼び出し
+          if (type === 'brand') {
+            useAIStore.getState().setBrandSuggestions(suggestions);
+          } else {
+            useAIStore.getState().setFragranceSuggestions(suggestions);
+          }
+
+          useAIStore.getState().setActiveSuggestionType(type);
+          useAIStore.getState().setShowSuggestions(true);
+        }
+      } catch (err) {
+        console.error('AI completion error:', err);
+        clearAllSuggestions();
+      } finally {
+        useAIStore.getState().setCompletionLoading(false);
+      }
+    },
+    [
+      type,
+      minChars,
+      clearAllSuggestions,
+      contextBrand,
+      detectLanguage,
+      expectedLanguage,
+    ]
+  );
 
   // 入力値変更時の処理
   useEffect(() => {
@@ -219,11 +237,13 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex(prev => (prev + 1) % suggestions.length);
+        setSelectedIndex((prev) => (prev + 1) % suggestions.length);
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setSelectedIndex(prev => (prev - 1 + suggestions.length) % suggestions.length);
+        setSelectedIndex(
+          (prev) => (prev - 1 + suggestions.length) % suggestions.length
+        );
         break;
       case 'Enter':
         e.preventDefault();
@@ -268,7 +288,11 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     }
 
     // 香水選択時にブランド名も自動入力
-    if (suggestion.type === 'fragrance' && suggestion.brandName && onSelectBrand) {
+    if (
+      suggestion.type === 'fragrance' &&
+      suggestion.brandName &&
+      onSelectBrand
+    ) {
       onSelectBrand(suggestion.brandName, suggestion.brandNameEn);
     }
 
@@ -355,16 +379,19 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
                       {/* 言語警告表示 */}
                       {suggestion.languageWarning && (
                         <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                          {expectedLanguage === 'ja' ? t('ai.input.language_warning.en_expected') : t('ai.input.language_warning.ja_expected')}
+                          {expectedLanguage === 'ja'
+                            ? t('ai.input.language_warning.en_expected')
+                            : t('ai.input.language_warning.ja_expected')}
                         </span>
                       )}
                     </div>
                     {/* 香水の場合はブランド名も表示 */}
-                    {suggestion.type === 'fragrance' && suggestion.brandName && (
-                      <span className="ml-2 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                        {suggestion.brandName}
-                      </span>
-                    )}
+                    {suggestion.type === 'fragrance' &&
+                      suggestion.brandName && (
+                        <span className="ml-2 text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                          {suggestion.brandName}
+                        </span>
+                      )}
                   </div>
                   <div className="ml-2 flex-shrink-0">
                     <ConfidenceIndicator
@@ -388,11 +415,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
       </div>
 
       {/* エラーメッセージ */}
-      {error && (
-        <p className="mt-1 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
 
       {/* ヘルプテキスト */}
       {!error && (

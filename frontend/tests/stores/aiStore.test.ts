@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useAIStore, type CompletionSuggestion } from '../../src/stores/aiStore';
+import {
+  useAIStore,
+  type CompletionSuggestion,
+} from '../../src/stores/aiStore';
 
 describe('AI Store - Brand/Fragrance Separation', () => {
   beforeEach(() => {
@@ -64,8 +67,12 @@ describe('AI Store - Brand/Fragrance Separation', () => {
     });
 
     // 香水名にブランド名が含まれていないことを確認
-    expect(result.current.fragranceSuggestions[0].text).not.toContain('シャネル');
-    expect(result.current.fragranceSuggestions[0].textEn).not.toContain('Chanel');
+    expect(result.current.fragranceSuggestions[0].text).not.toContain(
+      'シャネル'
+    );
+    expect(result.current.fragranceSuggestions[0].textEn).not.toContain(
+      'Chanel'
+    );
   });
 
   it('ブランド補完の構造を正しく保存する', () => {
@@ -150,7 +157,9 @@ describe('AI Store - Brand/Fragrance Separation', () => {
     });
 
     // 香水名はそれぞれ異なることを確認
-    const fragranceNames = result.current.fragranceSuggestions.map(s => s.text);
+    const fragranceNames = result.current.fragranceSuggestions.map(
+      (s) => s.text
+    );
     expect(fragranceNames).toEqual([
       'No.5 オードゥパルファム',
       'No.5 オードゥトワレ',

@@ -50,11 +50,15 @@ const ConfidenceIndicator: React.FC<ConfidenceIndicatorProps> = ({
     <div className={`flex flex-col space-y-1 ${className}`}>
       {showLabel && (
         <div className="flex items-center justify-between">
-          <span className={`font-medium text-gray-700 ${sizeClasses[size].split(' ')[1]}`}>
+          <span
+            className={`font-medium text-gray-700 ${sizeClasses[size].split(' ')[1]}`}
+          >
             {t('ai.confidence.label')}
           </span>
           {showPercentage && (
-            <span className={`font-mono text-gray-600 ${sizeClasses[size].split(' ')[1]}`}>
+            <span
+              className={`font-mono text-gray-600 ${sizeClasses[size].split(' ')[1]}`}
+            >
               {normalizedConfidence.toFixed(0)}%
             </span>
           )}
@@ -63,7 +67,9 @@ const ConfidenceIndicator: React.FC<ConfidenceIndicatorProps> = ({
 
       <div className="relative">
         {/* 背景バー */}
-        <div className={`w-full bg-gray-200 rounded-full ${sizeClasses[size].split(' ')[0]}`}>
+        <div
+          className={`w-full bg-gray-200 rounded-full ${sizeClasses[size].split(' ')[0]}`}
+        >
           {/* プログレスバー */}
           <div
             className={`${confidenceColor} ${sizeClasses[size].split(' ')[0]} rounded-full transition-all duration-300 ease-in-out`}
@@ -80,9 +86,7 @@ const ConfidenceIndicator: React.FC<ConfidenceIndicatorProps> = ({
 
       {/* 詳細ラベル（オプション） */}
       {showLabel && size !== 'sm' && (
-        <span className="text-xs text-gray-500">
-          {confidenceLabel}
-        </span>
+        <span className="text-xs text-gray-500">{confidenceLabel}</span>
       )}
     </div>
   );

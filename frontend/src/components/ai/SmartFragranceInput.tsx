@@ -66,12 +66,18 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoadingCompletions, setIsLoadingCompletions] = useState(false);
-  const [lastCompletionResponse, setLastCompletionResponse] = useState<{ suggestions: ApiSuggestion[]; provider?: string; response_time_ms?: number; cost_estimate?: number } | null>(null);
+  const [lastCompletionResponse, setLastCompletionResponse] = useState<{
+    suggestions: ApiSuggestion[];
+    provider?: string;
+    response_time_ms?: number;
+    cost_estimate?: number;
+  } | null>(null);
   const debounceTimeout = useRef<NodeJS.Timeout>();
   const completionTimeout = useRef<NodeJS.Timeout>();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [userInteractingWithDropdown, setUserInteractingWithDropdown] = useState(false);
+  const [userInteractingWithDropdown, setUserInteractingWithDropdown] =
+    useState(false);
 
   // LRUキャッシュの実装
   const cacheRef = useRef<Map<string, CacheItem>>(new Map());
@@ -117,188 +123,257 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
   }, [showSuggestions]);
 
   // AI正規化を実行
-  const performNormalization = useCallback(async (query: string) => {
-    if (query.length < minChars || query === lastNormalized || !currentProvider) {
-      return;
-    }
-
-    setIsNormalizing(true);
-    setNormalizationLoading(true);
-    setLastNormalized(query);
-
-    try {
-      console.log('🔄 Starting normalization request:', { query, currentProvider });
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/normalize-from-input`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          input: query,
-          provider: currentProvider,
-          language: 'mixed', // 日英混在対応
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('❌ AI normalization API error:', response.status, errorData);
-        throw new Error(`AI normalization request failed: ${response.status}`);
+  const performNormalization = useCallback(
+    async (query: string) => {
+      if (
+        query.length < minChars ||
+        query === lastNormalized ||
+        !currentProvider
+      ) {
+        return;
       }
 
-      const data = await response.json();
-      console.log('✅ Normalization response:', data);
+      setIsNormalizing(true);
+      setNormalizationLoading(true);
+      setLastNormalized(query);
 
-      if (data.success && data.data && data.data.normalized_data) {
-        setNormalizationResult(data.data.normalized_data);
+      try {
+        console.log('🔄 Starting normalization request:', {
+          query,
+          currentProvider,
+        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/ai/normalize-from-input`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              input: query,
+              provider: currentProvider,
+              language: 'mixed', // 日英混在対応
+            }),
+          }
+        );
 
-        // 正規化結果を親コンポーネントに通知
-        if (onNormalizationResult) {
-          onNormalizationResult({
-            brandName: data.data.normalized_data.normalized_brand_ja || data.data.normalized_data.normalized_brand,
-            brandNameEn: data.data.normalized_data.normalized_brand_en || data.data.normalized_data.normalized_brand,
-            fragranceName: data.data.normalized_data.normalized_fragrance_ja || data.data.normalized_data.normalized_fragrance_name,
-            fragranceNameEn: data.data.normalized_data.normalized_fragrance_en || data.data.normalized_data.normalized_fragrance_ja,
-          });
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error(
+            '❌ AI normalization API error:',
+            response.status,
+            errorData
+          );
+          throw new Error(
+            `AI normalization request failed: ${response.status}`
+          );
         }
+
+        const data = await response.json();
+        console.log('✅ Normalization response:', data);
+
+        if (data.success && data.data && data.data.normalized_data) {
+          setNormalizationResult(data.data.normalized_data);
+
+          // 正規化結果を親コンポーネントに通知
+          if (onNormalizationResult) {
+            onNormalizationResult({
+              brandName:
+                data.data.normalized_data.normalized_brand_ja ||
+                data.data.normalized_data.normalized_brand,
+              brandNameEn:
+                data.data.normalized_data.normalized_brand_en ||
+                data.data.normalized_data.normalized_brand,
+              fragranceName:
+                data.data.normalized_data.normalized_fragrance_ja ||
+                data.data.normalized_data.normalized_fragrance_name,
+              fragranceNameEn:
+                data.data.normalized_data.normalized_fragrance_en ||
+                data.data.normalized_data.normalized_fragrance_ja,
+            });
+          }
+        }
+      } catch (err) {
+        console.error('AI normalization error:', err);
+        setNormalizationError(t('ai.normalization.failed'));
+      } finally {
+        setIsNormalizing(false);
+        setNormalizationLoading(false);
       }
-    } catch (err) {
-      console.error('AI normalization error:', err);
-      setNormalizationError(t('ai.normalization.failed'));
-    } finally {
-      setIsNormalizing(false);
-      setNormalizationLoading(false);
-    }
-  }, [minChars, lastNormalized, currentProvider, setIsNormalizing, setNormalizationLoading, setLastNormalized, setNormalizationResult, setNormalizationError, onNormalizationResult, t]);
+    },
+    [
+      minChars,
+      lastNormalized,
+      currentProvider,
+      setIsNormalizing,
+      setNormalizationLoading,
+      setLastNormalized,
+      setNormalizationResult,
+      setNormalizationError,
+      onNormalizationResult,
+      t,
+    ]
+  );
 
   // キャッシュヘルパー関数
-  const getCachedResult = useCallback((query: string) => {
-    const cacheKey = `${currentProvider}-${query.toLowerCase()}`;
-    const cached = cacheRef.current.get(cacheKey);
+  const getCachedResult = useCallback(
+    (query: string) => {
+      const cacheKey = `${currentProvider}-${query.toLowerCase()}`;
+      const cached = cacheRef.current.get(cacheKey);
 
-    if (cached && Date.now() - cached.timestamp < cacheMaxAge) {
-      return cached.data;
-    }
-
-    // 期限切れのキャッシュを削除
-    if (cached) {
-      cacheRef.current.delete(cacheKey);
-    }
-
-    return null;
-  }, [currentProvider, cacheMaxAge]);
-
-  const setCachedResult = useCallback((query: string, data: { suggestions: ApiSuggestion[] }) => {
-    const cacheKey = `${currentProvider}-${query.toLowerCase()}`;
-
-    // キャッシュサイズ制限
-    if (cacheRef.current.size >= cacheMaxSize) {
-      // 最も古いエントリを削除
-      const firstKey = cacheRef.current.keys().next().value;
-      if (firstKey) {
-        cacheRef.current.delete(firstKey);
+      if (cached && Date.now() - cached.timestamp < cacheMaxAge) {
+        return cached.data;
       }
-    }
 
-    cacheRef.current.set(cacheKey, {
-      data,
-      timestamp: Date.now()
-    });
-  }, [currentProvider, cacheMaxSize]);
+      // 期限切れのキャッシュを削除
+      if (cached) {
+        cacheRef.current.delete(cacheKey);
+      }
+
+      return null;
+    },
+    [currentProvider, cacheMaxAge]
+  );
+
+  const setCachedResult = useCallback(
+    (query: string, data: { suggestions: ApiSuggestion[] }) => {
+      const cacheKey = `${currentProvider}-${query.toLowerCase()}`;
+
+      // キャッシュサイズ制限
+      if (cacheRef.current.size >= cacheMaxSize) {
+        // 最も古いエントリを削除
+        const firstKey = cacheRef.current.keys().next().value;
+        if (firstKey) {
+          cacheRef.current.delete(firstKey);
+        }
+      }
+
+      cacheRef.current.set(cacheKey, {
+        data,
+        timestamp: Date.now(),
+      });
+    },
+    [currentProvider, cacheMaxSize]
+  );
 
   // 補完機能（キャッシュ対応）
-  const fetchCompletions = useCallback(async (query: string) => {
-    if (query.length < 2 || !currentProvider) {
-      clearAllSuggestions();
-      setIsLoadingCompletions(false);
-      return;
-    }
-
-    // キャッシュチェック
-    const cachedResult = getCachedResult(query);
-    if (cachedResult) {
-      console.log('✅ キャッシュヒット:', query);
-      const suggestions: CompletionSuggestion[] = cachedResult.suggestions.map((s: ApiSuggestion) => ({
-        text: s.text,
-        textEn: s.text_en || s.textEn,
-        brandName: s.brand_name || s.brandName,
-        brandNameEn: s.brand_name_en || s.brandNameEn,
-        confidence: s.confidence || 0.5,
-        type: s.type || 'fragrance',
-        source: s.source,
-      }));
-
-      setFragranceSuggestions(suggestions);
-      if (isFocused) {
-        setShowSuggestions(true);
-        setUserInteractingWithDropdown(true);
-      }
-      return;
-    }
-
-    setIsLoadingCompletions(true);
-    console.log('🔍 AI補完開始:', query, 'provider:', currentProvider);
-
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/complete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query,
-          type: 'fragrance',
-          limit: 12,
-          provider: currentProvider,
-          language: 'ja',
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('❌ AI補完API エラー:', response.status, errorData);
-        throw new Error(`AI completion request failed: ${response.status}`);
+  const fetchCompletions = useCallback(
+    async (query: string) => {
+      if (query.length < 2 || !currentProvider) {
+        clearAllSuggestions();
+        setIsLoadingCompletions(false);
+        return;
       }
 
-      const data = await response.json();
-      console.log('✅ AI補完完了:', data.data?.suggestions?.length || 0, '件');
-
-      if (data.success && data.data.suggestions && data.data.suggestions.length > 0) {
-        // APIレスポンスを保存してフィードバック記録で使用
-        setLastCompletionResponse(data.data);
-
-        const suggestions: CompletionSuggestion[] = data.data.suggestions.map((s: ApiSuggestion) => ({
-          text: s.text,
-          textEn: s.text_en || s.textEn,
-          brandName: s.brand_name || s.brandName,
-          brandNameEn: s.brand_name_en || s.brandNameEn,
-          confidence: s.confidence || 0.5,
-          type: s.type || 'fragrance',
-          source: s.source,
-        }));
-
-        // キャッシュに保存
-        setCachedResult(query, data.data);
-        console.log('💾 キャッシュ保存:', query);
+      // キャッシュチェック
+      const cachedResult = getCachedResult(query);
+      if (cachedResult) {
+        console.log('✅ キャッシュヒット:', query);
+        const suggestions: CompletionSuggestion[] =
+          cachedResult.suggestions.map((s: ApiSuggestion) => ({
+            text: s.text,
+            textEn: s.text_en || s.textEn,
+            brandName: s.brand_name || s.brandName,
+            brandNameEn: s.brand_name_en || s.brandNameEn,
+            confidence: s.confidence || 0.5,
+            type: s.type || 'fragrance',
+            source: s.source,
+          }));
 
         setFragranceSuggestions(suggestions);
-        // フォーカスしている場合は必ずドロップダウンを表示
         if (isFocused) {
           setShowSuggestions(true);
           setUserInteractingWithDropdown(true);
         }
-      } else {
-        console.log('⚠️ 提案なし');
-        setLastCompletionResponse(null);
-        clearAllSuggestions();
+        return;
       }
-    } catch (err) {
-      console.error('❌ AI補完エラー:', err);
-      clearAllSuggestions();
-    } finally {
-      setIsLoadingCompletions(false);
-    }
-  }, [currentProvider, clearAllSuggestions, getCachedResult, setCachedResult, setFragranceSuggestions, setLastCompletionResponse, isFocused]);
+
+      setIsLoadingCompletions(true);
+      console.log('🔍 AI補完開始:', query, 'provider:', currentProvider);
+
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/ai/complete`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              query,
+              type: 'fragrance',
+              limit: 12,
+              provider: currentProvider,
+              language: 'ja',
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error('❌ AI補完API エラー:', response.status, errorData);
+          throw new Error(`AI completion request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log(
+          '✅ AI補完完了:',
+          data.data?.suggestions?.length || 0,
+          '件'
+        );
+
+        if (
+          data.success &&
+          data.data.suggestions &&
+          data.data.suggestions.length > 0
+        ) {
+          // APIレスポンスを保存してフィードバック記録で使用
+          setLastCompletionResponse(data.data);
+
+          const suggestions: CompletionSuggestion[] = data.data.suggestions.map(
+            (s: ApiSuggestion) => ({
+              text: s.text,
+              textEn: s.text_en || s.textEn,
+              brandName: s.brand_name || s.brandName,
+              brandNameEn: s.brand_name_en || s.brandNameEn,
+              confidence: s.confidence || 0.5,
+              type: s.type || 'fragrance',
+              source: s.source,
+            })
+          );
+
+          // キャッシュに保存
+          setCachedResult(query, data.data);
+          console.log('💾 キャッシュ保存:', query);
+
+          setFragranceSuggestions(suggestions);
+          // フォーカスしている場合は必ずドロップダウンを表示
+          if (isFocused) {
+            setShowSuggestions(true);
+            setUserInteractingWithDropdown(true);
+          }
+        } else {
+          console.log('⚠️ 提案なし');
+          setLastCompletionResponse(null);
+          clearAllSuggestions();
+        }
+      } catch (err) {
+        console.error('❌ AI補完エラー:', err);
+        clearAllSuggestions();
+      } finally {
+        setIsLoadingCompletions(false);
+      }
+    },
+    [
+      currentProvider,
+      clearAllSuggestions,
+      getCachedResult,
+      setCachedResult,
+      setFragranceSuggestions,
+      setLastCompletionResponse,
+      isFocused,
+    ]
+  );
 
   // デバウンス付き正規化実行
   useEffect(() => {
@@ -337,7 +412,18 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
         clearTimeout(completionTimeout.current);
       }
     };
-  }, [value, debounceMs, minChars, currentProvider, clearAllSuggestions, fetchCompletions, lastNormalized, performNormalization, showSuggestions, userInteractingWithDropdown]);
+  }, [
+    value,
+    debounceMs,
+    minChars,
+    currentProvider,
+    clearAllSuggestions,
+    fetchCompletions,
+    lastNormalized,
+    performNormalization,
+    showSuggestions,
+    userInteractingWithDropdown,
+  ]);
 
   // キーボードナビゲーション
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -346,11 +432,15 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex(prev => (prev + 1) % fragranceSuggestions.length);
+        setSelectedIndex((prev) => (prev + 1) % fragranceSuggestions.length);
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setSelectedIndex(prev => (prev - 1 + fragranceSuggestions.length) % fragranceSuggestions.length);
+        setSelectedIndex(
+          (prev) =>
+            (prev - 1 + fragranceSuggestions.length) %
+            fragranceSuggestions.length
+        );
         break;
       case 'Enter':
         e.preventDefault();
@@ -370,7 +460,11 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
   };
 
   // AI提案のフィードバックを記録
-  const recordFeedback = async (action: 'selected' | 'rejected' | 'modified', suggestion?: CompletionSuggestion, finalValue?: string) => {
+  const recordFeedback = async (
+    action: 'selected' | 'rejected' | 'modified',
+    suggestion?: CompletionSuggestion,
+    finalValue?: string
+  ) => {
     try {
       // APIレスポンスからプロバイダー情報を取得
       const aiProvider = lastCompletionResponse?.ai_provider || 'unknown';
@@ -390,14 +484,22 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
         was_helpful: action === 'selected',
       };
 
-      console.log('📝 AI提案フィードバック記録:', action, suggestion?.text, `provider: ${aiProvider}, model: ${aiModel}`);
+      console.log(
+        '📝 AI提案フィードバック記録:',
+        action,
+        suggestion?.text,
+        `provider: ${aiProvider}, model: ${aiModel}`
+      );
 
       // バックエンドAPIに送信
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/feedback/selection`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(feedbackData)
-      });
+      await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/ai/feedback/selection`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(feedbackData),
+        }
+      );
     } catch (error) {
       console.warn('フィードバック記録失敗:', error);
     }
@@ -433,7 +535,12 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
   // フォーカス処理
   const handleFocus = () => {
     setIsFocused(true);
-    console.log('🎯 フォーカス:', value, 'suggestions:', fragranceSuggestions.length);
+    console.log(
+      '🎯 フォーカス:',
+      value,
+      'suggestions:',
+      fragranceSuggestions.length
+    );
     // 候補があれば表示、なければ少し待ってから補完を実行
     if (fragranceSuggestions.length > 0) {
       setShowSuggestions(true);
@@ -471,7 +578,7 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
             bg-white text-gray-900 font-medium text-lg
             ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''}
             ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}
-            ${(isNormalizing || normalizationLoading || completionLoading) ? 'pr-12' : ''}
+            ${isNormalizing || normalizationLoading || completionLoading ? 'pr-12' : ''}
           `}
         />
 
@@ -490,7 +597,8 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
         )}
 
         {/* 補完ドロップダウン */}
-        {(showSuggestions && fragranceSuggestions.length > 0) || isLoadingCompletions ? (
+        {(showSuggestions && fragranceSuggestions.length > 0) ||
+        isLoadingCompletions ? (
           <div
             ref={dropdownRef}
             className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
@@ -500,7 +608,9 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
               <div className="px-3 py-4 text-center">
                 <div className="flex items-center justify-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                  <span className="text-sm text-gray-600">{t('ai.completion.loading')}</span>
+                  <span className="text-sm text-gray-600">
+                    {t('ai.completion.loading')}
+                  </span>
                 </div>
               </div>
             )}
@@ -523,22 +633,25 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
                           <span className="text-gray-900 font-medium">
                             {suggestion.text}
                           </span>
-                          {suggestion.textEn && suggestion.textEn !== suggestion.text && (
-                            <span className="text-sm text-gray-500">
-                              ({suggestion.textEn})
-                            </span>
-                          )}
+                          {suggestion.textEn &&
+                            suggestion.textEn !== suggestion.text && (
+                              <span className="text-sm text-gray-500">
+                                ({suggestion.textEn})
+                              </span>
+                            )}
                         </div>
                         {suggestion.brandName && (
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                               {suggestion.brandName}
                             </span>
-                            {suggestion.brandNameEn && suggestion.brandNameEn !== suggestion.brandName && (
-                              <span className="text-xs text-gray-500">
-                                ({suggestion.brandNameEn})
-                              </span>
-                            )}
+                            {suggestion.brandNameEn &&
+                              suggestion.brandNameEn !==
+                                suggestion.brandName && (
+                                <span className="text-xs text-gray-500">
+                                  ({suggestion.brandNameEn})
+                                </span>
+                              )}
                           </div>
                         )}
                       </div>
@@ -563,21 +676,14 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
             )}
           </div>
         ) : null}
-
       </div>
 
       {/* エラーメッセージ */}
-      {error && (
-        <p className="mt-2 text-sm text-red-600">
-          {error}
-        </p>
-      )}
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
 
       {/* ヘルプテキスト */}
       {!error && (
-        <p className="mt-2 text-xs text-gray-500">
-          {t('ai.input.help_text')}
-        </p>
+        <p className="mt-2 text-xs text-gray-500">{t('ai.input.help_text')}</p>
       )}
     </div>
   );

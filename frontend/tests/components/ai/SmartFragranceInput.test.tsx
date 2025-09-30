@@ -41,7 +41,15 @@ vi.mock('../../../src/hooks/useAIProviders', () => ({
 
 // 動的インポートのモック
 vi.mock('../../../src/components/ai/SmartFragranceInput', () => ({
-  default: ({ value, onChange, placeholder }: { value: string; onChange: (value: string) => void; placeholder: string }) => (
+  default: ({
+    value,
+    onChange,
+    placeholder,
+  }: {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder: string;
+  }) => (
     <div data-testid="smart-fragrance-input">
       <input
         data-testid="fragrance-input"
@@ -56,16 +64,13 @@ vi.mock('../../../src/components/ai/SmartFragranceInput', () => ({
 }));
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <I18nextProvider i18n={i18n}>
-    {children}
-  </I18nextProvider>
+  <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
 );
 
 describe('SmartFragranceInput - Brand/Fragrance Separation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-
 
   it('香水補完APIが正しく分離されたブランド名と香水名を返す', () => {
     // モックされたコンポーネントを使用してレンダリング確認
@@ -199,7 +204,11 @@ describe('SmartFragranceInput - Brand/Fragrance Separation', () => {
     expect(normalizationResult.fragranceNameEn).toBe('Sauvage');
 
     // ブランド名と香水名が分離されていることを確認
-    expect(normalizationResult.fragranceName).not.toContain(normalizationResult.brandName);
-    expect(normalizationResult.fragranceNameEn).not.toContain(normalizationResult.brandNameEn);
+    expect(normalizationResult.fragranceName).not.toContain(
+      normalizationResult.brandName
+    );
+    expect(normalizationResult.fragranceNameEn).not.toContain(
+      normalizationResult.brandNameEn
+    );
   });
 });

@@ -39,7 +39,11 @@ const FragranceRegistration: React.FC = () => {
     resetNormalization,
   } = useAIStore();
 
-  const { loading: normalizationLoading, result: normalizationResult, error: normalizationError } = useNormalizationState();
+  const {
+    loading: normalizationLoading,
+    result: normalizationResult,
+    error: normalizationError,
+  } = useNormalizationState();
 
   const [formData, setFormData] = useState<FragranceFormData>({
     smartInput: '',
@@ -68,40 +72,49 @@ const FragranceRegistration: React.FC = () => {
   }, [user, navigate]);
 
   // フォーム入力の処理
-  const handleInputChange = (field: keyof FragranceFormData) => (value: string | number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-    }));
+  const handleInputChange =
+    (field: keyof FragranceFormData) => (value: string | number) => {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
 
-    // エラーをクリア
-    if (errors[field]) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field];
-        return newErrors;
-      });
-    }
-  };
+      // エラーをクリア
+      if (errors[field]) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[field];
+          return newErrors;
+        });
+      }
+    };
 
   // バリデーション
   const validateForm = (): boolean => {
     const newErrors: Partial<FragranceFormData> = {};
 
     if (!formData.brandName.trim()) {
-      newErrors.brandName = t('validation.required', { field: t('fragrance.brand_name') });
+      newErrors.brandName = t('validation.required', {
+        field: t('fragrance.brand_name'),
+      });
     }
 
     if (!formData.fragranceName.trim()) {
-      newErrors.fragranceName = t('validation.required', { field: t('fragrance.fragrance_name') });
+      newErrors.fragranceName = t('validation.required', {
+        field: t('fragrance.fragrance_name'),
+      });
     }
 
     if (formData.volume && isNaN(parseFloat(formData.volume))) {
-      newErrors.volume = t('validation.number', { field: t('fragrance.volume') });
+      newErrors.volume = t('validation.number', {
+        field: t('fragrance.volume'),
+      });
     }
 
     if (formData.purchasePrice && isNaN(parseFloat(formData.purchasePrice))) {
-      newErrors.purchasePrice = t('validation.number', { field: t('fragrance.purchase_price') });
+      newErrors.purchasePrice = t('validation.number', {
+        field: t('fragrance.purchase_price'),
+      });
     }
 
     if (formData.userRating < 0 || formData.userRating > 5) {
@@ -123,19 +136,22 @@ const FragranceRegistration: React.FC = () => {
     setNormalizationError(null);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/normalize`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          brand_name: formData.brandName,
-          fragrance_name: formData.fragranceName,
-          language: 'ja',
-          provider: currentProvider || 'openai',
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/ai/normalize`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify({
+            brand_name: formData.brandName,
+            fragrance_name: formData.fragranceName,
+            language: 'ja',
+            provider: currentProvider || 'openai',
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Normalization failed');
@@ -162,14 +178,26 @@ const FragranceRegistration: React.FC = () => {
   // 正規化結果の適用
   const applyNormalization = () => {
     if (normalizationResult) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         // 日本語フィールド
-        brandName: normalizationResult.normalized_brand_ja || normalizationResult.normalized_brand || prev.brandName,
-        fragranceName: normalizationResult.normalized_fragrance_ja || normalizationResult.normalized_fragrance || prev.fragranceName,
+        brandName:
+          normalizationResult.normalized_brand_ja ||
+          normalizationResult.normalized_brand ||
+          prev.brandName,
+        fragranceName:
+          normalizationResult.normalized_fragrance_ja ||
+          normalizationResult.normalized_fragrance ||
+          prev.fragranceName,
         // 英語フィールド
-        brandNameEn: normalizationResult.normalized_brand_en || normalizationResult.normalized_brand || prev.brandNameEn,
-        fragranceNameEn: normalizationResult.normalized_fragrance_en || normalizationResult.normalized_fragrance || prev.fragranceNameEn,
+        brandNameEn:
+          normalizationResult.normalized_brand_en ||
+          normalizationResult.normalized_brand ||
+          prev.brandNameEn,
+        fragranceNameEn:
+          normalizationResult.normalized_fragrance_en ||
+          normalizationResult.normalized_fragrance ||
+          prev.fragranceNameEn,
       }));
       setShowNormalization(false);
       toast.success(t('fragrance.ai_quality_check.applied'));
@@ -192,13 +220,15 @@ const FragranceRegistration: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
           brand_name: formData.brandName,
           fragrance_name: formData.fragranceName,
           volume_ml: formData.volume ? parseFloat(formData.volume) : null,
-          purchase_price: formData.purchasePrice ? parseFloat(formData.purchasePrice) : null,
+          purchase_price: formData.purchasePrice
+            ? parseFloat(formData.purchasePrice)
+            : null,
           purchase_date: formData.purchaseDate || null,
           purchase_place: formData.purchasePlace || null,
           possession_type: formData.possessionType,
@@ -268,7 +298,9 @@ const FragranceRegistration: React.FC = () => {
                     </p>
                   </div>
                   <div className="px-3 py-1 bg-blue-50 border border-blue-200 rounded-md">
-                    <span className="text-xs font-medium text-blue-700">{t('fragrance.smart_input.ai_badge')}</span>
+                    <span className="text-xs font-medium text-blue-700">
+                      {t('fragrance.smart_input.ai_badge')}
+                    </span>
                   </div>
                 </div>
 
@@ -276,12 +308,13 @@ const FragranceRegistration: React.FC = () => {
                   value={formData.smartInput}
                   onChange={handleInputChange('smartInput')}
                   onNormalizationResult={(result) => {
-                    setFormData(prev => ({
+                    setFormData((prev) => ({
                       ...prev,
                       brandName: result.brandName || prev.brandName,
                       brandNameEn: result.brandNameEn || prev.brandNameEn,
                       fragranceName: result.fragranceName || prev.fragranceName,
-                      fragranceNameEn: result.fragranceNameEn || prev.fragranceNameEn,
+                      fragranceNameEn:
+                        result.fragranceNameEn || prev.fragranceNameEn,
                     }));
                   }}
                   label={t('fragrance.smart_input.label')}
@@ -317,11 +350,22 @@ const FragranceRegistration: React.FC = () => {
                         <input
                           type="text"
                           value={formData.brandName}
-                          onChange={(e) => setFormData(prev => ({ ...prev, brandName: e.target.value }))}
-                          placeholder={t('fragrance.detailed_info.brand_ja_placeholder')}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              brandName: e.target.value,
+                            }))
+                          }
+                          placeholder={t(
+                            'fragrance.detailed_info.brand_ja_placeholder'
+                          )}
                           className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                         />
-                        {errors.brandName && <p className="mt-1 text-sm text-red-600">{errors.brandName}</p>}
+                        {errors.brandName && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {errors.brandName}
+                          </p>
+                        )}
                       </div>
 
                       <div>
@@ -331,8 +375,15 @@ const FragranceRegistration: React.FC = () => {
                         <input
                           type="text"
                           value={formData.brandNameEn}
-                          onChange={(e) => setFormData(prev => ({ ...prev, brandNameEn: e.target.value }))}
-                          placeholder={t('fragrance.detailed_info.brand_en_placeholder')}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              brandNameEn: e.target.value,
+                            }))
+                          }
+                          placeholder={t(
+                            'fragrance.detailed_info.brand_en_placeholder'
+                          )}
                           className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                         />
                       </div>
@@ -353,11 +404,22 @@ const FragranceRegistration: React.FC = () => {
                         <input
                           type="text"
                           value={formData.fragranceName}
-                          onChange={(e) => setFormData(prev => ({ ...prev, fragranceName: e.target.value }))}
-                          placeholder={t('fragrance.detailed_info.fragrance_ja_placeholder')}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              fragranceName: e.target.value,
+                            }))
+                          }
+                          placeholder={t(
+                            'fragrance.detailed_info.fragrance_ja_placeholder'
+                          )}
                           className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900"
                         />
-                        {errors.fragranceName && <p className="mt-1 text-sm text-red-600">{errors.fragranceName}</p>}
+                        {errors.fragranceName && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {errors.fragranceName}
+                          </p>
+                        )}
                       </div>
 
                       <div>
@@ -367,8 +429,15 @@ const FragranceRegistration: React.FC = () => {
                         <input
                           type="text"
                           value={formData.fragranceNameEn}
-                          onChange={(e) => setFormData(prev => ({ ...prev, fragranceNameEn: e.target.value }))}
-                          placeholder={t('fragrance.detailed_info.fragrance_en_placeholder')}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              fragranceNameEn: e.target.value,
+                            }))
+                          }
+                          placeholder={t(
+                            'fragrance.detailed_info.fragrance_en_placeholder'
+                          )}
                           className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white text-gray-900"
                         />
                       </div>
@@ -377,10 +446,10 @@ const FragranceRegistration: React.FC = () => {
                 </div>
 
                 <div className="mt-4 text-xs text-gray-600 bg-gray-50 p-3 rounded-lg">
-                  💡 上記の統一入力欄に入力すると、AI が自動的にこれらのフィールドを埋めます。手動で編集することも可能です。
+                  💡 上記の統一入力欄に入力すると、AI
+                  が自動的にこれらのフィールドを埋めます。手動で編集することも可能です。
                 </div>
               </div>
-
 
               {/* AI正規化セクション（改良版） */}
               <div className="bg-blue-50 p-6 rounded-lg border border-blue-200 shadow-sm">
@@ -399,7 +468,11 @@ const FragranceRegistration: React.FC = () => {
                   <button
                     type="button"
                     onClick={performNormalization}
-                    disabled={normalizationLoading || !formData.brandName.trim() || !formData.fragranceName.trim()}
+                    disabled={
+                      normalizationLoading ||
+                      !formData.brandName.trim() ||
+                      !formData.fragranceName.trim()
+                    }
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-md transition-all duration-200 whitespace-nowrap"
                   >
                     {normalizationLoading ? (
@@ -421,8 +494,12 @@ const FragranceRegistration: React.FC = () => {
                     <div className="flex items-center">
                       <span className="text-red-500 text-xl mr-3">❌</span>
                       <div>
-                        <h4 className="text-red-800 font-medium">{t('fragrance.ai_quality_check.error_occurred')}</h4>
-                        <p className="text-sm text-red-600 mt-1">{normalizationError}</p>
+                        <h4 className="text-red-800 font-medium">
+                          {t('fragrance.ai_quality_check.error_occurred')}
+                        </h4>
+                        <p className="text-sm text-red-600 mt-1">
+                          {normalizationError}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -438,33 +515,41 @@ const FragranceRegistration: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
-                      {(normalizationResult.normalized_brand_ja || normalizationResult.normalized_brand) && (
+                      {(normalizationResult.normalized_brand_ja ||
+                        normalizationResult.normalized_brand) && (
                         <div className="bg-blue-50 p-4 rounded-lg">
                           <div className="text-sm text-blue-700 font-medium mb-1">
                             {t('fragrance.ai_quality_check.normalized_brand')}
                           </div>
                           <div className="text-lg font-semibold text-gray-900">
-                            {normalizationResult.normalized_brand_ja || normalizationResult.normalized_brand}
+                            {normalizationResult.normalized_brand_ja ||
+                              normalizationResult.normalized_brand}
                           </div>
                           {normalizationResult.normalized_brand_en && (
                             <div className="text-sm text-gray-600 mt-1">
-                              {t('fragrance.ai_quality_check.english_label')} {normalizationResult.normalized_brand_en}
+                              {t('fragrance.ai_quality_check.english_label')}{' '}
+                              {normalizationResult.normalized_brand_en}
                             </div>
                           )}
                         </div>
                       )}
 
-                      {(normalizationResult.normalized_fragrance_ja || normalizationResult.normalized_fragrance) && (
+                      {(normalizationResult.normalized_fragrance_ja ||
+                        normalizationResult.normalized_fragrance) && (
                         <div className="bg-purple-50 p-4 rounded-lg">
                           <div className="text-sm text-purple-700 font-medium mb-1">
-                            {t('fragrance.ai_quality_check.normalized_fragrance')}
+                            {t(
+                              'fragrance.ai_quality_check.normalized_fragrance'
+                            )}
                           </div>
                           <div className="text-lg font-semibold text-gray-900">
-                            {normalizationResult.normalized_fragrance_ja || normalizationResult.normalized_fragrance}
+                            {normalizationResult.normalized_fragrance_ja ||
+                              normalizationResult.normalized_fragrance}
                           </div>
                           {normalizationResult.normalized_fragrance_en && (
                             <div className="text-sm text-gray-600 mt-1">
-                              {t('fragrance.ai_quality_check.english_label')} {normalizationResult.normalized_fragrance_en}
+                              {t('fragrance.ai_quality_check.english_label')}{' '}
+                              {normalizationResult.normalized_fragrance_en}
                             </div>
                           )}
                         </div>
@@ -474,7 +559,9 @@ const FragranceRegistration: React.FC = () => {
                     <div className="mb-5">
                       <div className="flex items-center gap-3 mb-3">
                         <span className="text-lg">📊</span>
-                        <span className="font-medium text-gray-900">{t('fragrance.ai_quality_check.confidence_score')}</span>
+                        <span className="font-medium text-gray-900">
+                          {t('fragrance.ai_quality_check.confidence_score')}
+                        </span>
                       </div>
                       <ConfidenceIndicator
                         confidence={normalizationResult.confidence_score || 0.5}
@@ -521,7 +608,9 @@ const FragranceRegistration: React.FC = () => {
                   <input
                     type="number"
                     value={formData.volume}
-                    onChange={(e) => handleInputChange('volume')(e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange('volume')(e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     placeholder="50"
                   />
@@ -537,12 +626,16 @@ const FragranceRegistration: React.FC = () => {
                   <input
                     type="number"
                     value={formData.purchasePrice}
-                    onChange={(e) => handleInputChange('purchasePrice')(e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange('purchasePrice')(e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     placeholder="10000"
                   />
                   {errors.purchasePrice && (
-                    <p className="mt-1 text-sm text-red-600">{errors.purchasePrice}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.purchasePrice}
+                    </p>
                   )}
                 </div>
               </div>
@@ -555,7 +648,9 @@ const FragranceRegistration: React.FC = () => {
                   <input
                     type="date"
                     value={formData.purchaseDate}
-                    onChange={(e) => handleInputChange('purchaseDate')(e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange('purchaseDate')(e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   />
                 </div>
@@ -566,10 +661,14 @@ const FragranceRegistration: React.FC = () => {
                   </label>
                   <select
                     value={formData.possessionType}
-                    onChange={(e) => handleInputChange('possessionType')(e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange('possessionType')(e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   >
-                    <option value="full_bottle">{t('fragrance.full_bottle')}</option>
+                    <option value="full_bottle">
+                      {t('fragrance.full_bottle')}
+                    </option>
                     <option value="decant">{t('fragrance.decant')}</option>
                     <option value="sample">{t('fragrance.sample')}</option>
                   </select>
@@ -583,7 +682,9 @@ const FragranceRegistration: React.FC = () => {
                 <input
                   type="text"
                   value={formData.purchasePlace}
-                  onChange={(e) => handleInputChange('purchasePlace')(e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange('purchasePlace')(e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   placeholder={t('fragrance.purchase_place_placeholder')}
                 />
@@ -610,7 +711,9 @@ const FragranceRegistration: React.FC = () => {
                   ))}
                 </div>
                 {errors.userRating && (
-                  <p className="mt-1 text-sm text-red-600">{errors.userRating}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.userRating}
+                  </p>
                 )}
               </div>
 
@@ -620,7 +723,9 @@ const FragranceRegistration: React.FC = () => {
                 </label>
                 <textarea
                   value={formData.comments}
-                  onChange={(e) => handleInputChange('comments')(e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange('comments')(e.target.value)
+                  }
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   placeholder={t('fragrance.comments_placeholder')}
@@ -641,7 +746,9 @@ const FragranceRegistration: React.FC = () => {
                   disabled={isSubmitting}
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? t('fragrance.registering') : t('fragrance.register')}
+                  {isSubmitting
+                    ? t('fragrance.registering')
+                    : t('fragrance.register')}
                 </button>
               </div>
             </form>

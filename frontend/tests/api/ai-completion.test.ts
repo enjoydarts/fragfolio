@@ -3,11 +3,15 @@ import { http, HttpResponse } from 'msw';
 import { server } from '../mocks/server';
 
 // API呼び出し用のヘルパー関数
-const callCompletionAPI = async (query: string, type: 'brand' | 'fragrance', options?: {
-  limit?: number;
-  language?: string;
-  provider?: string;
-}) => {
+const callCompletionAPI = async (
+  query: string,
+  type: 'brand' | 'fragrance',
+  options?: {
+    limit?: number;
+    language?: string;
+    provider?: string;
+  }
+) => {
   const response = await fetch('/api/ai/complete', {
     method: 'POST',
     headers: {
@@ -37,7 +41,13 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
   it('香水補完APIが分離されたブランド・香水名を返す', async () => {
     server.use(
       http.post('/api/ai/complete', async ({ request }) => {
-        const body = await request.json() as { query: string; type: string; limit?: number; language?: string; provider?: string };
+        const body = (await request.json()) as {
+          query: string;
+          type: string;
+          limit?: number;
+          language?: string;
+          provider?: string;
+        };
 
         if (body.query === 'シャネル' && body.type === 'fragrance') {
           return HttpResponse.json({
@@ -82,28 +92,36 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
     expect(result.data.suggestions).toHaveLength(2);
 
     // 各候補がブランド・香水名分離構造を持つことを確認
-    result.data.suggestions.forEach((suggestion: { text: string; brand_name: string; type: string }) => {
-      expect(suggestion).toHaveProperty('text');
-      expect(suggestion).toHaveProperty('text_en');
-      expect(suggestion).toHaveProperty('brand_name');
-      expect(suggestion).toHaveProperty('brand_name_en');
-      expect(suggestion).toHaveProperty('confidence');
-      expect(suggestion.type).toBe('fragrance');
+    result.data.suggestions.forEach(
+      (suggestion: { text: string; brand_name: string; type: string }) => {
+        expect(suggestion).toHaveProperty('text');
+        expect(suggestion).toHaveProperty('text_en');
+        expect(suggestion).toHaveProperty('brand_name');
+        expect(suggestion).toHaveProperty('brand_name_en');
+        expect(suggestion).toHaveProperty('confidence');
+        expect(suggestion.type).toBe('fragrance');
 
-      // 香水名にブランド名が含まれていないことを確認
-      expect(suggestion.text).not.toContain('シャネル');
-      expect(suggestion.text_en).not.toContain('Chanel');
+        // 香水名にブランド名が含まれていないことを確認
+        expect(suggestion.text).not.toContain('シャネル');
+        expect(suggestion.text_en).not.toContain('Chanel');
 
-      // ブランド名が正しく分離されていることを確認
-      expect(suggestion.brand_name).toBe('シャネル');
-      expect(suggestion.brand_name_en).toBe('Chanel');
-    });
+        // ブランド名が正しく分離されていることを確認
+        expect(suggestion.brand_name).toBe('シャネル');
+        expect(suggestion.brand_name_en).toBe('Chanel');
+      }
+    );
   });
 
   it('ブランド補完APIが適切な構造を返す', async () => {
     server.use(
       http.post('/api/ai/complete', async ({ request }) => {
-        const body = await request.json() as { query: string; type: string; limit?: number; language?: string; provider?: string };
+        const body = (await request.json()) as {
+          query: string;
+          type: string;
+          limit?: number;
+          language?: string;
+          provider?: string;
+        };
 
         if (body.query === 'シャン' && body.type === 'brand') {
           return HttpResponse.json({
@@ -147,17 +165,28 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
     expect(result.success).toBe(true);
     expect(result.data.suggestions).toHaveLength(2);
 
-    result.data.suggestions.forEach((suggestion: { text: string; brand_name: string; type: string }) => {
-      expect(suggestion.type).toBe('brand');
-      // ブランドの場合、brand_nameはnullまたは自分自身と同じ
-      expect(suggestion.brand_name === null || suggestion.brand_name === suggestion.text).toBe(true);
-    });
+    result.data.suggestions.forEach(
+      (suggestion: { text: string; brand_name: string; type: string }) => {
+        expect(suggestion.type).toBe('brand');
+        // ブランドの場合、brand_nameはnullまたは自分自身と同じ
+        expect(
+          suggestion.brand_name === null ||
+            suggestion.brand_name === suggestion.text
+        ).toBe(true);
+      }
+    );
   });
 
   it('複数のNo.5バリエーションが正しく分離される', async () => {
     server.use(
       http.post('/api/ai/complete', async ({ request }) => {
-        const body = await request.json() as { query: string; type: string; limit?: number; language?: string; provider?: string };
+        const body = (await request.json()) as {
+          query: string;
+          type: string;
+          limit?: number;
+          language?: string;
+          provider?: string;
+        };
 
         if (body.query === 'No.5' && body.type === 'fragrance') {
           return HttpResponse.json({
@@ -212,22 +241,26 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
     expect(result.data.suggestions).toHaveLength(3);
 
     // すべて同じブランドであることを確認
-    result.data.suggestions.forEach((suggestion: { text: string; brand_name: string; type: string }) => {
-      expect(suggestion.brand_name).toBe('シャネル');
-      expect(suggestion.brand_name_en).toBe('Chanel');
-      expect(suggestion.type).toBe('fragrance');
+    result.data.suggestions.forEach(
+      (suggestion: { text: string; brand_name: string; type: string }) => {
+        expect(suggestion.brand_name).toBe('シャネル');
+        expect(suggestion.brand_name_en).toBe('Chanel');
+        expect(suggestion.type).toBe('fragrance');
 
-      // No.5のバリエーションであることを確認
-      expect(suggestion.text).toContain('No.5');
-      expect(suggestion.text_en).toContain('No.5');
+        // No.5のバリエーションであることを確認
+        expect(suggestion.text).toContain('No.5');
+        expect(suggestion.text_en).toContain('No.5');
 
-      // 香水名にブランド名が含まれていないことを確認
-      expect(suggestion.text).not.toContain('シャネル');
-      expect(suggestion.text_en).not.toContain('Chanel');
-    });
+        // 香水名にブランド名が含まれていないことを確認
+        expect(suggestion.text).not.toContain('シャネル');
+        expect(suggestion.text_en).not.toContain('Chanel');
+      }
+    );
 
     // 各バリエーションが異なることを確認
-    const fragranceNames = result.data.suggestions.map((s: { text: string }) => s.text);
+    const fragranceNames = result.data.suggestions.map(
+      (s: { text: string }) => s.text
+    );
     expect(new Set(fragranceNames).size).toBe(3); // 重複なし
   });
 
@@ -256,17 +289,26 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
   it('バリデーションエラーを適切に処理する', async () => {
     server.use(
       http.post('/api/ai/complete', async ({ request }) => {
-        const body = await request.json() as { query: string; type: string; limit?: number; language?: string; provider?: string };
+        const body = (await request.json()) as {
+          query: string;
+          type: string;
+          limit?: number;
+          language?: string;
+          provider?: string;
+        };
 
         // 短すぎるクエリの場合
         if (body.query && body.query.length < 2) {
-          return HttpResponse.json({
-            success: false,
-            message: 'クエリが短すぎます',
-            errors: {
-              query: ['クエリは最低2文字必要です'],
+          return HttpResponse.json(
+            {
+              success: false,
+              message: 'クエリが短すぎます',
+              errors: {
+                query: ['クエリは最低2文字必要です'],
+              },
             },
-          }, { status: 422 });
+            { status: 422 }
+          );
         }
 
         return HttpResponse.json({ success: false });
@@ -283,10 +325,13 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
   it('サーバーエラーを適切に処理する', async () => {
     server.use(
       http.post('/api/ai/complete', async () => {
-        return HttpResponse.json({
-          success: false,
-          message: 'AI補完に失敗しました',
-        }, { status: 500 });
+        return HttpResponse.json(
+          {
+            success: false,
+            message: 'AI補完に失敗しました',
+          },
+          { status: 500 }
+        );
       })
     );
 
@@ -299,7 +344,13 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
   it('言語パラメータが正しく処理される', async () => {
     server.use(
       http.post('/api/ai/complete', async ({ request }) => {
-        const body = await request.json() as { query: string; type: string; limit?: number; language?: string; provider?: string };
+        const body = (await request.json()) as {
+          query: string;
+          type: string;
+          limit?: number;
+          language?: string;
+          provider?: string;
+        };
 
         if (body.language === 'en') {
           return HttpResponse.json({
@@ -328,7 +379,9 @@ describe('AI Completion API - Brand/Fragrance Separation Integration', () => {
       })
     );
 
-    const result = await callCompletionAPI('Sauvage', 'fragrance', { language: 'en' });
+    const result = await callCompletionAPI('Sauvage', 'fragrance', {
+      language: 'en',
+    });
 
     expect(result.success).toBe(true);
     expect(result.data.suggestions[0].text).toBe('Sauvage');

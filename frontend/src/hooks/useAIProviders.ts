@@ -2,12 +2,15 @@ import { useEffect } from 'react';
 import { useAIStore } from '../stores/aiStore';
 
 export const useAIProviders = () => {
-  const { setAvailableProviders, setCurrentProvider, currentProvider } = useAIStore();
+  const { setAvailableProviders, setCurrentProvider, currentProvider } =
+    useAIStore();
 
   useEffect(() => {
     const fetchProviders = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/ai/providers`);
+        const response = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/ai/providers`
+        );
 
         if (response.ok) {
           const data = await response.json();
