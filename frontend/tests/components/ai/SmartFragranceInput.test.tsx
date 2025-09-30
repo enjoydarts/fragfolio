@@ -62,9 +62,6 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 describe('SmartFragranceInput - Brand/Fragrance Separation', () => {
-  const mockOnChange = vi.fn();
-  const mockOnNormalizationResult = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
   });

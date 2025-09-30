@@ -68,7 +68,7 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
     clearAllSuggestions,
   } = useAIStore();
 
-  const { loading: normalizationLoading, result: normalizationResult } = useNormalizationState();
+  const { loading: normalizationLoading } = useNormalizationState();
   const { currentProvider } = useAIProviders();
 
   // 外部クリックでドロップダウンを閉じる
