@@ -72,8 +72,8 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
     response_time_ms?: number;
     cost_estimate?: number;
   } | null>(null);
-  const debounceTimeout = useRef<NodeJS.Timeout>();
-  const completionTimeout = useRef<NodeJS.Timeout>();
+  const debounceTimeout = useRef<number | undefined>(undefined);
+  const completionTimeout = useRef<number | undefined>(undefined);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [userInteractingWithDropdown, setUserInteractingWithDropdown] =
@@ -276,7 +276,7 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
             brandName: s.brand_name || s.brandName,
             brandNameEn: s.brand_name_en || s.brandNameEn,
             confidence: s.confidence || 0.5,
-            type: s.type || 'fragrance',
+            type: (s.type || 'fragrance') as 'brand' | 'fragrance',
             source: s.source,
           }));
 
@@ -467,8 +467,8 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
   ) => {
     try {
       // APIレスポンスからプロバイダー情報を取得
-      const aiProvider = lastCompletionResponse?.ai_provider || 'unknown';
-      const aiModel = lastCompletionResponse?.ai_model || 'unknown';
+      const aiProvider = lastCompletionResponse?.provider || 'unknown';
+      const aiModel = 'unknown'; // モデル情報は現在のレスポンスに含まれていない
 
       const feedbackData = {
         operation_type: 'completion',

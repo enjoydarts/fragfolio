@@ -60,7 +60,9 @@ const FragranceRegistration: React.FC = () => {
     comments: '',
   });
 
-  const [errors, setErrors] = useState<Partial<FragranceFormData>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof FragranceFormData, string>>
+  >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNormalization, setShowNormalization] = useState(false);
 
@@ -91,7 +93,7 @@ const FragranceRegistration: React.FC = () => {
 
   // バリデーション
   const validateForm = (): boolean => {
-    const newErrors: Partial<FragranceFormData> = {};
+    const newErrors: Partial<Record<keyof FragranceFormData, string>> = {};
 
     if (!formData.brandName.trim()) {
       newErrors.brandName = t('validation.required', {

@@ -15,8 +15,14 @@ export interface CompletionSuggestion {
 // AI正規化の結果型定義
 export interface NormalizationResult {
   normalized_brand?: string;
+  normalized_brand_ja?: string;
+  normalized_brand_en?: string;
+  normalized_fragrance?: string;
   normalized_fragrance_name?: string;
-  final_confidence_score: number;
+  normalized_fragrance_ja?: string;
+  normalized_fragrance_en?: string;
+  final_confidence_score?: number;
+  confidence_score?: number;
   fallback_reason?: string;
 }
 

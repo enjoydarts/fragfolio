@@ -66,7 +66,7 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   const isActive = activeSuggestionType === type;
 
   // デバウンス処理
-  const debounceTimeout = useRef<NodeJS.Timeout>();
+  const debounceTimeout = useRef<number | undefined>(undefined);
 
   // 言語検出関数
   const detectLanguage = useCallback((text: string): 'ja' | 'en' => {
