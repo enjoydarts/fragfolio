@@ -164,23 +164,6 @@ EOT;
                                     'description' => '根拠を一文で（例: クエリと音韻が近くラインの主要フランカー）',
                                 ],
                             ],
-                            'allOf' => [
-                                // 簡易ガード：text/text_en に一般的ブランド名が混入していないか
-                                [
-                                    'not' => [
-                                        'properties' => [
-                                            'text' => ['pattern' => '(?i)\\b(dior|chanel|creed|byredo|hermes|tom\\s*ford|maison|diptyque|le\\s*labo|amouage|ysl|givenchy|guerlain)\\b'],
-                                        ],
-                                    ],
-                                ],
-                                [
-                                    'not' => [
-                                        'properties' => [
-                                            'text_en' => ['pattern' => '(?i)\\b(dior|chanel|creed|byredo|hermes|tom\\s*ford|maison|diptyque|le\\s*labo|amouage|ysl|givenchy|guerlain)\\b'],
-                                        ],
-                                    ],
-                                ],
-                            ],
                         ],
                     ],
                 ],
