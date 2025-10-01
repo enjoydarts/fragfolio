@@ -65,8 +65,11 @@ class GeminiProvider implements AIProviderInterface
         // コスト記録
         $this->recordCost($response, 'completion', $costEstimate);
 
+        // 新しいスキーマでは items 配列が返される
+        $suggestions = $result['items'] ?? [];
+
         return [
-            'suggestions' => $result['suggestions'] ?? [],
+            'suggestions' => $suggestions,
             'provider' => 'gemini',
             'ai_provider' => 'gemini',
             'ai_model' => $this->model,
@@ -88,14 +91,15 @@ class GeminiProvider implements AIProviderInterface
         // コスト記録
         $this->recordCost($response, 'normalization', $costEstimate);
 
+        // 新しいスキーマに対応
         return [
-            'normalized_brand' => $result['normalized_brand'] ?? $brandName,
-            'normalized_brand_ja' => $result['normalized_brand_ja'] ?? $brandName,
-            'normalized_brand_en' => $result['normalized_brand_en'] ?? $brandName,
-            'normalized_fragrance_name' => $result['normalized_fragrance_name'] ?? $fragranceName,
-            'normalized_fragrance_ja' => $result['normalized_fragrance_ja'] ?? $fragranceName,
-            'normalized_fragrance_en' => $result['normalized_fragrance_en'] ?? $fragranceName,
-            'confidence_score' => $result['confidence_score'] ?? 0.5,
+            'normalized_brand' => $result['brand_name'] ?? $brandName,
+            'normalized_brand_ja' => $result['brand_name'] ?? $brandName,
+            'normalized_brand_en' => $result['brand_name_en'] ?? $brandName,
+            'normalized_fragrance_name' => $result['text'] ?? $fragranceName,
+            'normalized_fragrance_ja' => $result['text'] ?? $fragranceName,
+            'normalized_fragrance_en' => $result['text_en'] ?? $fragranceName,
+            'confidence_score' => $result['confidence'] ?? 0.5,
             'provider' => 'gemini',
             'ai_provider' => 'gemini',
             'ai_model' => $this->model,
@@ -232,107 +236,26 @@ class GeminiProvider implements AIProviderInterface
 
     private function getCompletionTool(string $type, int $limit): array
     {
+        $schema = PromptBuilder::suggestionJsonSchema();
+
         return [
             [
-                'name' => 'suggest_fragrances',
-                'description' => '香水またはブランドの提案リストを生成する',
-                'parameters' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'suggestions' => [
-                            'type' => 'array',
-                            'description' => '提案リスト',
-                            'items' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'text' => [
-                                        'type' => 'string',
-                                        'description' => '日本語名',
-                                    ],
-                                    'text_en' => [
-                                        'type' => 'string',
-                                        'description' => '英語名',
-                                    ],
-                                    'confidence' => [
-                                        'type' => 'number',
-                                        'description' => '信頼度（0.0-1.0）',
-                                        'minimum' => 0.0,
-                                        'maximum' => 1.0,
-                                    ],
-                                    'type' => [
-                                        'type' => 'string',
-                                        'description' => 'タイプ',
-                                        'enum' => ['brand', 'fragrance'],
-                                    ],
-                                    'brand_name' => [
-                                        'type' => 'string',
-                                        'description' => 'ブランド名（香水の場合）',
-                                    ],
-                                    'brand_name_en' => [
-                                        'type' => 'string',
-                                        'description' => '英語ブランド名（香水の場合）',
-                                    ],
-                                ],
-                                'required' => ['text', 'text_en', 'confidence', 'type'],
-                            ],
-                        ],
-                    ],
-                    'required' => ['suggestions'],
-                ],
+                'name' => $schema['name'],
+                'description' => $schema['description'],
+                'parameters' => $schema['parameters'],
             ],
         ];
     }
 
     private function getNormalizationTool(): array
     {
+        $schema = PromptBuilder::normalizationJsonSchema();
+
         return [
             [
-                'name' => 'normalize_fragrance',
-                'description' => '香水情報を正規化・検証する',
-                'parameters' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'normalized_brand' => [
-                            'type' => 'string',
-                            'description' => '正規化されたブランド名（基本）',
-                        ],
-                        'normalized_brand_ja' => [
-                            'type' => 'string',
-                            'description' => '日本語ブランド名',
-                        ],
-                        'normalized_brand_en' => [
-                            'type' => 'string',
-                            'description' => '英語ブランド名',
-                        ],
-                        'normalized_fragrance_name' => [
-                            'type' => 'string',
-                            'description' => '正規化された香水名（基本）',
-                        ],
-                        'normalized_fragrance_ja' => [
-                            'type' => 'string',
-                            'description' => '日本語香水名',
-                        ],
-                        'normalized_fragrance_en' => [
-                            'type' => 'string',
-                            'description' => '英語香水名',
-                        ],
-                        'confidence_score' => [
-                            'type' => 'number',
-                            'description' => '正規化の信頼度（0.0-1.0）',
-                            'minimum' => 0.0,
-                            'maximum' => 1.0,
-                        ],
-                    ],
-                    'required' => [
-                        'normalized_brand',
-                        'normalized_brand_ja',
-                        'normalized_brand_en',
-                        'normalized_fragrance_name',
-                        'normalized_fragrance_ja',
-                        'normalized_fragrance_en',
-                        'confidence_score',
-                    ],
-                ],
+                'name' => $schema['name'],
+                'description' => $schema['description'],
+                'parameters' => $schema['parameters'],
             ],
         ];
     }

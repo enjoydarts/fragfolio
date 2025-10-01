@@ -58,8 +58,11 @@ class AnthropicProvider implements AIProviderInterface
         // コスト記録
         $this->recordCost($response, 'completion', $costEstimate);
 
+        // 新しいスキーマでは items 配列が返される
+        $suggestions = $result['items'] ?? [];
+
         return [
-            'suggestions' => $result['suggestions'] ?? [],
+            'suggestions' => $suggestions,
             'response_time_ms' => round($responseTime, 2),
             'provider' => 'anthropic',
             'ai_provider' => 'anthropic',
@@ -358,129 +361,26 @@ class AnthropicProvider implements AIProviderInterface
 
     private function getNormalizationTool(): array
     {
+        $schema = PromptBuilder::normalizationJsonSchema();
+
         return [
             [
-                'name' => 'normalize_fragrance',
-                'description' => '香水情報を正規化・検証する',
-                'input_schema' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'normalized_brand' => [
-                            'type' => 'string',
-                            'description' => '正規化されたブランド名（基本）',
-                        ],
-                        'normalized_brand_ja' => [
-                            'type' => 'string',
-                            'description' => '日本語ブランド名',
-                        ],
-                        'normalized_brand_en' => [
-                            'type' => 'string',
-                            'description' => '英語ブランド名',
-                        ],
-                        'normalized_fragrance_name' => [
-                            'type' => 'string',
-                            'description' => '正規化された香水名（基本）',
-                        ],
-                        'normalized_fragrance_ja' => [
-                            'type' => 'string',
-                            'description' => '日本語香水名',
-                        ],
-                        'normalized_fragrance_en' => [
-                            'type' => 'string',
-                            'description' => '英語香水名',
-                        ],
-                        'concentration_type' => [
-                            'type' => 'string',
-                            'description' => 'EDP/EDT/Parfum/その他',
-                        ],
-                        'launch_year' => [
-                            'type' => 'string',
-                            'description' => '発売年',
-                        ],
-                        'fragrance_family' => [
-                            'type' => 'string',
-                            'description' => '香りファミリー',
-                        ],
-                        'final_confidence_score' => [
-                            'type' => 'number',
-                            'description' => '信頼度スコア（0.0-1.0）',
-                            'minimum' => 0.0,
-                            'maximum' => 1.0,
-                        ],
-                        'description_ja' => [
-                            'type' => 'string',
-                            'description' => '日本語での説明',
-                        ],
-                        'description_en' => [
-                            'type' => 'string',
-                            'description' => 'English description',
-                        ],
-                        'validation_notes' => [
-                            'type' => 'string',
-                            'description' => '信頼度の根拠や確認事項',
-                        ],
-                    ],
-                    'required' => [
-                        'normalized_brand',
-                        'normalized_fragrance_name',
-                        'final_confidence_score',
-                    ],
-                ],
+                'name' => $schema['name'],
+                'description' => $schema['description'],
+                'input_schema' => $schema['parameters'],
             ],
         ];
     }
 
     private function getCompletionTool(string $type, int $limit): array
     {
+        $schema = PromptBuilder::suggestionJsonSchema();
+
         return [
             [
-                'name' => 'suggest_fragrances',
-                'description' => '香水またはブランドの提案リストを生成する',
-                'input_schema' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'suggestions' => [
-                            'type' => 'array',
-                            'description' => '提案リスト',
-                            'items' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'text' => [
-                                        'type' => 'string',
-                                        'description' => '日本語名',
-                                    ],
-                                    'text_en' => [
-                                        'type' => 'string',
-                                        'description' => '英語名',
-                                    ],
-                                    'confidence' => [
-                                        'type' => 'number',
-                                        'description' => '信頼度（0.0-1.0）',
-                                        'minimum' => 0.0,
-                                        'maximum' => 1.0,
-                                    ],
-                                    'type' => [
-                                        'type' => 'string',
-                                        'description' => 'タイプ',
-                                        'enum' => ['brand', 'fragrance'],
-                                    ],
-                                    'brand_name' => [
-                                        'type' => 'string',
-                                        'description' => 'ブランド名（香水の場合）',
-                                    ],
-                                    'brand_name_en' => [
-                                        'type' => 'string',
-                                        'description' => '英語ブランド名（香水の場合）',
-                                    ],
-                                ],
-                                'required' => ['text', 'text_en', 'confidence', 'type'],
-                            ],
-                            'minItems' => $limit,
-                            'maxItems' => $limit,
-                        ],
-                    ],
-                    'required' => ['suggestions'],
-                ],
+                'name' => $schema['name'],
+                'description' => $schema['description'],
+                'input_schema' => $schema['parameters'],
             ],
         ];
     }

@@ -3,183 +3,214 @@
 namespace App\Services\AI;
 
 /**
- * AI プロンプト構築サービス
- * OpenAI、Anthropic、Gemini で共通のプロンプトを生成
+ * AI プロンプト構築サービス（安全・厳格版）
+ * - 思考過程の逐語出力を禁止（rationale_brief の一文のみ）
+ * - 出力はツール/関数呼び出しの JSON に限定（Schema で強制）
  */
 class PromptBuilder
 {
     /**
-     * 補完用プロンプトを構築
+     * 補完（候補サジェスト）用プロンプト
+     *
+     * 各ベンダの推奨：
+     * - OpenAI: Structured Outputs (response_format: json_schema) か Function Calling
+     * - Anthropic: tools[].input_schema（JSON Schema）
+     * - Gemini: Function Calling parameters（JSON Schema）
      */
-    public static function buildCompletionPrompt(string $query, string $type, int $limit, string $language, array $fewShotExamples = []): string
-    {
+    public static function buildCompletionPrompt(
+        string $query,
+        string $type,
+        int $limit,
+        string $language,
+        array $fewShotExamples = []
+    ): string {
         $typeText = $type === 'brand' ? 'ブランド名' : '香水名';
 
-        $prompt = "あなたは香水の専門エキスパートです。実在する香水製品のみを対象として、ユーザーのクエリに最も関連性の高い「ブランド名 + 香水名」の組み合わせを提案してください。
+        $prompt = <<<EOT
+あなたは香水データの正規化と候補提案に特化したアシスタントです。出力は**ツール/関数呼び出しの引数 JSON のみ**とし、余計な文章は一切含めません（説明文や思考過程の出力禁止）。
 
-**対象範囲:** 有名ブランド（シャネル、ディオール、クリード、バイレード、エルメス、トムフォード、アミュアージュ、メゾン・マルジェラ、ディプティック、ル・ラボ、メゾン・フランシス・カーキジャン等）から真のニッチブランド（ナシマト、パルファム・ダンピール、オルファクティブ・スタジオ、エタット・リーブル・ドランジュ等）まで幅広く含める
+【対象範囲】
+- 実在する香水ブランドとその製品のみ（メジャー〜ニッチ含む）
+- 架空名・誤綴り・未確認品は除外。曖昧な場合は confidence を下げる
 
-**重要：多言語対応について**
-- `text`フィールド：必ず日本語名（日本語カタカナ表記）を返す
-- `text_en`フィールド：必ず英語名（オリジナル英語表記）を返す
-- 両フィールドに同じ英語名を入れることは禁止
-- 必ず異なる言語表記を提供する
+【多言語規則（厳守）】
+- text: 日本語の香水名（ブランド名は含めない）
+- text_en: 英語の香水名（ブランド名は含めない）
+- brand_name: 日本語ブランド名
+- brand_name_en: 英語ブランド名
+- text と text_en は**異なる言語表記**（同一英語の再掲は禁止）
 
-**多言語表記の正しい例：**
-- text: \"ディオール ソヴァージュ EDT\" / text_en: \"Dior Sauvage EDT\"
-- text: \"シャネル No.5 オードゥパルファム\" / text_en: \"Chanel No.5 Eau de Parfum\"
-- text: \"バイレード ジプシー ウォーター\" / text_en: \"Byredo Gypsy Water\"
-- text: \"トム フォード ブラック オーキッド\" / text_en: \"Tom Ford Black Orchid\"
-- text: \"クリード アベントゥス\" / text_en: \"Creed Aventus\"
-- text: \"クリード ヒマラヤ\" / text_en: \"Creed Himalaya\"
-- text: \"クリード シルバー マウンテン ウォーター\" / text_en: \"Creed Silver Mountain Water\"
+【分離規則（厳守）】
+- 香水名とブランド名は必ず分離（text/text_en にブランド名を入れない）
+- コンセントレーションやフランカーは香水名側に含めてよい（例: "ソヴァージュ EDP" / "Sauvage EDP"）
 
-**間違った多言語表記の例（禁止）：**
-- text: \"Dior Sauvage EDT\" / text_en: \"Dior Sauvage EDT\" （同じ英語名は禁止）
-- text: \"Chanel No.5\" / text_en: \"Chanel No.5\" （同じ表記は禁止）
+【提案要件】
+- ユーザークエリ: "{$query}"
+- 返す件数: **ちょうど {$limit} 件**
+- 各件は { text, text_en, brand_name, brand_name_en, confidence, rationale_brief } を必須とする
+- すべて「ブランド名 + 香水名」の**固有組み合わせ**（重複禁止）
+- クエリ関連性の高い順。ライン内バリエーション（EDT/EDP/Parfum/Elixir、主要フランカー）を積極的に混在
+- 確信が弱い候補は confidence を低くし、rationale_brief に理由を**一文**で記載
 
-**出力形式の重要な変更：**
-- `text`フィールド：純粋な香水名のみ（ブランド名を除く日本語名）
-- `text_en`フィールド：純粋な香水名のみ（ブランド名を除く英語名）
-- `brand_name`フィールド：日本語ブランド名
-- `brand_name_en`フィールド：英語ブランド名
+【信頼度スコア（上限 1.0）】
+- 文字列一致度: 完全 0.4 / 部分 0.2 / 音韻類似 0.1
+- ブランド知名度: 超有名 0.3 / 有名 0.2 / 一般 0.1
+- 製品知名度: 代表 0.2 / 有名 0.15 / 一般 0.1
+- 実在確実性: 確実 0.1 / 高い 0.05
 
-**正しい出力例：**
-```json
-{
-  \"text\": \"ソヴァージュ EDT\",
-  \"text_en\": \"Sauvage EDT\",
-  \"brand_name\": \"ディオール\",
-  \"brand_name_en\": \"Dior\",
-  \"confidence\": 0.9
-}
-```
+【Few-shot（任意・ある場合のみ）】
+EOT;
 
-**間違った出力例（禁止）：**
-```json
-{
-  \"text\": \"ディオール ソヴァージュ EDT\",  // ブランド名を含むのは禁止
-  \"text_en\": \"Dior Sauvage EDT\",      // ブランド名を含むのは禁止
-}
-```
-
-**絶対的な制約（厳守）:**
-- 香水名とブランド名を必ず分離する
-- `text`と`text_en`にはブランド名を含めない
-- 架空の香水や存在しない製品は提案しない
-- 実在する香水ブランドの製品のみ（メジャーブランドからニッチブランドまで幅広く対象とする）
-- **香水のバリエーション・コンセントレーション・フランカーを積極的に含める**
-
-**香水バリエーション例（分離形式）:**
-- 入力「Dior Sauvage」→ 分離出力:
-  - text: \"ソヴァージュ EDT\", brand_name: \"ディオール\"
-  - text: \"ソヴァージュ パルファム\", brand_name: \"ディオール\"
-  - text: \"ソヴァージュ エリクサー\", brand_name: \"ディオール\"
-- 入力「Chanel No.5」→ 分離出力:
-  - text: \"No.5 オードゥパルファム\", brand_name: \"シャネル\"
-  - text: \"No.5 オードゥトワレ\", brand_name: \"シャネル\"
-
-**正しい提案例（分離形式）:**
-- text: \"ジプシー ウォーター\", brand_name: \"バイレード\"（○）
-- text: \"ソヴァージュ EDT\", brand_name: \"ディオール\"（○：コンセントレーション明記）
-- text: \"No.5 オードゥパルファム\", brand_name: \"シャネル\"（○：フルネーム）
-
-**間違った提案例:**
-- text: \"バイレード ジプシー ウォーター\"（×：ブランド名を含む）
-- text: \"ディオール ソヴァージュ\"（×：ブランド名を含む）
-- brand_nameが空（×：ブランド名必須）
-
-**Chain of Thought - 実在香水製品検索:**
-
-**Step 1: クエリ分析**
-クエリ: \"{$query}\"
-- ブランド名推定: 音韻的類似性による香水ブランド特定
-- 製品名推定: そのブランドの実在製品との一致度
-
-**Step 2: 実在製品マッチング**
-- 確認済み実在製品のみ抽出
-- ブランド名 + 製品名の完全セット生成
-- 人気度・知名度による信頼性評価
-
-**Step 3: Few-shot参照による精度向上**";
-
-        // Few-shot例を追加
         if (! empty($fewShotExamples)) {
-            $prompt .= "\n\n**Step 3: 推論パターンの学習適用**\n以下の成功事例から推論手法を学習し、現在のクエリに適用してください:\n";
-            foreach ($fewShotExamples as $i => $example) {
-                $prompt .= ($i + 1).". 入力「{$example['query']}」→推論結果「{$example['selected_text']}」(精度: {$example['relevance_score']})\n";
+            $prompt .= "\n以下は推論パターンの参考例（**固有名詞は鵜呑みにしない**）：\n";
+            foreach ($fewShotExamples as $i => $ex) {
+                $prompt .= sprintf(
+                    "- 例%d: 入力「%s」→ 採択「%s」 (関連度: %s)\n",
+                    $i + 1,
+                    $ex['query'] ?? '',
+                    $ex['selected_text'] ?? '',
+                    $ex['relevance_score'] ?? ''
+                );
             }
-            $prompt .= "\n重要: 上記事例と全く同じブランドでなくても、推論プロセス（音韻変換、表記正規化、部分補完等）を参考にして未知のクエリを処理してください。\n";
-        } else {
-            $prompt .= "\n\n**Step 3: 汎用的推論能力の適用**\n";
-            $prompt .= "事例がない場合でも、以下の言語学的アプローチで推論を実行:\n";
-            $prompt .= "- 音韻対応ルール適用（カタカナ→英語音写の一般則）\n";
-            $prompt .= "- 語彙補完技術（部分情報からの候補生成）\n";
-            $prompt .= "- 表記正規化手法（音韻距離最小化）\n";
-            $prompt .= "- 文脈推測（香水命名パターンからの推定）\n\n";
         }
 
-        $prompt .= "\n\n**CRITICAL: ユーザーのクエリに関連する香水のみを提案すること**
+        $prompt .= <<<EOT
 
-**Task: 「ブランド名 + 香水名」の完全セットで{$limit}個の提案生成**
 
-ユーザーのクエリ: 「{$query}」
+【禁止事項】
+- 思考過程や手順の逐語出力（CoT）。必要なら rationale_brief の一文のみ
+- ブランド名だけ、香水名だけの提案
+- スキーマからの逸脱、余計な自然文の混入
 
-このクエリに対して、以下の基準で{$limit}個の実在する香水製品を生成してください:
-
-1. **最優先: クエリ関連性**: 「{$query}」と名前・音韻・コンセプトが類似している香水のみを提案
-2. **完全セット必須**: 必ず「ブランド名 + 香水名」の組み合わせのみ
-3. **実在性確認**: 実際に存在する香水製品のみ
-4. **ブランド名単体禁止**: ブランド名だけの提案は絶対禁止
-5. **重複回避必須**: 同一の「ブランド名 + 香水名」の組み合わせは絶対に重複させない
-6. **バリエーション優先**: 同一香水ラインの異なるコンセントレーション・バリエーションを積極的に含める
-
-**バリエーション提案の重要性:**
-- 同じ香水ラインの異なるコンセントレーション（EDT、EDP、Parfum、Elixir等）を含める
-- 限定版やフランカー製品も適宜含める
-
-**信頼度スコア算出基準（厳密に計算）:**
-以下の要素を数値化して合計し、1.0を上限とする:
-- 文字列一致度: 完全一致=0.4, 部分一致=0.2, 音韻類似=0.1
-- ブランド知名度: 超有名ブランド=0.3, 有名ブランド=0.2, 一般ブランド=0.1
-- 製品知名度: 代表的製品=0.2, 有名製品=0.15, 一般製品=0.1
-- 実在確実性: 確実に存在=0.1, 存在可能性高=0.05
-
-**重要:** 上記の基準で各提案の信頼度スコアを厳密に計算すること。
-
-**重要な制約:**
-1. 各提案は必ず異なる「ブランド名 + 香水名」の組み合わせにする
-2. 同じ組み合わせは絶対に2回提案しない
-3. 必ず{$limit}個の提案を生成する（それ以上でもそれ以下でもない）
-
-このタスクを実行し、suggest_fragrances ツールを使用して結果を返してください。";
+【出力】
+- suggest_fragrances ツール（または同等の function）を**1回**呼び出し、
+  ちょうど {$limit} 件の配列を返すこと。
+EOT;
 
         return $prompt;
     }
 
     /**
-     * 正規化用プロンプトを構築
+     * 正規化（入力のブランド名・香水名を正式表記へ）
      */
-    public static function buildNormalizationPrompt(string $brandName, string $fragranceName, string $language): string
+    public static function buildNormalizationPrompt(
+        string $brandName,
+        string $fragranceName,
+        string $language
+    ): string {
+        return <<<EOT
+あなたは香水データベースの専門家です。出力は**ツール/関数呼び出しの引数 JSON のみ**。説明文や思考過程は出力しません。
+
+【入力】
+- ブランド名: "{$brandName}"
+- 香水名   : "{$fragranceName}"
+- 言語     : {$language}
+
+【タスク】
+1) ブランド名/香水名を正式表記へ正規化（日本語/英語の両方）
+2) 実在確認。曖昧な場合は confidence を下げ、rationale_brief に理由を**一文**で記載
+3) スキーマ逸脱禁止
+
+【出力】
+- normalize_fragrance ツール（または同等 function）を**1回**呼び出す。
+EOT;
+    }
+
+    /**
+     * サジェスト用 共通スキーマ（OpenAI/Anthropic/Gemini で流用）
+     */
+    public static function suggestionJsonSchema(): array
     {
-        return "あなたは香水データベースの専門家です。入力されたブランド名と香水名を正規化してください。
+        return [
+            'name' => 'suggest_fragrances',
+            'description' => 'クエリに関連する実在香水の候補を返す',
+            'parameters' => [
+                'type' => 'object',
+                'properties' => [
+                    'items' => [
+                        'type' => 'array',
+                        'minItems' => 1,
+                        'items' => [
+                            'type' => 'object',
+                            'required' => [
+                                'text', 'text_en',
+                                'brand_name', 'brand_name_en',
+                                'confidence', 'rationale_brief',
+                            ],
+                            'properties' => [
+                                'text' => [
+                                    'type' => 'string',
+                                    'description' => '日本語の香水名（ブランド名は含めない／例: ソヴァージュ EDP）',
+                                ],
+                                'text_en' => [
+                                    'type' => 'string',
+                                    'description' => '英語の香水名（ブランド名は含めない／例: Sauvage EDP）',
+                                ],
+                                'brand_name' => [
+                                    'type' => 'string',
+                                    'description' => '日本語ブランド名（例: ディオール）',
+                                ],
+                                'brand_name_en' => [
+                                    'type' => 'string',
+                                    'description' => '英語ブランド名（例: Dior）',
+                                ],
+                                'confidence' => [
+                                    'type' => 'number',
+                                    'minimum' => 0.0,
+                                    'maximum' => 1.0,
+                                ],
+                                'rationale_brief' => [
+                                    'type' => 'string',
+                                    'description' => '根拠を一文で（例: クエリと音韻が近くラインの主要フランカー）',
+                                ],
+                            ],
+                            'allOf' => [
+                                // 簡易ガード：text/text_en に一般的ブランド名が混入していないか
+                                [
+                                    'not' => [
+                                        'properties' => [
+                                            'text' => ['pattern' => '(?i)\\b(dior|chanel|creed|byredo|hermes|tom\\s*ford|maison|diptyque|le\\s*labo|amouage|ysl|givenchy|guerlain)\\b'],
+                                        ],
+                                    ],
+                                ],
+                                [
+                                    'not' => [
+                                        'properties' => [
+                                            'text_en' => ['pattern' => '(?i)\\b(dior|chanel|creed|byredo|hermes|tom\\s*ford|maison|diptyque|le\\s*labo|amouage|ysl|givenchy|guerlain)\\b'],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'required' => ['items'],
+                'additionalProperties' => false,
+            ],
+        ];
+    }
 
-**入力:**
-- ブランド名: \"{$brandName}\"
-- 香水名: \"{$fragranceName}\"
-- 言語: {$language}
-
-**タスク:**
-1. ブランド名を正規化（正式な表記に統一）
-2. 香水名を正規化（正式な表記に統一）
-3. 日本語・英語の両方の表記を提供
-4. 信頼度スコアを算出（0.0-1.0）
-
-**重要:**
-- 実在するブランド・香水のみを対象とする
-- 架空のブランド・香水は提案しない
-- 不確実な場合は信頼度を低くする
-
-normalize_fragrance ツールを使用して結果を返してください。";
+    /**
+     * 正規化用 共通スキーマ
+     */
+    public static function normalizationJsonSchema(): array
+    {
+        return [
+            'name' => 'normalize_fragrance',
+            'description' => 'ブランド名と香水名を正式表記に正規化する',
+            'parameters' => [
+                'type' => 'object',
+                'properties' => [
+                    'text' => ['type' => 'string'],           // 日本語香水名（ブランド名は含めない）
+                    'text_en' => ['type' => 'string'],        // 英語香水名（ブランド名は含めない）
+                    'brand_name' => ['type' => 'string'],     // 日本語ブランド名
+                    'brand_name_en' => ['type' => 'string'],  // 英語ブランド名
+                    'confidence' => ['type' => 'number', 'minimum' => 0.0, 'maximum' => 1.0],
+                    'rationale_brief' => ['type' => 'string'], // 根拠を一文
+                ],
+                'required' => ['text', 'text_en', 'brand_name', 'brand_name_en', 'confidence', 'rationale_brief'],
+                'additionalProperties' => false,
+            ],
+        ];
     }
 }
