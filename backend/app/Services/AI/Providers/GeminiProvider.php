@@ -4,6 +4,7 @@ namespace App\Services\AI\Providers;
 
 use App\Services\AI\Contracts\AIProviderInterface;
 use App\Services\AI\CostTrackingService;
+use App\Services\AI\PromptBuilder;
 use Google\Auth\ApplicationDefaultCredentials;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -104,6 +105,13 @@ class GeminiProvider implements AIProviderInterface
     }
 
     private function buildCompletionPrompt(string $query, string $type, int $limit, string $language): string
+    {
+        $fewShotExamples = $this->getFewShotExamples($query, $type);
+
+        return PromptBuilder::buildCompletionPrompt($query, $type, $limit, $language, $fewShotExamples);
+    }
+
+    private function buildCompletionPromptOld(string $query, string $type, int $limit, string $language): string
     {
         $typeText = $type === 'brand' ? 'ブランド名' : '香水名';
         $fewShotExamples = $this->getFewShotExamples($query, $type);
@@ -242,6 +250,11 @@ suggest_fragrances関数を呼び出して提案してください。";
     }
 
     private function buildNormalizationPrompt(string $brandName, string $fragranceName, string $language): string
+    {
+        return PromptBuilder::buildNormalizationPrompt($brandName, $fragranceName, $language);
+    }
+
+    private function buildNormalizationPromptOld(string $brandName, string $fragranceName, string $language): string
     {
         return "香水情報の正規化を行ってください。
 
