@@ -154,6 +154,9 @@ class GeminiProvider implements AIProviderInterface
                         ],
                     ],
                 ],
+                'generation_config' => [
+                    'maxOutputTokens' => 8192,
+                ],
             ];
 
             $url = "https://{$this->location}-aiplatform.googleapis.com/v1/projects/{$this->projectId}/locations/{$this->location}/publishers/google/models/{$this->model}:generateContent";
