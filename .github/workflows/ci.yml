@@ -125,6 +125,7 @@ jobs:
         working-directory: ./backend
         run: |
           cp .env.example .env.testing
+          echo "" >> .env.testing
           echo "APP_ENV=testing" >> .env.testing
           echo "DB_CONNECTION=mysql" >> .env.testing
           echo "DB_HOST=127.0.0.1" >> .env.testing
