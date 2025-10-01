@@ -22,8 +22,8 @@ export const useAIProviders = () => {
 
             setAvailableProviders(availableProviders);
 
-            // 現在のプロバイダーが未設定の場合、デフォルトプロバイダーを設定
-            if (!currentProvider && data.data.default) {
+            // バックエンドのデフォルトプロバイダーを常に設定
+            if (data.data.default) {
               setCurrentProvider(data.data.default);
             }
           }
@@ -39,7 +39,8 @@ export const useAIProviders = () => {
     };
 
     fetchProviders();
-  }, [setAvailableProviders, setCurrentProvider, currentProvider]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return { currentProvider };
 };
