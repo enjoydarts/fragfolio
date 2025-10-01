@@ -273,6 +273,8 @@ class AnthropicProvider implements AIProviderInterface
                 'model' => $this->model,
                 'prompt_length' => strlen($prompt),
                 'tools_count' => count($tools),
+                'prompt' => substr($prompt, 0, 500),
+                'tools' => $tools,
             ]);
 
             $response = Http::withHeaders([
@@ -281,7 +283,7 @@ class AnthropicProvider implements AIProviderInterface
                 'anthropic-version' => '2023-06-01',
             ])->post('https://api.anthropic.com/v1/messages', [
                 'model' => $this->model,
-                'max_tokens' => 1000,
+                'max_tokens' => 4096,
                 'messages' => [
                     ['role' => 'user', 'content' => $prompt],
                 ],
@@ -300,6 +302,7 @@ class AnthropicProvider implements AIProviderInterface
                 'input_tokens' => $responseData['usage']['input_tokens'] ?? 0,
                 'output_tokens' => $responseData['usage']['output_tokens'] ?? 0,
                 'cost_estimate' => $this->estimateCost($responseData),
+                'response' => $responseData,
             ]);
 
             return $responseData;
