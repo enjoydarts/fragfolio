@@ -135,7 +135,7 @@ EOT;
                             'required' => [
                                 'text', 'text_en',
                                 'brand_name', 'brand_name_en',
-                                'confidence', 'rationale_brief',
+                                'confidence',
                             ],
                             'properties' => [
                                 'text' => [
@@ -191,7 +191,7 @@ EOT;
                     'confidence' => ['type' => 'number', 'minimum' => 0.0, 'maximum' => 1.0],
                     'rationale_brief' => ['type' => 'string'], // 根拠を一文
                 ],
-                'required' => ['text', 'text_en', 'brand_name', 'brand_name_en', 'confidence', 'rationale_brief'],
+                'required' => ['text', 'text_en', 'brand_name', 'brand_name_en', 'confidence'],
                 'additionalProperties' => false,
             ],
         ];
