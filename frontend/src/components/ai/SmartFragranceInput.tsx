@@ -201,18 +201,8 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
         setNormalizationLoading(false);
       }
     },
-    [
-      minChars,
-      lastNormalized,
-      currentProvider,
-      setIsNormalizing,
-      setNormalizationLoading,
-      setLastNormalized,
-      setNormalizationResult,
-      setNormalizationError,
-      onNormalizationResult,
-      t,
-    ]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [minChars, lastNormalized, currentProvider, onNormalizationResult, t]
   );
 
   // キャッシュヘルパー関数
@@ -364,15 +354,8 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
         setIsLoadingCompletions(false);
       }
     },
-    [
-      currentProvider,
-      clearAllSuggestions,
-      getCachedResult,
-      setCachedResult,
-      setFragranceSuggestions,
-      setLastCompletionResponse,
-      isFocused,
-    ]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentProvider, getCachedResult, setCachedResult, isFocused]
   );
 
   // デバウンス付き正規化実行
@@ -412,15 +395,13 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
         clearTimeout(completionTimeout.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     value,
     debounceMs,
     minChars,
     currentProvider,
-    clearAllSuggestions,
-    fetchCompletions,
     lastNormalized,
-    performNormalization,
     showSuggestions,
     userInteractingWithDropdown,
   ]);
