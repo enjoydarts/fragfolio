@@ -498,7 +498,7 @@ CREATE TABLE role_has_permissions (
 CREATE TABLE ai_cost_tracking (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id BIGINT UNSIGNED NULL,
-    provider ENUM('openai', 'anthropic', 'gemini') NOT NULL,
+    provider ENUM('openai', 'anthropic', 'gemini', 'fallback') NOT NULL,
     model VARCHAR(100) NULL,
     operation_type VARCHAR(50) NOT NULL,
     tokens_used INT UNSIGNED NOT NULL DEFAULT 0,
