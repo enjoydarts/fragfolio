@@ -50,6 +50,9 @@ class CompletionService
         $cacheKey = $this->generateCacheKey('completion', $query, $type, $provider, $language, $contextBrand);
 
         try {
+            // キャッシュチェック
+            $wasCached = Cache::has($cacheKey);
+
             // キャッシュから結果を取得（5分間キャッシュ）
             $result = Cache::remember($cacheKey, 300, function () use ($query, $provider, $type, $limit, $language, $contextBrand) {
                 $aiProvider = $this->providerFactory->create($provider);
@@ -75,7 +78,7 @@ class CompletionService
 
             // 結果の後処理
             $result['suggestions'] = $this->processSuggestions($result['suggestions'] ?? [], $query);
-            $result['cached'] = Cache::has($cacheKey);
+            $result['cached'] = $wasCached;
 
             return $result;
 
