@@ -58,11 +58,8 @@ class AnthropicProvider implements AIProviderInterface
         // コスト記録
         $this->recordCost($response, 'completion', $costEstimate);
 
-        // 新しいスキーマでは items 配列が返される
-        $suggestions = $result['items'] ?? [];
-
         return [
-            'suggestions' => $suggestions,
+            'suggestions' => $result['suggestions'] ?? [],
             'response_time_ms' => round($responseTime, 2),
             'provider' => 'anthropic',
             'ai_provider' => 'anthropic',

@@ -127,7 +127,7 @@ EOT;
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
-                    'items' => [
+                    'suggestions' => [
                         'type' => 'array',
                         'minItems' => 1,
                         'items' => [
@@ -167,7 +167,7 @@ EOT;
                         ],
                     ],
                 ],
-                'required' => ['items'],
+                'required' => ['suggestions'],
                 'additionalProperties' => false,
             ],
         ];

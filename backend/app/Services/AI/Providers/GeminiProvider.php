@@ -65,11 +65,8 @@ class GeminiProvider implements AIProviderInterface
         // コスト記録
         $this->recordCost($response, 'completion', $costEstimate);
 
-        // 新しいスキーマでは items 配列が返される
-        $suggestions = $result['items'] ?? [];
-
         return [
-            'suggestions' => $suggestions,
+            'suggestions' => $result['suggestions'] ?? [],
             'provider' => 'gemini',
             'ai_provider' => 'gemini',
             'ai_model' => $this->model,
