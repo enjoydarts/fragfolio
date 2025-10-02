@@ -118,9 +118,9 @@ class AIFeedbackService
                 ->get()
                 ->map(function ($feedback) {
                     return [
-                        'query' => $feedback->getAttribute('query'),
-                        'selected_text' => $feedback->getAttribute('selected_suggestion')['text'] ?? '',
-                        'relevance_score' => $feedback->getAttribute('relevance_score') ?? 0.5,
+                        'query' => $feedback->query,
+                        'selected_text' => $feedback->selected_suggestion['text'] ?? '',
+                        'relevance_score' => (float) ($feedback->relevance_score ?? 0.5),
                     ];
                 })
                 ->toArray();
@@ -147,9 +147,9 @@ class AIFeedbackService
                 ->get()
                 ->map(function ($feedback) {
                     return [
-                        'query' => $feedback->getAttribute('query'),
-                        'selected_text' => $feedback->getAttribute('selected_suggestion')['text'] ?? '',
-                        'relevance_score' => $feedback->getAttribute('relevance_score') ?? 0.5,
+                        'query' => $feedback->query,
+                        'selected_text' => $feedback->selected_suggestion['text'] ?? '',
+                        'relevance_score' => (float) ($feedback->relevance_score ?? 0.5),
                     ];
                 })
                 ->toArray();

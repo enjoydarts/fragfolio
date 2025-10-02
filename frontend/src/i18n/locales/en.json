@@ -376,7 +376,11 @@
       "confidence_score": "AI Confidence Score",
       "apply_button": "Apply Normalization Results",
       "applied": "Normalization results applied",
-      "info_message": "ℹ️ After entering brand name and fragrance name, press the \"AI Quality Check\" button to have AI verify and normalize the information"
+      "info_message": "ℹ️ After entering brand name and fragrance name, press the \"AI Quality Check\" button to have AI verify and normalize the information",
+      "auto_analyzed": "AI Auto-Analysis Results",
+      "auto_description": "AI automatically analyzed and normalized the entered information",
+      "not_exists_title": "⚠️ May Not Exist",
+      "not_exists_message": "AI could not confirm the existence of this brand/fragrance. It may be fictional or incorrect information."
     }
   },
   "ai": {

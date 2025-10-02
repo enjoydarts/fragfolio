@@ -179,27 +179,16 @@ const FragranceRegistration: React.FC = () => {
 
   // 正規化結果の適用
   const applyNormalization = () => {
-    if (normalizationResult) {
+    if (normalizationResult?.normalized_data) {
+      const data = normalizationResult.normalized_data;
       setFormData((prev) => ({
         ...prev,
         // 日本語フィールド
-        brandName:
-          normalizationResult.normalized_brand_ja ||
-          normalizationResult.normalized_brand ||
-          prev.brandName,
-        fragranceName:
-          normalizationResult.normalized_fragrance_ja ||
-          normalizationResult.normalized_fragrance ||
-          prev.fragranceName,
+        brandName: data.brand_name || prev.brandName,
+        fragranceName: data.text || prev.fragranceName,
         // 英語フィールド
-        brandNameEn:
-          normalizationResult.normalized_brand_en ||
-          normalizationResult.normalized_brand ||
-          prev.brandNameEn,
-        fragranceNameEn:
-          normalizationResult.normalized_fragrance_en ||
-          normalizationResult.normalized_fragrance ||
-          prev.fragranceNameEn,
+        brandNameEn: data.brand_name_en || prev.brandNameEn,
+        fragranceNameEn: data.text_en || prev.fragranceNameEn,
       }));
       setShowNormalization(false);
       toast.success(t('fragrance.ai_quality_check.applied'));
@@ -453,7 +442,7 @@ const FragranceRegistration: React.FC = () => {
                 </div>
               </div>
 
-              {/* AI正規化セクション（改良版） */}
+              {/* AI品質チェック & 正規化（手動実行） */}
               <div className="bg-blue-50 p-6 rounded-lg border border-blue-200 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
@@ -517,27 +506,24 @@ const FragranceRegistration: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
-                      {(normalizationResult.normalized_brand_ja ||
-                        normalizationResult.normalized_brand) && (
+                      {normalizationResult.normalized_data?.brand_name && (
                         <div className="bg-blue-50 p-4 rounded-lg">
                           <div className="text-sm text-blue-700 font-medium mb-1">
                             {t('fragrance.ai_quality_check.normalized_brand')}
                           </div>
                           <div className="text-lg font-semibold text-gray-900">
-                            {normalizationResult.normalized_brand_ja ||
-                              normalizationResult.normalized_brand}
+                            {normalizationResult.normalized_data.brand_name}
                           </div>
-                          {normalizationResult.normalized_brand_en && (
+                          {normalizationResult.normalized_data.brand_name_en && (
                             <div className="text-sm text-gray-600 mt-1">
                               {t('fragrance.ai_quality_check.english_label')}{' '}
-                              {normalizationResult.normalized_brand_en}
+                              {normalizationResult.normalized_data.brand_name_en}
                             </div>
                           )}
                         </div>
                       )}
 
-                      {(normalizationResult.normalized_fragrance_ja ||
-                        normalizationResult.normalized_fragrance) && (
+                      {normalizationResult.normalized_data?.text && (
                         <div className="bg-purple-50 p-4 rounded-lg">
                           <div className="text-sm text-purple-700 font-medium mb-1">
                             {t(
@@ -545,18 +531,39 @@ const FragranceRegistration: React.FC = () => {
                             )}
                           </div>
                           <div className="text-lg font-semibold text-gray-900">
-                            {normalizationResult.normalized_fragrance_ja ||
-                              normalizationResult.normalized_fragrance}
+                            {normalizationResult.normalized_data.text}
                           </div>
-                          {normalizationResult.normalized_fragrance_en && (
+                          {normalizationResult.normalized_data.text_en && (
                             <div className="text-sm text-gray-600 mt-1">
                               {t('fragrance.ai_quality_check.english_label')}{' '}
-                              {normalizationResult.normalized_fragrance_en}
+                              {normalizationResult.normalized_data.text_en}
                             </div>
                           )}
                         </div>
                       )}
                     </div>
+
+                    {/* 実在確認警告 */}
+                    {normalizationResult.normalized_data?.exists === false && (
+                      <div className="mb-5 p-4 bg-red-50 border-l-4 border-red-400 rounded-lg">
+                        <div className="flex items-center">
+                          <span className="text-red-500 text-xl mr-3">⚠️</span>
+                          <div>
+                            <h4 className="text-red-800 font-medium">
+                              {t('fragrance.ai_quality_check.not_exists_title')}
+                            </h4>
+                            <p className="text-sm text-red-600 mt-1">
+                              {t('fragrance.ai_quality_check.not_exists_message')}
+                            </p>
+                            {normalizationResult.normalized_data.rationale_brief && (
+                              <p className="text-sm text-red-700 mt-2 italic">
+                                {normalizationResult.normalized_data.rationale_brief}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div className="mb-5">
                       <div className="flex items-center gap-3 mb-3">
@@ -566,7 +573,7 @@ const FragranceRegistration: React.FC = () => {
                         </span>
                       </div>
                       <ConfidenceIndicator
-                        confidence={normalizationResult.confidence_score || 0.5}
+                        confidence={normalizationResult.normalized_data?.confidence || 0.5}
                         size="lg"
                         showLabel={true}
                         showPercentage={true}

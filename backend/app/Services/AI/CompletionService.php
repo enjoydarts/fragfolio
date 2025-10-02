@@ -55,14 +55,7 @@ class CompletionService
 
             // キャッシュから結果を取得（5分間キャッシュ）
             $result = Cache::remember($cacheKey, 300, function () use ($query, $provider, $type, $limit, $language, $contextBrand) {
-                $aiProvider = $this->providerFactory->create($provider);
-
-                return $aiProvider->complete($query, [
-                    'type' => $type,
-                    'limit' => $limit,
-                    'language' => $language,
-                    'contextBrand' => $contextBrand,
-                ]);
+                return $this->attemptCompletionWithFallback($query, $provider, $type, $limit, $language, $contextBrand);
             });
 
             // コスト追跡
@@ -203,6 +196,71 @@ class CompletionService
         $contextBrand = $contextBrand ?: '';
 
         return "ai:{$operation}:".md5("{$query}:{$type}:{$provider}:{$language}:{$contextBrand}");
+    }
+
+    /**
+     * 複数プロバイダーでリトライしながら補完を試みる
+     */
+    private function attemptCompletionWithFallback(string $query, ?string $provider, string $type, int $limit, string $language, ?string $contextBrand): array
+    {
+        // プロバイダー優先順位（指定されたプロバイダーを最優先）
+        $providers = $provider ? [$provider] : [];
+        $allProviders = ['anthropic', 'openai', 'gemini'];
+
+        // 指定プロバイダー以外を追加
+        foreach ($allProviders as $p) {
+            if (!in_array($p, $providers)) {
+                $providers[] = $p;
+            }
+        }
+
+        $lastException = null;
+
+        foreach ($providers as $currentProvider) {
+            try {
+                Log::info('Attempting completion with provider', [
+                    'provider' => $currentProvider,
+                    'query' => $query,
+                ]);
+
+                $aiProvider = $this->providerFactory->create($currentProvider);
+                $result = $aiProvider->complete($query, [
+                    'type' => $type,
+                    'limit' => $limit,
+                    'language' => $language,
+                    'contextBrand' => $contextBrand,
+                ]);
+
+                // 成功したらすぐに返す
+                if (!empty($result['suggestions'])) {
+                    if ($currentProvider !== $provider) {
+                        Log::info('Completion succeeded with fallback provider', [
+                            'original_provider' => $provider,
+                            'fallback_provider' => $currentProvider,
+                            'suggestions_count' => count($result['suggestions']),
+                        ]);
+                    }
+                    return $result;
+                }
+
+            } catch (\Exception $e) {
+                $lastException = $e;
+                Log::warning('Completion failed with provider, trying next', [
+                    'provider' => $currentProvider,
+                    'error' => $e->getMessage(),
+                    'error_type' => get_class($e),
+                ]);
+                continue;
+            }
+        }
+
+        // 全プロバイダーで失敗した場合
+        Log::error('All AI providers failed for completion', [
+            'tried_providers' => $providers,
+            'last_error' => $lastException?->getMessage(),
+        ]);
+
+        throw $lastException ?? new \Exception('All AI providers failed');
     }
 
     /**
