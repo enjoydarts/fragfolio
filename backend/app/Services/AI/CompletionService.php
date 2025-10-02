@@ -209,7 +209,7 @@ class CompletionService
 
         // 指定プロバイダー以外を追加
         foreach ($allProviders as $p) {
-            if (!in_array($p, $providers)) {
+            if (! in_array($p, $providers)) {
                 $providers[] = $p;
             }
         }
@@ -232,7 +232,7 @@ class CompletionService
                 ]);
 
                 // 成功したらすぐに返す
-                if (!empty($result['suggestions'])) {
+                if (! empty($result['suggestions'])) {
                     if ($currentProvider !== $provider) {
                         Log::info('Completion succeeded with fallback provider', [
                             'original_provider' => $provider,
@@ -240,6 +240,7 @@ class CompletionService
                             'suggestions_count' => count($result['suggestions']),
                         ]);
                     }
+
                     return $result;
                 }
 
@@ -250,6 +251,7 @@ class CompletionService
                     'error' => $e->getMessage(),
                     'error_type' => get_class($e),
                 ]);
+
                 continue;
             }
         }

@@ -435,7 +435,7 @@ class GeminiProvider implements AIProviderInterface
                     // 最大リトライ回数に達したら429エラーを返す（フォールバックのため）
                     Log::error('Gemini rate limit exceeded after all retries', [
                         'max_retries' => $maxRetries,
-                        'total_wait_time' => array_sum(array_map(fn($i) => min(2 ** $i, 60), range(1, $maxRetries))),
+                        'total_wait_time' => array_sum(array_map(fn ($i) => min(2 ** $i, 60), range(1, $maxRetries))),
                     ]);
                 }
 
