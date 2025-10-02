@@ -25,7 +25,7 @@ class BatchNormalizeFragranceRequest extends FormRequest
             'fragrances' => ['required', 'array', 'min:1', 'max:10'],
             'fragrances.*.brand_name' => ['required', 'string', 'min:2', 'max:100'],
             'fragrances.*.fragrance_name' => ['required', 'string', 'min:2', 'max:200'],
-            'provider' => ['sometimes', 'string', 'in:openai,anthropic'],
+            'provider' => ['sometimes', 'string', 'in:openai,anthropic,gemini'],
             'language' => ['sometimes', 'string', 'in:ja,en'],
         ];
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\AI;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\AI\BatchNormalizeFragranceRequest;
 use App\Http\Requests\Api\AI\NormalizeFragranceRequest;
+use App\Http\Requests\Api\AI\SmartFragranceInputRequest;
 use App\UseCases\AI\NormalizeFragranceUseCase;
 use Illuminate\Http\JsonResponse;
 
@@ -99,6 +100,46 @@ class NormalizationController extends Controller
     }
 
     /**
+     * 統一入力からの香水情報正規化
+     */
+    public function normalizeFromInput(SmartFragranceInputRequest $request): JsonResponse
+    {
+        try {
+            $result = $this->useCase->normalizeFromInput(
+                input: $request->validated('input'),
+                options: [
+                    'provider' => $request->validated('provider'),
+                    'language' => $request->validated('language', 'mixed'),
+                    'user_id' => $request->user()?->id,
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'data' => $result,
+            ]);
+
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => [
+                    'type' => 'validation_error',
+                    'message' => $e->getMessage(),
+                ],
+            ], 422);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => [
+                    'type' => 'internal_error',
+                    'message' => __('ai.smart_normalization_failed'),
+                ],
+            ], 500);
+        }
+    }
+
+    /**
      * 正規化プロバイダー一覧
      */
     public function providers(): JsonResponse
@@ -119,9 +160,15 @@ class NormalizationController extends Controller
                         'available' => ! empty(config('services.anthropic.api_key')),
                         'models' => [config('services.ai.models.claude')],
                     ],
+                    [
+                        'name' => 'gemini',
+                        'display_name' => 'Google Gemini',
+                        'available' => ! empty(config('services.google.project_id')),
+                        'models' => [config('services.ai.models.gemini')],
+                    ],
                 ],
                 'default' => config('services.ai.default_provider'),
-                'total' => 2,
+                'total' => 3,
             ],
         ]);
     }
@@ -157,6 +204,17 @@ class NormalizationController extends Controller
                 $overallHealthy = false;
             }
 
+            // Gemini プロバイダーチェック
+            $geminiHealthy = $this->checkProviderHealth('gemini');
+            $providers[] = [
+                'name' => 'gemini',
+                'healthy' => $geminiHealthy,
+                'last_check' => now()->toISOString(),
+            ];
+            if (! $geminiHealthy) {
+                $overallHealthy = false;
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -188,6 +246,8 @@ class NormalizationController extends Controller
                     return ! empty(config('services.openai.api_key'));
                 case 'anthropic':
                     return ! empty(config('services.anthropic.api_key'));
+                case 'gemini':
+                    return ! empty(config('services.google.project_id'));
                 default:
                     return false;
             }

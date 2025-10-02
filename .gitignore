@@ -42,3 +42,6 @@ junit.xml
 
 # Claude Code settings
 .claude/
+
+# Google Cloud Service Account keys
+backend/storage/keys/*.json

@@ -27,7 +27,8 @@ class CompletionController extends Controller
             'type' => 'required|string|in:brand,fragrance',
             'limit' => 'nullable|integer|min:1|max:20',
             'language' => 'nullable|string|in:ja,en',
-            'provider' => 'nullable|string|in:openai,anthropic',
+            'provider' => 'nullable|string|in:openai,anthropic,gemini',
+            'contextBrand' => 'nullable|string|max:100', // ブランド名フィルタ用
         ], [
             'query.required' => __('ai.validation.query_required'),
             'query.min' => __('ai.validation.query_min_length'),
@@ -57,6 +58,7 @@ class CompletionController extends Controller
                     'limit' => $request->input('limit', 10),
                     'language' => $request->input('language', app()->getLocale()),
                     'provider' => $request->input('provider'),
+                    'contextBrand' => $request->input('contextBrand'), // ブランド名フィルタ
                     'user_id' => $request->user()?->id,
                 ]
             );
@@ -85,7 +87,7 @@ class CompletionController extends Controller
             'queries.*' => 'required|string|min:2|max:100',
             'type' => 'required|string|in:brand,fragrance',
             'language' => 'nullable|string|in:ja,en',
-            'provider' => 'nullable|string|in:openai,anthropic',
+            'provider' => 'nullable|string|in:openai,anthropic,gemini',
         ], [
             'queries.required' => __('ai.validation.queries_required'),
             'queries.array' => __('ai.validation.queries_array'),

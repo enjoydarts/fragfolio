@@ -44,10 +44,17 @@ return [
         'api_key' => env('ANTHROPIC_API_KEY'),
     ],
 
+    'gemini' => [
+        'project_id' => env('GEMINI_PROJECT_ID'),
+        'location' => env('GEMINI_LOCATION', 'asia-northeast1'),
+        'service_account_path' => env('GEMINI_SERVICE_ACCOUNT_PATH'),
+    ],
+
     'ai' => [
-        'default_provider' => env('DEFAULT_AI_PROVIDER', 'openai'),
-        'gpt_model' => env('AI_MODEL_GPT', 'gpt-4'),
-        'claude_model' => env('AI_MODEL_CLAUDE', 'claude-3-sonnet-20240229'),
+        'default_provider' => env('DEFAULT_AI_PROVIDER', 'gemini'),
+        'gpt_model' => env('AI_MODEL_GPT', 'gpt-4o-mini'),
+        'claude_model' => env('AI_MODEL_CLAUDE', 'claude-3-5-haiku-20241022'),
+        'gemini_model' => env('AI_MODEL_GEMINI', 'gemini-2.5-flash'),
     ],
 
     'turnstile' => [

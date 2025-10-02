@@ -24,6 +24,15 @@ interface AIProviderInterface
     public function normalize(string $brandName, string $fragranceName, array $options = []): array;
 
     /**
+     * 統一入力からの正規化機能
+     *
+     * @param  string  $input  統一入力テキスト（ブランド名、香水名、またはその両方）
+     * @param  array  $options  オプション設定
+     * @return array 正規化結果
+     */
+    public function normalizeFromInput(string $input, array $options = []): array;
+
+    /**
      * 香りノート推定機能
      *
      * @param  string  $brandName  ブランド名

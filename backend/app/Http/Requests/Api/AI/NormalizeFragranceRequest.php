@@ -24,7 +24,7 @@ class NormalizeFragranceRequest extends FormRequest
         return [
             'brand_name' => ['required', 'string', 'min:2', 'max:100'],
             'fragrance_name' => ['required', 'string', 'min:2', 'max:200'],
-            'provider' => ['sometimes', 'string', 'in:openai,anthropic'],
+            'provider' => ['sometimes', 'string', 'in:openai,anthropic,gemini'],
             'language' => ['sometimes', 'string', 'in:ja,en'],
         ];
     }

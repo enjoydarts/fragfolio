@@ -12,6 +12,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call([
+            AIFeedbackSeeder::class,
+        ]);
+
         // 将来的にマスターデータのSeederを追加予定
         // $this->call([
         //     ConcentrationTypeSeeder::class,

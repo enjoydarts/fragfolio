@@ -5,6 +5,7 @@ namespace App\UseCases\AI;
 use App\Services\AI\AIProviderFactory;
 use App\Services\AI\CompletionService;
 use App\Services\AI\CostTrackingService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class CompleteFragranceUseCase
@@ -41,6 +42,21 @@ class CompleteFragranceUseCase
             throw new \InvalidArgumentException('Query cannot be empty');
         }
 
+        // キャッシュキー生成
+        $cacheKey = $this->generateCacheKey($query, $options);
+
+        // キャッシュチェック
+        $cachedResult = Cache::get($cacheKey);
+        if ($cachedResult !== null) {
+            Log::info('AI completion cache hit', [
+                'query' => $query,
+                'cache_key' => $cacheKey,
+                'provider' => $options['provider'] ?? 'default',
+            ]);
+
+            return $cachedResult;
+        }
+
         // ユーザーの制限チェック
         if (isset($options['user_id'])) {
             $this->validateUserLimits($options['user_id']);
@@ -58,8 +74,11 @@ class CompleteFragranceUseCase
             // 結果の後処理
             $result = $this->postProcessResult($result, $query, $options);
 
+            // キャッシュに保存（15分間）
+            Cache::put($cacheKey, $result, now()->addMinutes(15));
+
             // ログ記録
-            $this->logCompletion($query, $options, $result);
+            $this->logCompletion($query, $options, $result, true);
 
             return $result;
 
@@ -218,7 +237,7 @@ class CompleteFragranceUseCase
     /**
      * 補完ログを記録
      */
-    private function logCompletion(string $query, array $options, array $result): void
+    private function logCompletion(string $query, array $options, array $result, bool $cacheStored = false): void
     {
         Log::info('Fragrance completion executed', [
             'query' => $query,
@@ -229,7 +248,26 @@ class CompleteFragranceUseCase
             'cost_estimate' => $result['cost_estimate'] ?? 0,
             'user_id' => $options['user_id'] ?? null,
             'cached' => $result['cached'] ?? false,
+            'cache_stored' => $cacheStored,
         ]);
+    }
+
+    /**
+     * キャッシュキーを生成
+     */
+    private function generateCacheKey(string $query, array $options): string
+    {
+        $keyParts = [
+            'ai_completion',
+            md5(strtolower(trim($query))),
+            $options['type'] ?? 'fragrance',
+            $options['language'] ?? 'ja',
+            $options['provider'] ?? 'default',
+            $options['limit'] ?? 10,
+            $options['contextBrand'] ?? 'none',
+        ];
+
+        return implode(':', $keyParts);
     }
 
     /**

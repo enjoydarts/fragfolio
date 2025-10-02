@@ -399,14 +399,11 @@ class NormalizationService
             $totalConfidence = ($totalConfidence + $data['fragrance_match_confidence']) / 2;
         }
 
-        // 元の文字列との類似度も考慮
-        $brandSimilarity = $this->calculateSimilarity($originalBrand, $data['normalized_brand'] ?? '');
-        $fragranceSimilarity = $this->calculateSimilarity($originalFragrance, $data['normalized_fragrance_name'] ?? '');
-
-        $averageSimilarity = ($brandSimilarity + $fragranceSimilarity) / 2;
-        $finalConfidence = ($totalConfidence * 0.7) + ($averageSimilarity * 0.3);
-
-        $data['final_confidence_score'] = round($finalConfidence, 3);
+        // AIが判断した信頼度をそのまま使用（独自計算は行わない）
+        if (! isset($data['final_confidence_score']) || $data['final_confidence_score'] === 0) {
+            // AIが信頼度を返していない場合のみ、デフォルト値を設定
+            $data['final_confidence_score'] = 0.75; // 中程度の信頼度
+        }
 
         return $result;
     }
@@ -482,6 +479,216 @@ class NormalizationService
             'provider' => 'fallback',
             'cost_estimate' => 0.0,
         ];
+    }
+
+    /**
+     * 統一入力からの正規化処理
+     *
+     * @param  string  $input  統一入力テキスト（ブランド名、香水名、またはその両方）
+     * @param  array  $options  オプション設定
+     * @return array 正規化結果
+     */
+    public function normalizeFromInput(string $input, array $options = []): array
+    {
+        $provider = $options['provider'] ?? null;
+        $language = $options['language'] ?? 'mixed';
+        $userId = $options['user_id'] ?? null;
+
+        // 入力検証
+        if (empty(trim($input))) {
+            throw new \InvalidArgumentException('Input text is required');
+        }
+
+        // キャッシュキー生成（統一入力用）
+        $cacheKey = $this->generateSmartInputCacheKey('smart_normalization', $input, $provider, $language);
+
+        try {
+            // キャッシュから結果を取得（30分間キャッシュ）
+            $result = Cache::remember($cacheKey, 1800, function () use ($input, $provider, $language) {
+                try {
+                    $aiProvider = $this->providerFactory->create($provider);
+
+                    return $aiProvider->normalizeFromInput($input, [
+                        'language' => $language,
+                    ]);
+                } catch (\Exception $e) {
+                    // AI APIが失敗した場合のフォールバック処理
+                    Log::warning('AI smart normalization failed, using fallback', [
+                        'input' => $input,
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    return $this->generateFallbackSmartNormalization($input, $language);
+                }
+            });
+
+            // マスタデータとの照合
+            $result = $this->matchWithMasterDataFromSmartInput($result);
+
+            // 正規化ルールの適用
+            $result = $this->applyNormalizationRules($result);
+
+            // 信頼度スコアの計算（統一入力用）
+            $result = $this->calculateSmartInputConfidenceScore($result, $input);
+
+            // コスト追跡
+            if ($userId && isset($result['cost_estimate'])) {
+                $this->costTracker->trackUsage($userId, [
+                    'provider' => $result['provider'],
+                    'operation_type' => 'smart_normalization',
+                    'cost' => $result['cost_estimate'],
+                    'response_time_ms' => $result['response_time_ms'],
+                    'metadata' => [
+                        'input' => $input,
+                    ],
+                ]);
+            }
+
+            // メタデータの追加
+            $result['metadata'] = [
+                'original_input' => $input,
+                'language' => $language,
+                'provider' => $result['provider'] ?? 'unknown',
+                'timestamp' => now()->toISOString(),
+                'cached' => Cache::has($cacheKey),
+            ];
+
+            return $result;
+
+        } catch (\Exception $e) {
+            Log::error('Smart normalization service failed', [
+                'input' => $input,
+                'provider' => $provider,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * 統一入力からのマスタデータ照合
+     */
+    private function matchWithMasterDataFromSmartInput(array $normalizedData): array
+    {
+        if (! isset($normalizedData['normalized_data'])) {
+            return $normalizedData;
+        }
+
+        $data = $normalizedData['normalized_data'];
+
+        // ブランド名の照合（日本語・英語両方を試行）
+        if (isset($data['normalized_brand_ja']) || isset($data['normalized_brand_en'])) {
+            $brandToMatch = $data['normalized_brand_ja'] ?? $data['normalized_brand_en'];
+            $matchedBrand = $this->findMatchingBrand($brandToMatch);
+            if ($matchedBrand) {
+                $data['matched_brand'] = $matchedBrand;
+                $data['brand_match_confidence'] = $this->calculateBrandMatchConfidence($brandToMatch, $matchedBrand);
+            }
+        }
+
+        // 香水名の照合（ブランドが特定できた場合のみ）
+        if (isset($data['matched_brand']) && (isset($data['normalized_fragrance_ja']) || isset($data['normalized_fragrance_en']))) {
+            $fragranceToMatch = $data['normalized_fragrance_ja'] ?? $data['normalized_fragrance_en'];
+            $matchedFragrance = $this->findMatchingFragrance(
+                $data['matched_brand']['id'],
+                $fragranceToMatch
+            );
+            if ($matchedFragrance) {
+                $data['matched_fragrance'] = $matchedFragrance;
+                $data['fragrance_match_confidence'] = $this->calculateFragranceMatchConfidence(
+                    $fragranceToMatch,
+                    $matchedFragrance
+                );
+            }
+        }
+
+        $normalizedData['normalized_data'] = $data;
+
+        return $normalizedData;
+    }
+
+    /**
+     * 統一入力用の信頼度スコア計算
+     */
+    private function calculateSmartInputConfidenceScore(array $result, string $originalInput): array
+    {
+        if (! isset($result['normalized_data'])) {
+            return $result;
+        }
+
+        $data = &$result['normalized_data'];
+        $totalConfidence = $data['confidence_score'] ?? 0.8;
+
+        // マスタマッチの信頼度を加味
+        if (isset($data['brand_match_confidence'])) {
+            $totalConfidence = ($totalConfidence + $data['brand_match_confidence']) / 2;
+        }
+
+        if (isset($data['fragrance_match_confidence'])) {
+            $totalConfidence = ($totalConfidence + $data['fragrance_match_confidence']) / 2;
+        }
+
+        // AIが判断した信頼度をそのまま使用（独自計算は行わない）
+        if (! isset($data['final_confidence_score']) || $data['final_confidence_score'] === 0) {
+            // AIが信頼度を返していない場合のみ、デフォルト値を設定
+            $data['final_confidence_score'] = 0.75; // 中程度の信頼度
+        }
+
+        return $result;
+    }
+
+    /**
+     * 統一入力用フォールバック正規化処理
+     */
+    private function generateFallbackSmartNormalization(string $input, string $language): array
+    {
+        // シンプルなパターンマッチングで分割を試行
+        $patterns = [
+            '/(.+?)\s+(.+)/',  // スペース区切り
+            '/(.+?)・(.+)/',   // 中点区切り
+            '/(.+?)\/(.+)/',   // スラッシュ区切り
+        ];
+
+        $brandName = '';
+        $fragranceName = '';
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, trim($input), $matches)) {
+                $brandName = trim($matches[1]);
+                $fragranceName = trim($matches[2]);
+                break;
+            }
+        }
+
+        // パターンマッチしなかった場合は入力全体を香水名とみなす
+        if (empty($brandName) && empty($fragranceName)) {
+            $fragranceName = trim($input);
+        }
+
+        return [
+            'normalized_data' => [
+                'normalized_brand_ja' => $brandName,
+                'normalized_brand_en' => '',
+                'normalized_fragrance_ja' => $fragranceName,
+                'normalized_fragrance_en' => '',
+                'confidence_score' => 0.3, // フォールバックは低い信頼度
+                'fallback_reason' => 'AI provider unavailable',
+            ],
+            'response_time_ms' => 10,
+            'provider' => 'fallback',
+            'cost_estimate' => 0.0,
+        ];
+    }
+
+    /**
+     * 統一入力用キャッシュキー生成
+     */
+    private function generateSmartInputCacheKey(string $operation, string $input, ?string $provider, string $language): string
+    {
+        $provider = $provider ?: $this->providerFactory->getDefaultProvider();
+
+        return "ai:{$operation}:".md5("{$input}:{$provider}:{$language}");
     }
 
     /**

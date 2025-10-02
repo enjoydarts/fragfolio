@@ -234,6 +234,70 @@ class NormalizeFragranceUseCase
     }
 
     /**
+     * 統一入力からの正規化処理
+     *
+     * @param  string  $input  統一入力テキスト（ブランド名、香水名、またはその両方）
+     * @param  array  $options  オプション設定
+     * @return array 正規化結果
+     *
+     * @throws \InvalidArgumentException
+     * @throws \Exception
+     */
+    public function normalizeFromInput(string $input, array $options = []): array
+    {
+        $userId = $options['user_id'] ?? null;
+
+        // ユーザー固有の制限チェック
+        if ($userId) {
+            $this->checkUserLimits($userId, 'normalization');
+        }
+
+        // 入力値のサニタイズ
+        $input = $this->sanitizeInput($input);
+
+        // 実行時間計測開始
+        $startTime = microtime(true);
+
+        try {
+            $result = $this->normalizationService->normalizeFromInput($input, $options);
+
+            // 実行時間を結果に追加
+            $executionTime = round((microtime(true) - $startTime) * 1000);
+            $result['execution_time_ms'] = $executionTime;
+
+            // ユーザーフィードバック処理
+            $this->processUserFeedback($result, $options);
+
+            // 使用状況ログ
+            Log::info('Smart input normalization completed', [
+                'user_id' => $userId,
+                'input' => $input,
+                'provider' => $result['provider'] ?? 'unknown',
+                'execution_time_ms' => $executionTime,
+                'confidence_score' => $result['normalized_data']['final_confidence_score'] ?? null,
+            ]);
+
+            return $result;
+
+        } catch (\InvalidArgumentException $e) {
+            Log::warning('Smart input normalization validation failed', [
+                'user_id' => $userId,
+                'input' => $input,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Smart input normalization failed', [
+                'user_id' => $userId,
+                'input' => $input,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
      * 正規化結果の品質評価
      */
     public function evaluateQuality(array $result): array

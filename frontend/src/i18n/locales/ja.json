@@ -9,7 +9,9 @@
     "register": "新規登録",
     "profile": "プロフィール",
     "logout": "ログアウト",
-    "settings": "設定"
+    "settings": "設定",
+    "collection": "コレクション",
+    "register_fragrance": "香水登録"
   },
   "features": {
     "collection": {
@@ -318,6 +320,113 @@
       "logout_all": "他のセッションをすべてログアウト",
       "logout_confirm": "ログアウト"
     }
+  },
+  "fragrance": {
+    "register_title": "香水登録",
+    "register_description": "新しい香水をあなたのコレクションに追加します。AI機能を使って正確な情報を入力できます。",
+    "brand_name": "ブランド名",
+    "fragrance_name": "香水名",
+    "volume": "容量",
+    "purchase_price": "購入価格",
+    "purchase_date": "購入日",
+    "purchase_place": "購入場所",
+    "possession_type": "所有タイプ",
+    "rating": "評価",
+    "comments": "コメント",
+    "brand_placeholder": "例: CHANEL, Dior, Tom Ford",
+    "fragrance_placeholder": "例: No.5, J'adore, Black Orchid",
+    "purchase_place_placeholder": "例: 百貨店、オンラインショップ",
+    "comments_placeholder": "香水についての感想や印象を自由に記入してください",
+    "full_bottle": "フルボトル",
+    "decant": "分け売り",
+    "sample": "サンプル",
+    "register": "登録",
+    "registering": "登録中...",
+    "registration_success": "香水を登録しました",
+    "registration_error": "香水の登録に失敗しました",
+    "smart_input": {
+      "title": "香水情報を入力",
+      "description": "AIが自動で分析・整理します",
+      "ai_badge": "AI搭載",
+      "label": "ブランド名・香水名を自由に入力してください"
+    },
+    "detailed_info": {
+      "title": "詳細情報（自動入力済み）",
+      "editable": "編集可能",
+      "brand_group": "ブランド名",
+      "brand_ja": "日本語",
+      "brand_en": "英語",
+      "fragrance_group": "香水名",
+      "fragrance_ja": "日本語",
+      "fragrance_en": "英語",
+      "brand_ja_placeholder": "例: シャネル, ディオール",
+      "brand_en_placeholder": "例: CHANEL, Dior",
+      "fragrance_ja_placeholder": "例: No.5, ソヴァージュ",
+      "fragrance_en_placeholder": "例: No.5, Sauvage"
+    },
+    "ai_quality_check": {
+      "title": "AI品質チェック & 正規化",
+      "description": "入力された情報を AI が検証・修正し、より正確な情報に変換します",
+      "button": "AI正規化実行",
+      "analyzing": "AI分析中...",
+      "error_occurred": "エラーが発生しました",
+      "result_title": "AI分析結果",
+      "normalized_brand": "✨ 正規化されたブランド名",
+      "normalized_fragrance": "🌸 正規化された香水名",
+      "english_label": "英語:",
+      "confidence_score": "AI信頼度スコア",
+      "apply_button": "正規化結果を適用",
+      "applied": "正規化結果を適用しました",
+      "info_message": "ℹ️ ブランド名と香水名を入力後、「AI品質チェック実行」ボタンを押すとAIが情報を検証・正規化します"
+    }
+  },
+  "ai": {
+    "normalize": "正規化",
+    "normalizing": "正規化中...",
+    "confidence": {
+      "label": "信頼度",
+      "high": "高",
+      "medium": "中",
+      "low": "低",
+      "very_low": "とても低い"
+    },
+    "completion": {
+      "help": "{{minChars}}文字以上入力するとAI補完が表示されます",
+      "source": "ソース",
+      "suggestions": "提案",
+      "loading": "AI が香水を探しています...",
+      "no_suggestions": "提案がありません"
+    },
+    "normalization": {
+      "title": "AI正規化",
+      "missing_data": "ブランド名と香水名の両方を入力してください",
+      "success": "正規化が完了しました",
+      "error": "正規化に失敗しました",
+      "result": "正規化結果",
+      "apply": "適用",
+      "applied": "正規化結果を適用しました",
+      "auto_complete_hint": "この結果が自動的に各フィールドに反映されます",
+      "failed": "正規化に失敗しました"
+    },
+    "status": {
+      "suggesting": "提案中...",
+      "normalizing": "正規化中...",
+      "analyzing": "解析中..."
+    },
+    "input": {
+      "placeholder": "例: シャネル No.5 / CHANEL No.5 / Tom Ford Black Orchid",
+      "help_text": "ブランド名や香水名を入力してください。リアルタイム補完と AI 正規化で各フィールドに自動分配されます。",
+      "language_warning": {
+        "ja_expected": "日本語?",
+        "en_expected": "英語?"
+      }
+    }
+  },
+  "validation": {
+    "required": "{{field}}は必須です",
+    "number": "{{field}}は数値で入力してください",
+    "rating_range": "評価は1-5の範囲で入力してください",
+    "form_errors": "入力内容にエラーがあります"
   },
   "common": {
     "loading": "読み込み中...",

@@ -94,6 +94,23 @@ export const Header: React.FC = () => {
                       <p className="text-xs text-gray-500">{user.email}</p>
                     </div>
                     <a
+                      href="/collection"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 transition-colors duration-200"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      <span className="w-4 h-4 mr-3">📦</span>
+                      {t('nav.collection')}
+                    </a>
+                    <a
+                      href="/fragrance/register"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 transition-colors duration-200"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      <span className="w-4 h-4 mr-3">➕</span>
+                      {t('nav.register_fragrance')}
+                    </a>
+                    <div className="border-t border-gray-100 my-1"></div>
+                    <a
                       href="/settings"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 transition-colors duration-200"
                       onClick={() => setIsUserMenuOpen(false)}

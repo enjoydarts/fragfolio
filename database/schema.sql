@@ -498,10 +498,13 @@ CREATE TABLE role_has_permissions (
 CREATE TABLE ai_cost_tracking (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id BIGINT UNSIGNED NULL,
-    provider ENUM('openai', 'anthropic') NOT NULL,
+    provider ENUM('openai', 'anthropic', 'gemini', 'fallback') NOT NULL,
+    model VARCHAR(100) NULL,
     operation_type VARCHAR(50) NOT NULL,
     tokens_used INT UNSIGNED NOT NULL DEFAULT 0,
-    estimated_cost DECIMAL(8,4) NOT NULL DEFAULT 0.0000,
+    input_tokens INT UNSIGNED NULL,
+    output_tokens INT UNSIGNED NULL,
+    estimated_cost DECIMAL(12,8) NOT NULL DEFAULT 0.00000000,
     api_response_time_ms INT UNSIGNED NOT NULL DEFAULT 0,
     metadata JSON NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -530,4 +533,48 @@ CREATE TABLE ai_note_suggestion_feedback (
     INDEX idx_ai_note_suggestion_feedback_suggestion_id (suggestion_id),
     INDEX idx_ai_note_suggestion_feedback_rating (rating),
     INDEX idx_ai_note_suggestion_feedback_created_at (created_at)
+);
+
+-- AI feedback for learning and improving suggestions
+CREATE TABLE ai_feedback (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id BIGINT UNSIGNED NULL,
+    session_id VARCHAR(255) NULL,
+
+    -- Request information
+    operation_type VARCHAR(50) NOT NULL,
+    query_type VARCHAR(50) NULL,
+    `query` TEXT NOT NULL,
+    request_params JSON NULL,
+
+    -- AI suggestion information
+    ai_provider VARCHAR(50) NOT NULL,
+    ai_model VARCHAR(100) NOT NULL,
+    ai_suggestions JSON NOT NULL,
+
+    -- User actions
+    user_action ENUM('selected', 'rejected', 'modified', 'ignored') NOT NULL,
+    selected_suggestion JSON NULL,
+    final_input TEXT NULL,
+
+    -- Learning data
+    relevance_score DECIMAL(3,2) NULL,
+    was_helpful BOOLEAN NULL,
+    user_notes TEXT NULL,
+
+    -- Metadata
+    user_agent TEXT NULL,
+    ip_address VARCHAR(45) NULL,
+    context_data JSON NULL,
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    CONSTRAINT fk_ai_feedback_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_ai_feedback_session_id (session_id),
+    INDEX idx_ai_feedback_query_operation (`query`(100), operation_type),
+    INDEX idx_ai_feedback_user_action_created (user_action, created_at),
+    INDEX idx_ai_feedback_helpful_relevance (was_helpful, relevance_score),
+    INDEX idx_ai_feedback_provider_model (ai_provider, ai_model)
 );

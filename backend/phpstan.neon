@@ -11,6 +11,8 @@ parameters:
 
     treatPhpDocTypesAsCertain: false
 
+    reportUnmatchedIgnoredErrors: false
+
     ignoreErrors:
         - '#Access to an undefined property App\\Models\\UserProfile::\$date_of_birth#'
         - '#Access to an undefined property Laragear\\WebAuthn\\Contracts\\WebAuthnAuthenticatable::#'
@@ -18,6 +20,7 @@ parameters:
         - '#Using nullsafe property access.*on left side of \?\? is unnecessary#'
         - '#Instanceof between App\\Models\\User and.*will always evaluate to true#'
         - '#Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$email#'
+        - '#Call to static method getCredentials\(\) on an unknown class Google\\Auth\\ApplicationDefaultCredentials\.#'
 
     excludePaths:
         - ./*/*/FileToBeExcluded.php

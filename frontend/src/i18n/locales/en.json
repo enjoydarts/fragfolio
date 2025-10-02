@@ -9,7 +9,9 @@
     "register": "Sign Up",
     "profile": "Profile",
     "logout": "Logout",
-    "settings": "Settings"
+    "settings": "Settings",
+    "collection": "Collection",
+    "register_fragrance": "Register Fragrance"
   },
   "features": {
     "collection": {
@@ -317,6 +319,113 @@
       "logout_all": "Log out all other sessions",
       "logout_confirm": "Logout"
     }
+  },
+  "fragrance": {
+    "register_title": "Register Fragrance",
+    "register_description": "Add a new fragrance to your collection. Use AI features to input accurate information.",
+    "brand_name": "Brand Name",
+    "fragrance_name": "Fragrance Name",
+    "volume": "Volume",
+    "purchase_price": "Purchase Price",
+    "purchase_date": "Purchase Date",
+    "purchase_place": "Purchase Place",
+    "possession_type": "Possession Type",
+    "rating": "Rating",
+    "comments": "Comments",
+    "brand_placeholder": "e.g., CHANEL, Dior, Tom Ford",
+    "fragrance_placeholder": "e.g., No.5, J'adore, Black Orchid",
+    "purchase_place_placeholder": "e.g., Department store, Online shop",
+    "comments_placeholder": "Feel free to write your impressions and thoughts about the fragrance",
+    "full_bottle": "Full Bottle",
+    "decant": "Decant",
+    "sample": "Sample",
+    "register": "Register",
+    "registering": "Registering...",
+    "registration_success": "Fragrance registered successfully",
+    "registration_error": "Failed to register fragrance",
+    "smart_input": {
+      "title": "Enter Fragrance Information",
+      "description": "AI will automatically analyze and organize",
+      "ai_badge": "AI-Powered",
+      "label": "Enter brand name and fragrance name freely"
+    },
+    "detailed_info": {
+      "title": "Detailed Information (Auto-filled)",
+      "editable": "Editable",
+      "brand_group": "Brand Name",
+      "brand_ja": "Japanese",
+      "brand_en": "English",
+      "fragrance_group": "Fragrance Name",
+      "fragrance_ja": "Japanese",
+      "fragrance_en": "English",
+      "brand_ja_placeholder": "e.g., シャネル, ディオール",
+      "brand_en_placeholder": "e.g., CHANEL, Dior",
+      "fragrance_ja_placeholder": "e.g., No.5, ソヴァージュ",
+      "fragrance_en_placeholder": "e.g., No.5, Sauvage"
+    },
+    "ai_quality_check": {
+      "title": "AI Quality Check & Normalization",
+      "description": "AI will verify and correct the entered information, converting it to more accurate data",
+      "button": "Run AI Normalization",
+      "analyzing": "AI analyzing...",
+      "error_occurred": "An error occurred",
+      "result_title": "AI Analysis Results",
+      "normalized_brand": "✨ Normalized Brand Name",
+      "normalized_fragrance": "🌸 Normalized Fragrance Name",
+      "english_label": "English:",
+      "confidence_score": "AI Confidence Score",
+      "apply_button": "Apply Normalization Results",
+      "applied": "Normalization results applied",
+      "info_message": "ℹ️ After entering brand name and fragrance name, press the \"AI Quality Check\" button to have AI verify and normalize the information"
+    }
+  },
+  "ai": {
+    "normalize": "Normalize",
+    "normalizing": "Normalizing...",
+    "confidence": {
+      "label": "Confidence",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "very_low": "Very Low"
+    },
+    "completion": {
+      "help": "AI completion will appear after typing {{minChars}} characters",
+      "source": "Source",
+      "suggestions": "Suggestions",
+      "loading": "AI is searching for fragrances...",
+      "no_suggestions": "No suggestions available"
+    },
+    "normalization": {
+      "title": "AI Normalization",
+      "missing_data": "Please enter both brand name and fragrance name",
+      "success": "Normalization completed",
+      "error": "Normalization failed",
+      "result": "Normalization Result",
+      "apply": "Apply",
+      "applied": "Normalization result applied",
+      "auto_complete_hint": "This result will be automatically reflected in each field",
+      "failed": "Normalization failed"
+    },
+    "status": {
+      "suggesting": "Suggesting...",
+      "normalizing": "Normalizing...",
+      "analyzing": "Analyzing..."
+    },
+    "input": {
+      "placeholder": "e.g., CHANEL No.5 / Dior Sauvage / Tom Ford Black Orchid",
+      "help_text": "Enter brand name or fragrance name. Real-time completion and AI normalization will automatically distribute to each field.",
+      "language_warning": {
+        "ja_expected": "Japanese?",
+        "en_expected": "English?"
+      }
+    }
+  },
+  "validation": {
+    "required": "{{field}} is required",
+    "number": "{{field}} must be a number",
+    "rating_range": "Rating must be between 1-5",
+    "form_errors": "There are errors in the form"
   },
   "common": {
     "loading": "Loading...",

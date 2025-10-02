@@ -57,10 +57,12 @@ class CompletionServiceTest extends TestCase
         $expectedResult = [
             'suggestions' => [
                 [
-                    'text' => 'CHANEL',
+                    'text' => 'シャネル',
+                    'text_en' => 'CHANEL',
                     'confidence' => 0.95,
                     'type' => 'brand',
-                    'metadata' => ['country' => 'France'],
+                    'brand_name' => null,
+                    'brand_name_en' => null,
                 ],
             ],
             'response_time_ms' => 250,
@@ -84,6 +86,7 @@ class CompletionServiceTest extends TestCase
                 'type' => 'brand',
                 'limit' => 5,
                 'language' => 'ja',
+                'contextBrand' => null,
             ])
             ->once()
             ->andReturn($expectedResult);

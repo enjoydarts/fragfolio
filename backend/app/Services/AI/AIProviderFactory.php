@@ -4,11 +4,19 @@ namespace App\Services\AI;
 
 use App\Services\AI\Contracts\AIProviderInterface;
 use App\Services\AI\Providers\AnthropicProvider;
+use App\Services\AI\Providers\GeminiProvider;
 use App\Services\AI\Providers\OpenAIProvider;
 use InvalidArgumentException;
 
 class AIProviderFactory
 {
+    private CostTrackingService $costTrackingService;
+
+    public function __construct(CostTrackingService $costTrackingService)
+    {
+        $this->costTrackingService = $costTrackingService;
+    }
+
     /**
      * AIプロバイダーを作成
      *
@@ -21,8 +29,9 @@ class AIProviderFactory
         $provider = $provider ?: config('services.ai.default_provider', 'openai');
 
         return match (strtolower($provider)) {
-            'openai' => new OpenAIProvider,
-            'anthropic' => new AnthropicProvider,
+            'openai' => new OpenAIProvider($this->costTrackingService),
+            'anthropic' => new AnthropicProvider($this->costTrackingService),
+            'gemini' => new GeminiProvider($this->costTrackingService),
             default => throw new InvalidArgumentException("Unsupported AI provider: {$provider}")
         };
     }
@@ -42,6 +51,11 @@ class AIProviderFactory
         // Anthropic API キーが設定されているかチェック
         if (config('services.anthropic.api_key')) {
             $providers[] = 'anthropic';
+        }
+
+        // Gemini プロジェクトIDが設定されているかチェック
+        if (config('services.gemini.project_id')) {
+            $providers[] = 'gemini';
         }
 
         return $providers;

@@ -44,19 +44,24 @@ class CompletionService
         $limit = min($options['limit'] ?? 10, 20); // 最大20件に制限
         $language = $options['language'] ?? 'ja';
         $userId = $options['user_id'] ?? null;
+        $contextBrand = $options['contextBrand'] ?? null;
 
-        // キャッシュキー生成
-        $cacheKey = $this->generateCacheKey('completion', $query, $type, $provider, $language);
+        // キャッシュキー生成（contextBrandを含める）
+        $cacheKey = $this->generateCacheKey('completion', $query, $type, $provider, $language, $contextBrand);
 
         try {
+            // キャッシュチェック
+            $wasCached = Cache::has($cacheKey);
+
             // キャッシュから結果を取得（5分間キャッシュ）
-            $result = Cache::remember($cacheKey, 300, function () use ($query, $provider, $type, $limit, $language) {
+            $result = Cache::remember($cacheKey, 300, function () use ($query, $provider, $type, $limit, $language, $contextBrand) {
                 $aiProvider = $this->providerFactory->create($provider);
 
                 return $aiProvider->complete($query, [
                     'type' => $type,
                     'limit' => $limit,
                     'language' => $language,
+                    'contextBrand' => $contextBrand,
                 ]);
             });
 
@@ -73,7 +78,7 @@ class CompletionService
 
             // 結果の後処理
             $result['suggestions'] = $this->processSuggestions($result['suggestions'] ?? [], $query);
-            $result['cached'] = Cache::has($cacheKey);
+            $result['cached'] = $wasCached;
 
             return $result;
 
@@ -121,18 +126,20 @@ class CompletionService
      */
     private function processSuggestions(array $suggestions, string $query): array
     {
-        $query = strtolower(trim($query));
-
+        // 各候補に類似度スコアと調整済み信頼度を追加
         return array_map(function ($suggestion) use ($query) {
-            // 文字列類似度の計算
-            $similarity = $this->calculateSimilarity($query, strtolower($suggestion['text'] ?? ''));
+            $text = $suggestion['text'] ?? '';
+            $confidence = $suggestion['confidence'] ?? 0.0;
 
-            // 信頼度調整（類似度も考慮）
-            $adjustedConfidence = ($suggestion['confidence'] ?? 0.0) * (0.7 + 0.3 * $similarity);
+            // 類似度計算
+            $similarityScore = $this->calculateSimilarity($query, $text);
+
+            // 信頼度を類似度で調整
+            $adjustedConfidence = $confidence * (0.5 + ($similarityScore * 0.5));
 
             return array_merge($suggestion, [
-                'similarity_score' => round($similarity, 3),
-                'adjusted_confidence' => round($adjustedConfidence, 3),
+                'similarity_score' => $similarityScore,
+                'adjusted_confidence' => $adjustedConfidence,
             ]);
         }, $suggestions);
     }
@@ -149,21 +156,53 @@ class CompletionService
             return 0.0;
         }
 
-        // レーベンシュタイン距離を使用
-        $distance = levenshtein($str1, $str2);
+        // 部分一致チェック（大文字小文字区別なし）
+        $str1Lower = mb_strtolower($str1);
+        $str2Lower = mb_strtolower($str2);
+
+        // 完全一致（大文字小文字も完全に同じ）
+        if ($str1 === $str2) {
+            return 1.0;
+        }
+
+        // 大文字小文字を無視した場合の一致
+        if ($str1Lower === $str2Lower) {
+            return 0.75;
+        }
+
+        // 部分一致（どちらかがもう一方を含む）
+        if (mb_strpos($str2Lower, $str1Lower) !== false || mb_strpos($str1Lower, $str2Lower) !== false) {
+            return 0.6;
+        }
+
+        // 単語レベルでの一致チェック
+        $words1 = preg_split('/\s+/', $str1Lower);
+        $words2 = preg_split('/\s+/', $str2Lower);
+        $commonWords = array_intersect($words1, $words2);
+
+        if (! empty($commonWords)) {
+            $wordSimilarity = count($commonWords) / max(count($words1), count($words2));
+            if ($wordSimilarity > 0.5) {
+                return 0.6 + ($wordSimilarity * 0.2); // 0.6〜0.8の範囲
+            }
+        }
+
+        // レーベンシュタイン距離による類似度（フォールバック）
+        $distance = levenshtein($str1Lower, $str2Lower);
         $maxLength = max($len1, $len2);
 
-        return 1.0 - ($distance / $maxLength);
+        return max(0.0, 1.0 - ($distance / $maxLength));
     }
 
     /**
      * キャッシュキー生成
      */
-    private function generateCacheKey(string $operation, string $query, string $type, ?string $provider, string $language): string
+    private function generateCacheKey(string $operation, string $query, string $type, ?string $provider, string $language, ?string $contextBrand = null): string
     {
         $provider = $provider ?: $this->providerFactory->getDefaultProvider();
+        $contextBrand = $contextBrand ?: '';
 
-        return "ai:{$operation}:".md5("{$query}:{$type}:{$provider}:{$language}");
+        return "ai:{$operation}:".md5("{$query}:{$type}:{$provider}:{$language}:{$contextBrand}");
     }
 
     /**

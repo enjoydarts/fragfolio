@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AI\CompletionController;
 use App\Http\Controllers\Api\AI\CostController;
+use App\Http\Controllers\Api\AI\FeedbackController;
 use App\Http\Controllers\Api\AI\NormalizationController;
 use App\Http\Controllers\Api\AI\NoteSuggestionController;
 use App\Http\Controllers\Api\Auth\AuthController;
@@ -55,6 +56,7 @@ Route::prefix('ai')->group(function () {
 
     // New normalization routes
     Route::post('/normalize', [NormalizationController::class, 'normalize']);
+    Route::post('/normalize-from-input', [NormalizationController::class, 'normalizeFromInput']);
     Route::post('/batch-normalize', [NormalizationController::class, 'batchNormalize']);
     Route::get('/normalization/providers', [NormalizationController::class, 'providers']);
     Route::get('/normalization/health', [NormalizationController::class, 'health']);
@@ -66,6 +68,14 @@ Route::prefix('ai')->group(function () {
     Route::get('/note-suggestion/health', [NoteSuggestionController::class, 'health']);
     Route::get('/note-categories', [NoteSuggestionController::class, 'noteCategories']);
     Route::post('/similar-fragrances', [NoteSuggestionController::class, 'similarFragrances']);
+
+    // AI Feedback routes (public access to allow anonymous feedback)
+    Route::prefix('feedback')->group(function () {
+        Route::post('/selection', [FeedbackController::class, 'recordSelection']);
+        Route::post('/rejection', [FeedbackController::class, 'recordRejection']);
+        Route::post('/modification', [FeedbackController::class, 'recordModification']);
+        Route::post('/session', [FeedbackController::class, 'generateSessionId']);
+    });
 
     // Legacy normalization route (for backward compatibility)
     Route::post('/legacy-normalize', [FragranceNormalizationController::class, 'normalize']);
