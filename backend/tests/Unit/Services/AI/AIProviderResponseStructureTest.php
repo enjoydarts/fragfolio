@@ -177,9 +177,10 @@ class AIProviderResponseStructureTest extends TestCase
             ->shouldReceive('getDefaultProvider')
             ->andReturn('openai');
 
+        // Fallback mechanism tries anthropic first, then openai, then gemini
         $this->providerFactoryMock
             ->shouldReceive('create')
-            ->with(null)
+            ->with('anthropic')
             ->once()
             ->andReturn($this->aiProviderMock);
 
@@ -201,7 +202,8 @@ class AIProviderResponseStructureTest extends TestCase
         $this->assertArrayHasKey('suggestions', $result);
         $this->assertArrayHasKey('provider', $result);
         $this->assertArrayHasKey('cost_estimate', $result);
-        $this->assertEquals('openai', $result['provider']);
+        // Fallback mechanism returns the provider from the response
+        $this->assertEquals('openai', $result['provider']); // Response contains 'openai' as provider
         $this->assertEquals(0.002, $result['cost_estimate']);
 
         // 補完候補の構造を検証

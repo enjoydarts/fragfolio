@@ -74,9 +74,10 @@ class CompletionServiceTest extends TestCase
             ->shouldReceive('getDefaultProvider')
             ->andReturn('openai');
 
+        // Fallback mechanism tries anthropic first
         $this->providerFactoryMock
             ->shouldReceive('create')
-            ->with(null)
+            ->with('anthropic')
             ->once()
             ->andReturn($this->aiProviderMock);
 
