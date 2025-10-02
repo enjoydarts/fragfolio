@@ -126,7 +126,14 @@ class CompletionServiceTest extends TestCase
         $userId = 123;
         $options = ['type' => 'brand', 'user_id' => $userId];
         $mockResult = [
-            'suggestions' => [],
+            'suggestions' => [
+                [
+                    'text' => 'テストブランド',
+                    'text_en' => 'Test Brand',
+                    'confidence' => 0.9,
+                    'type' => 'brand',
+                ],
+            ],
             'response_time_ms' => 200,
             'provider' => 'openai',
             'cost_estimate' => 0.002,
@@ -136,12 +143,16 @@ class CompletionServiceTest extends TestCase
             ->shouldReceive('getDefaultProvider')
             ->andReturn('openai');
 
+        // Fallback mechanism tries anthropic first
         $this->providerFactoryMock
             ->shouldReceive('create')
+            ->with('anthropic')
+            ->once()
             ->andReturn($this->aiProviderMock);
 
         $this->aiProviderMock
             ->shouldReceive('complete')
+            ->once()
             ->andReturn($mockResult);
 
         $this->costTrackerMock
@@ -203,9 +214,11 @@ class CompletionServiceTest extends TestCase
             ->shouldReceive('getDefaultProvider')
             ->andReturn('openai');
 
+        // Fallback mechanism tries anthropic first for each query
         $this->providerFactoryMock
             ->shouldReceive('create')
-            ->twice()
+            ->with('anthropic')
+            ->twice() // Once for each query
             ->andReturn($this->aiProviderMock);
 
         $this->aiProviderMock
