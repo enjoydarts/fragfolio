@@ -99,7 +99,7 @@ class RegisterFragranceUseCase
 
         if ($brand) {
             // 英語名が提供されていて、既存のブランドに英語名がない場合は更新
-            if ($nameEn && (! $brand->name_en || $brand->name_en === '')) {
+            if ($nameEn && empty($brand->name_en)) {
                 $brand->update(['name_en' => $nameEn]);
             }
 
@@ -125,7 +125,7 @@ class RegisterFragranceUseCase
 
         if ($fragrance) {
             // 英語名が提供されていて、既存の香水に英語名がない場合は更新
-            if ($nameEn && (! $fragrance->name_en || $fragrance->name_en === '')) {
+            if ($nameEn && empty($fragrance->name_en)) {
                 $fragrance->update(['name_en' => $nameEn]);
             }
 

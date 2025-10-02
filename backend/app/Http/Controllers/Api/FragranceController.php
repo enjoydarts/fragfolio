@@ -164,6 +164,7 @@ class FragranceController extends Controller
                 ], 401);
             }
 
+            /** @var \App\Models\UserFragrance $userFragrance */
             $userFragrance = $user->fragrances()->findOrFail($id);
 
             // 基本情報の更新

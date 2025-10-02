@@ -8,6 +8,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $brand_id
+ * @property string $name_ja
+ * @property string $name_en
+ * @property string|null $description_ja
+ * @property string|null $description_en
+ * @property int|null $concentration_type_id
+ * @property int|null $release_year
+ * @property string|null $image
+ * @property bool $is_discontinued
+ * @property bool $is_active
+ */
 class Fragrance extends Model
 {
     use HasFactory;
