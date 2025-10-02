@@ -12,17 +12,6 @@ class Fragrance extends Model
 {
     use HasFactory;
 
-    /**
-     * Model properties from database
-     */
-    public ?string $name_en = null;
-
-    public ?string $name_ja = null;
-
-    public ?string $description_en = null;
-
-    public ?string $description_ja = null;
-
     protected $fillable = [
         'brand_id',
         'name_ja',

@@ -6,57 +6,87 @@ use Illuminate\Support\Facades\DB;
 
 trait SqldefTestCleanup
 {
-    /**
-     * Clean up test database by truncating tables
-     * This works with sqldef since it doesn't require migrations
-     */
-    protected function cleanupTestDatabase(): void
-    {
-        // Ensure we're using the test database
-        if (app()->environment() !== 'testing') {
-            throw new \RuntimeException('This method should only be called in testing environment');
-        }
-
-        $currentDatabase = DB::connection()->getDatabaseName();
-        if ($currentDatabase !== 'fragfolio_test') {
-            throw new \RuntimeException('Not connected to test database: '.$currentDatabase);
-        }
-
-        // Get all table names
-        $tables = DB::select('SHOW TABLES');
-        $databaseName = 'fragfolio_test';
-        $tableColumn = "Tables_in_{$databaseName}";
-
-        // Disable foreign key checks to avoid constraint errors during truncation
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
-
-        try {
-            foreach ($tables as $table) {
-                $tableName = $table->$tableColumn;
-                // Skip system tables and migration tables (if any exist)
-                if (! in_array($tableName, ['migrations', 'failed_jobs'])) {
-                    DB::table($tableName)->truncate();
-                }
-            }
-        } finally {
-            // Re-enable foreign key checks
-            DB::statement('SET FOREIGN_KEY_CHECKS=1');
-        }
-    }
+    protected static bool $schemaLoaded = false;
 
     /**
-     * Setup method to be called before each test
+     * スキーマをロードして各テスト前にデータベースをクリーンアップ
      */
     protected function setUpSqldefCleanup(): void
     {
-        $this->cleanupTestDatabase();
+        // スキーマが未ロードの場合、sqldefでスキーマを適用
+        if (! self::$schemaLoaded) {
+            $this->loadSchemaWithSqldef();
+            self::$schemaLoaded = true;
+        }
+
+        // 各テスト前にデータをクリーンアップ（テーブル構造は維持）
+        $this->truncateAllTables();
     }
 
     /**
-     * Teardown method to be called after each test
+     * テスト後のクリーンアップ
      */
     protected function tearDownSqldefCleanup(): void
     {
-        $this->cleanupTestDatabase();
+        // 必要に応じて各テスト後の処理を追加
+    }
+
+    /**
+     * sqldefを使用してスキーマをロード
+     */
+    protected function loadSchemaWithSqldef(): void
+    {
+        $schemaPath = base_path('sqldef/schema.sql');
+        $database = config('database.connections.mysql.database');
+        $username = config('database.connections.mysql.username');
+        $password = config('database.connections.mysql.password');
+        $host = config('database.connections.mysql.host');
+
+        if (! file_exists($schemaPath)) {
+            throw new \RuntimeException("Schema file not found: {$schemaPath}");
+        }
+
+        $command = sprintf(
+            'cat %s | mysqldef -u %s -p%s -h %s --ssl-mode=DISABLED %s',
+            escapeshellarg($schemaPath),
+            escapeshellarg($username),
+            escapeshellarg($password),
+            escapeshellarg($host),
+            escapeshellarg($database)
+        );
+
+        exec($command, $output, $returnCode);
+
+        if ($returnCode !== 0) {
+            throw new \RuntimeException('Failed to load schema with sqldef: '.implode("\n", $output));
+        }
+    }
+
+    /**
+     * 全テーブルのデータを削除（テーブル構造は維持）
+     */
+    protected function truncateAllTables(): void
+    {
+        // 外部キー制約を一時的に無効化
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+        // migrations以外の全テーブルをTRUNCATE
+        $tables = DB::select('SHOW TABLES');
+        $databaseName = DB::getDatabaseName();
+        $tableKey = "Tables_in_{$databaseName}";
+
+        foreach ($tables as $table) {
+            $tableName = $table->$tableKey;
+
+            // migrationsテーブルはスキップ
+            if ($tableName === 'migrations') {
+                continue;
+            }
+
+            DB::statement("TRUNCATE TABLE `{$tableName}`");
+        }
+
+        // 外部キー制約を再度有効化
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
 }

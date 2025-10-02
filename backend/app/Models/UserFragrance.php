@@ -11,13 +11,6 @@ class UserFragrance extends Model
 {
     use HasFactory;
 
-    /**
-     * Model properties from database
-     */
-    public ?float $volume_ml = null;
-
-    public ?float $current_volume_ml = null;
-
     protected $fillable = [
         'user_id',
         'fragrance_id',

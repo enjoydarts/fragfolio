@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AI\NoteSuggestionController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\TwoFactorLoginController;
 use App\Http\Controllers\Api\Auth\WebAuthnManagementController;
+use App\Http\Controllers\Api\FragranceController;
 use App\Http\Controllers\Api\FragranceNormalizationController;
 use App\Http\Controllers\Api\TurnstileController;
 use App\Http\Controllers\WebAuthn\WebAuthnLoginController;
@@ -148,5 +149,14 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/global-stats', [CostController::class, 'globalStats']);
             Route::get('/top-users', [CostController::class, 'topUsers']);
         });
+    });
+
+    // Fragrance collection routes (authenticated)
+    Route::prefix('fragrances')->group(function () {
+        Route::get('/', [FragranceController::class, 'index']);
+        Route::post('/', [FragranceController::class, 'store']);
+        Route::get('/{id}', [FragranceController::class, 'show']);
+        Route::put('/{id}', [FragranceController::class, 'update']);
+        Route::delete('/{id}', [FragranceController::class, 'destroy']);
     });
 });
