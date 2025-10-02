@@ -311,7 +311,10 @@ const SmartFragranceInput: React.FC<SmartFragranceInputProps> = ({
           data.data?.suggestions?.length || 0,
           '件'
         );
-        console.log('📡 生APIレスポンス (最初の1件):', data.data?.suggestions?.[0]);
+        console.log(
+          '📡 生APIレスポンス (最初の1件):',
+          data.data?.suggestions?.[0]
+        );
 
         if (
           data.success &&

@@ -514,10 +514,14 @@ const FragranceRegistration: React.FC = () => {
                           <div className="text-lg font-semibold text-gray-900">
                             {normalizationResult.normalized_data.brand_name}
                           </div>
-                          {normalizationResult.normalized_data.brand_name_en && (
+                          {normalizationResult.normalized_data
+                            .brand_name_en && (
                             <div className="text-sm text-gray-600 mt-1">
                               {t('fragrance.ai_quality_check.english_label')}{' '}
-                              {normalizationResult.normalized_data.brand_name_en}
+                              {
+                                normalizationResult.normalized_data
+                                  .brand_name_en
+                              }
                             </div>
                           )}
                         </div>
@@ -553,11 +557,17 @@ const FragranceRegistration: React.FC = () => {
                               {t('fragrance.ai_quality_check.not_exists_title')}
                             </h4>
                             <p className="text-sm text-red-600 mt-1">
-                              {t('fragrance.ai_quality_check.not_exists_message')}
+                              {t(
+                                'fragrance.ai_quality_check.not_exists_message'
+                              )}
                             </p>
-                            {normalizationResult.normalized_data.rationale_brief && (
+                            {normalizationResult.normalized_data
+                              .rationale_brief && (
                               <p className="text-sm text-red-700 mt-2 italic">
-                                {normalizationResult.normalized_data.rationale_brief}
+                                {
+                                  normalizationResult.normalized_data
+                                    .rationale_brief
+                                }
                               </p>
                             )}
                           </div>
@@ -573,7 +583,9 @@ const FragranceRegistration: React.FC = () => {
                         </span>
                       </div>
                       <ConfidenceIndicator
-                        confidence={normalizationResult.normalized_data?.confidence || 0.5}
+                        confidence={
+                          normalizationResult.normalized_data?.confidence || 0.5
+                        }
                         size="lg"
                         showLabel={true}
                         showPercentage={true}
