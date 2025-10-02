@@ -402,7 +402,7 @@ class GeminiProvider implements AIProviderInterface
         }
     }
 
-    private function makeRequestWithRetry(string $url, array $requestData, string $accessToken, int $maxRetries = 3): \Illuminate\Http\Client\Response
+    private function makeRequestWithRetry(string $url, array $requestData, string $accessToken, int $maxRetries = 5): \Illuminate\Http\Client\Response
     {
         $attempt = 0;
 
@@ -416,9 +416,10 @@ class GeminiProvider implements AIProviderInterface
                 // 429エラー（レート制限）の場合はリトライ
                 if ($response->status() === 429) {
                     $attempt++;
-                    $waitTime = min(2 ** $attempt, 8); // 指数バックオフ（最大8秒）
+                    // Geminiのレート制限は厳しいため、長めのバックオフ: 2秒 → 4秒 → 8秒 → 16秒 → 32秒
+                    $waitTime = min(2 ** $attempt, 60); // 指数バックオフ（最大60秒）
 
-                    Log::warning('Rate limit hit, retrying...', [
+                    Log::warning('Gemini rate limit hit, retrying with exponential backoff...', [
                         'attempt' => $attempt,
                         'max_retries' => $maxRetries,
                         'wait_time' => $waitTime,
@@ -430,6 +431,12 @@ class GeminiProvider implements AIProviderInterface
 
                         continue;
                     }
+
+                    // 最大リトライ回数に達したら429エラーを返す（フォールバックのため）
+                    Log::error('Gemini rate limit exceeded after all retries', [
+                        'max_retries' => $maxRetries,
+                        'total_wait_time' => array_sum(array_map(fn ($i) => min(2 ** $i, 60), range(1, $maxRetries))),
+                    ]);
                 }
 
                 return $response;
@@ -441,8 +448,8 @@ class GeminiProvider implements AIProviderInterface
                     throw $e;
                 }
 
-                $waitTime = min(2 ** $attempt, 8);
-                Log::warning('Request failed, retrying...', [
+                $waitTime = min(2 ** $attempt, 60);
+                Log::warning('Gemini request failed, retrying...', [
                     'attempt' => $attempt,
                     'max_retries' => $maxRetries,
                     'wait_time' => $waitTime,

@@ -120,7 +120,7 @@ class AIFeedbackService
                     return [
                         'query' => $feedback->getAttribute('query'),
                         'selected_text' => $feedback->getAttribute('selected_suggestion')['text'] ?? '',
-                        'relevance_score' => $feedback->getAttribute('relevance_score') ?? 0.5,
+                        'relevance_score' => (float) ($feedback->getAttribute('relevance_score') ?? 0.5),
                     ];
                 })
                 ->toArray();
@@ -149,7 +149,7 @@ class AIFeedbackService
                     return [
                         'query' => $feedback->getAttribute('query'),
                         'selected_text' => $feedback->getAttribute('selected_suggestion')['text'] ?? '',
-                        'relevance_score' => $feedback->getAttribute('relevance_score') ?? 0.5,
+                        'relevance_score' => (float) ($feedback->getAttribute('relevance_score') ?? 0.5),
                     ];
                 })
                 ->toArray();

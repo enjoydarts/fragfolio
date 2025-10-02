@@ -88,9 +88,10 @@ class BrandFragranceSeparationTest extends TestCase
             ->withAnyArgs()
             ->andReturn(true);
 
+        // Fallback mechanism tries anthropic first
         $this->providerFactoryMock
             ->shouldReceive('create')
-            ->with(null) // CompletionService passes null when no provider specified
+            ->with('anthropic')
             ->once()
             ->andReturn($this->aiProviderMock);
 
@@ -243,7 +244,18 @@ class BrandFragranceSeparationTest extends TestCase
 
         $this->providerFactoryMock
             ->shouldReceive('create')
-            ->with(null)
+            ->with('anthropic')
+            ->once()
+            ->andReturn($this->aiProviderMock);
+
+        $this->providerFactoryMock
+            ->shouldReceive('create')
+            ->with('openai')
+            ->andReturn($this->aiProviderMock);
+
+        $this->providerFactoryMock
+            ->shouldReceive('create')
+            ->with('gemini')
             ->andReturn($this->aiProviderMock);
 
         $this->aiProviderMock

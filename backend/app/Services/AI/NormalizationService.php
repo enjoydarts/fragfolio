@@ -69,6 +69,9 @@ class NormalizationService
             // 正規化ルールの適用
             $result = $this->applyNormalizationRules($result);
 
+            // HTMLエンティティのデコード（&amp; → & など）
+            $result = $this->decodeHtmlEntities($result);
+
             // 信頼度スコアの計算
             $result = $this->calculateConfidenceScore($result, $brandName, $fragranceName);
 
@@ -286,6 +289,24 @@ class NormalizationService
         }
 
         return null;
+    }
+
+    /**
+     * HTMLエンティティのデコード（&amp; → & など）
+     */
+    private function decodeHtmlEntities(array $result): array
+    {
+        if (! isset($result['normalized_data'])) {
+            return $result;
+        }
+
+        foreach ($result['normalized_data'] as $key => $value) {
+            if (is_string($value)) {
+                $result['normalized_data'][$key] = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+            }
+        }
+
+        return $result;
     }
 
     /**

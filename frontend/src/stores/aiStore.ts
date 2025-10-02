@@ -12,17 +12,25 @@ export interface CompletionSuggestion {
   languageWarning?: boolean; // 言語不一致警告
 }
 
+// AI正規化データの内部構造
+export interface NormalizedData {
+  brand_name?: string;
+  brand_name_en?: string;
+  text?: string; // 香水名（日本語）
+  text_en?: string; // 香水名（英語）
+  confidence?: number;
+  final_confidence_score?: number;
+  exists?: boolean;
+  rationale_brief?: string;
+}
+
 // AI正規化の結果型定義
 export interface NormalizationResult {
-  normalized_brand?: string;
-  normalized_brand_ja?: string;
-  normalized_brand_en?: string;
-  normalized_fragrance?: string;
-  normalized_fragrance_name?: string;
-  normalized_fragrance_ja?: string;
-  normalized_fragrance_en?: string;
-  final_confidence_score?: number;
-  confidence_score?: number;
+  normalized_data?: NormalizedData;
+  response_time_ms?: number;
+  provider?: string;
+  cost_estimate?: number;
+  execution_time_ms?: number;
   fallback_reason?: string;
 }
 
