@@ -36,15 +36,29 @@ trait SqldefTestCleanup
      */
     protected function loadSchemaWithSqldef(): void
     {
-        $schemaPath = base_path('sqldef/schema.sql');
+        // 複数のパスを試す（Docker環境とCI環境で異なる）
+        $possiblePaths = [
+            base_path('sqldef/schema.sql'),           // Docker: /var/www/html/sqldef/schema.sql
+            base_path('../sqldef/schema.sql'),        // CI: /home/runner/work/fragfolio/fragfolio/sqldef/schema.sql
+            dirname(base_path()).'/sqldef/schema.sql', // 絶対パス
+        ];
+
+        $schemaPath = null;
+        foreach ($possiblePaths as $path) {
+            if (file_exists($path)) {
+                $schemaPath = $path;
+                break;
+            }
+        }
+
+        if (! $schemaPath) {
+            throw new \RuntimeException('Schema file not found. Tried: '.implode(', ', $possiblePaths));
+        }
+
         $database = config('database.connections.mysql.database');
         $username = config('database.connections.mysql.username');
         $password = config('database.connections.mysql.password');
         $host = config('database.connections.mysql.host');
-
-        if (! file_exists($schemaPath)) {
-            throw new \RuntimeException("Schema file not found: {$schemaPath}");
-        }
 
         $command = sprintf(
             'cat %s | mysqldef -u %s -p%s -h %s --ssl-mode=DISABLED %s',

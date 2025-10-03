@@ -8,13 +8,10 @@ use App\Models\User;
 use App\Models\UserFragrance;
 use App\UseCases\Fragrance\DeleteFragranceUseCase;
 use Illuminate\Support\Facades\Log;
-use Tests\SqldefTestCleanup;
 use Tests\TestCase;
 
 class DeleteFragranceUseCaseTest extends TestCase
 {
-    use SqldefTestCleanup;
-
     private DeleteFragranceUseCase $useCase;
 
     private User $user;
@@ -24,7 +21,6 @@ class DeleteFragranceUseCaseTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->setUpSqldefCleanup();
 
         $this->useCase = new DeleteFragranceUseCase;
 

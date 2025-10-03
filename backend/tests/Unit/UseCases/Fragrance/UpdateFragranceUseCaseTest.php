@@ -9,13 +9,10 @@ use App\Models\UserFragrance;
 use App\Models\UserFragranceTag;
 use App\UseCases\Fragrance\UpdateFragranceUseCase;
 use Illuminate\Support\Facades\Log;
-use Tests\SqldefTestCleanup;
 use Tests\TestCase;
 
 class UpdateFragranceUseCaseTest extends TestCase
 {
-    use SqldefTestCleanup;
-
     private UpdateFragranceUseCase $useCase;
 
     private User $user;
@@ -25,7 +22,6 @@ class UpdateFragranceUseCaseTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->setUpSqldefCleanup();
 
         $this->useCase = new UpdateFragranceUseCase;
 
