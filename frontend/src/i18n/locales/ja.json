@@ -169,15 +169,6 @@
     "invalid_state": "認証器の状態が無効です"
   },
   "or": "または",
-  "common": {
-    "loading": "読み込み中...",
-    "save": "保存",
-    "cancel": "キャンセル",
-    "close": "閉じる",
-    "complete": "完了",
-    "copy": "コピー",
-    "back_to_dashboard": "ダッシュボードに戻る"
-  },
   "verification": {
     "success": {
       "title": "認証完了",
@@ -344,6 +335,17 @@
     "registering": "登録中...",
     "registration_success": "香水を登録しました",
     "registration_error": "香水の登録に失敗しました",
+    "my_collection": "マイコレクション",
+    "collection_count": "全{{count}}件",
+    "add_new": "新規追加",
+    "no_fragrances": "香水がまだありません",
+    "no_fragrances_description": "最初の香水を登録してコレクションを始めましょう",
+    "add_first_fragrance": "最初の香水を登録",
+    "fetch_error": "香水の取得に失敗しました",
+    "projection_weak": "弱",
+    "projection_moderate": "中",
+    "projection_strong": "強",
+    "hours": "時間",
     "smart_input": {
       "title": "香水情報を入力",
       "description": "AIが自動で分析・整理します",
@@ -442,6 +444,9 @@
     "edit": "編集",
     "show": "表示",
     "hide": "隠す",
+    "details": "詳細",
+    "previous": "前へ",
+    "next": "次へ",
     "back_to_dashboard": "ダッシュボードに戻る"
   }
 }

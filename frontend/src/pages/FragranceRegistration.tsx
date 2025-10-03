@@ -144,7 +144,7 @@ const FragranceRegistration: React.FC = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
           },
           body: JSON.stringify({
             brand_name: formData.brandName,
@@ -207,26 +207,31 @@ const FragranceRegistration: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/fragrances', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          brand_name: formData.brandName,
-          fragrance_name: formData.fragranceName,
-          volume_ml: formData.volume ? parseFloat(formData.volume) : null,
-          purchase_price: formData.purchasePrice
-            ? parseFloat(formData.purchasePrice)
-            : null,
-          purchase_date: formData.purchaseDate || null,
-          purchase_place: formData.purchasePlace || null,
-          possession_type: formData.possessionType,
-          user_rating: formData.userRating || null,
-          comments: formData.comments || null,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/fragrances`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+          },
+          body: JSON.stringify({
+            brand_name: formData.brandName,
+            brand_name_en: formData.brandNameEn || null,
+            fragrance_name: formData.fragranceName,
+            fragrance_name_en: formData.fragranceNameEn || null,
+            volume_ml: formData.volume ? parseFloat(formData.volume) : null,
+            purchase_price: formData.purchasePrice
+              ? parseFloat(formData.purchasePrice)
+              : null,
+            purchase_date: formData.purchaseDate || null,
+            purchase_place: formData.purchasePlace || null,
+            possession_type: formData.possessionType,
+            user_rating: formData.userRating || null,
+            comments: formData.comments || null,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Registration failed');

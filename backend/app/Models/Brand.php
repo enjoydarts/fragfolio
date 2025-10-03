@@ -6,20 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $name_ja
+ * @property string $name_en
+ * @property string|null $description_ja
+ * @property string|null $description_en
+ * @property string|null $country
+ * @property int|null $founded_year
+ * @property string|null $website
+ * @property string|null $logo
+ * @property bool $is_active
+ */
 class Brand extends Model
 {
     use HasFactory;
-
-    /**
-     * Model properties from database
-     */
-    public ?string $name_en = null;
-
-    public ?string $name_ja = null;
-
-    public ?string $description_en = null;
-
-    public ?string $description_ja = null;
 
     protected $fillable = [
         'name_ja',

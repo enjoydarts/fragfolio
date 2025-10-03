@@ -7,16 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int $fragrance_id
+ * @property string|null $purchase_date
+ * @property float|null $volume_ml
+ * @property float|null $purchase_price
+ * @property string|null $purchase_place
+ * @property float|null $current_volume_ml
+ * @property string $possession_type
+ * @property int|null $duration_hours
+ * @property string|null $projection
+ * @property int|null $user_rating
+ * @property string|null $comments
+ * @property string|null $bottle_image
+ * @property string|null $box_image
+ * @property bool $is_active
+ */
 class UserFragrance extends Model
 {
     use HasFactory;
-
-    /**
-     * Model properties from database
-     */
-    public ?float $volume_ml = null;
-
-    public ?float $current_volume_ml = null;
 
     protected $fillable = [
         'user_id',
