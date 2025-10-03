@@ -38,9 +38,11 @@ trait SqldefTestCleanup
     {
         // 複数のパスを試す（Docker環境とCI環境で異なる）
         $possiblePaths = [
-            base_path('sqldef/schema.sql'),           // Docker: /var/www/html/sqldef/schema.sql
-            base_path('../sqldef/schema.sql'),        // CI: /home/runner/work/fragfolio/fragfolio/sqldef/schema.sql
+            base_path('sqldef/schema.sql'),            // Docker: /var/www/html/sqldef/schema.sql
+            base_path('../sqldef/schema.sql'),         // CI: /home/runner/work/fragfolio/fragfolio/sqldef/schema.sql
+            base_path('../database/schema.sql'),       // CI: /home/runner/work/fragfolio/fragfolio/database/schema.sql
             dirname(base_path()).'/sqldef/schema.sql', // 絶対パス
+            dirname(base_path()).'/database/schema.sql', // database ディレクトリ
         ];
 
         $schemaPath = null;
