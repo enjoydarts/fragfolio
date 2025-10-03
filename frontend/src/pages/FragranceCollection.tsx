@@ -57,6 +57,7 @@ const FragranceCollection: React.FC = () => {
     }
 
     fetchFragrances();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, navigate, currentPage]);
 
   const fetchFragrances = async () => {
@@ -86,7 +87,7 @@ const FragranceCollection: React.FC = () => {
           total: data.data.total,
         });
       }
-    } catch (err) {
+    } catch {
       toast.error(t('fragrance.fetch_error'));
     } finally {
       setLoading(false);
