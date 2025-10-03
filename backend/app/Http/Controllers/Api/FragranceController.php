@@ -5,15 +5,26 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\StoreFragranceRequest;
 use App\UseCases\Fragrance\RegisterFragranceUseCase;
+use App\UseCases\Fragrance\UpdateFragranceUseCase;
+use App\UseCases\Fragrance\DeleteFragranceUseCase;
 use Illuminate\Http\JsonResponse;
 
 class FragranceController extends Controller
 {
     private RegisterFragranceUseCase $registerUseCase;
 
-    public function __construct(RegisterFragranceUseCase $registerUseCase)
-    {
+    private UpdateFragranceUseCase $updateUseCase;
+
+    private DeleteFragranceUseCase $deleteUseCase;
+
+    public function __construct(
+        RegisterFragranceUseCase $registerUseCase,
+        UpdateFragranceUseCase $updateUseCase,
+        DeleteFragranceUseCase $deleteUseCase
+    ) {
         $this->registerUseCase = $registerUseCase;
+        $this->updateUseCase = $updateUseCase;
+        $this->deleteUseCase = $deleteUseCase;
     }
 
     /**
@@ -167,30 +178,11 @@ class FragranceController extends Controller
             /** @var \App\Models\UserFragrance $userFragrance */
             $userFragrance = $user->fragrances()->findOrFail($id);
 
-            // 基本情報の更新
-            $userFragrance->update([
-                'purchase_date' => $request->validated('purchase_date'),
-                'volume_ml' => $request->validated('volume_ml'),
-                'purchase_price' => $request->validated('purchase_price'),
-                'purchase_place' => $request->validated('purchase_place'),
-                'possession_type' => $request->validated('possession_type'),
-                'duration_hours' => $request->validated('duration_hours'),
-                'projection' => $request->validated('projection'),
-                'user_rating' => $request->validated('user_rating'),
-                'comments' => $request->validated('comments'),
-            ]);
-
-            // タグの更新
-            if ($request->has('tags')) {
-                $userFragrance->tags()->delete();
-                foreach ($request->validated('tags') as $tagName) {
-                    $userFragrance->tags()->create(['tag_name' => trim($tagName)]);
-                }
-            }
+            $updatedFragrance = $this->updateUseCase->execute($userFragrance, $request->validated());
 
             return response()->json([
                 'success' => true,
-                'data' => $userFragrance->load(['fragrance.brand', 'tags']),
+                'data' => $updatedFragrance,
                 'message' => __('fragrance.update_success'),
             ]);
 
@@ -233,7 +225,7 @@ class FragranceController extends Controller
             }
 
             $userFragrance = $user->fragrances()->findOrFail($id);
-            $userFragrance->update(['is_active' => false]);
+            $this->deleteUseCase->execute($userFragrance);
 
             return response()->json([
                 'success' => true,
