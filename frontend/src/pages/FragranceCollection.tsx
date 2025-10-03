@@ -295,20 +295,14 @@ const FragranceCollection: React.FC = () => {
                 </div>
 
                 {/* アクションボタン */}
-                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between">
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
                   <button
                     onClick={() =>
                       navigate(`/fragrance/${userFragrance.id}/edit`)
                     }
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    className="w-full text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
                     {t('common.edit')}
-                  </button>
-                  <button
-                    onClick={() => navigate(`/fragrance/${userFragrance.id}`)}
-                    className="text-sm text-gray-600 hover:text-gray-700 font-medium"
-                  >
-                    {t('common.details')}
                   </button>
                 </div>
               </div>

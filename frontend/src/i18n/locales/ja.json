@@ -169,15 +169,6 @@
     "invalid_state": "認証器の状態が無効です"
   },
   "or": "または",
-  "common": {
-    "loading": "読み込み中...",
-    "save": "保存",
-    "cancel": "キャンセル",
-    "close": "閉じる",
-    "complete": "完了",
-    "copy": "コピー",
-    "back_to_dashboard": "ダッシュボードに戻る"
-  },
   "verification": {
     "success": {
       "title": "認証完了",
@@ -453,6 +444,9 @@
     "edit": "編集",
     "show": "表示",
     "hide": "隠す",
+    "details": "詳細",
+    "previous": "前へ",
+    "next": "次へ",
     "back_to_dashboard": "ダッシュボードに戻る"
   }
 }

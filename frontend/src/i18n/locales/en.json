@@ -169,15 +169,6 @@
     "invalid_state": "Authenticator state is invalid"
   },
   "or": "or",
-  "common": {
-    "loading": "Loading...",
-    "save": "Save",
-    "cancel": "Cancel",
-    "close": "Close",
-    "complete": "Complete",
-    "copy": "Copy",
-    "back_to_dashboard": "Back to Dashboard"
-  },
   "verification": {
     "success": {
       "title": "Verification Complete",
@@ -452,6 +443,9 @@
     "edit": "Edit",
     "show": "Show",
     "hide": "Hide",
+    "details": "Details",
+    "previous": "Previous",
+    "next": "Next",
     "back_to_dashboard": "Back to Dashboard"
   }
 }
