@@ -21,6 +21,7 @@ import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
 import { PasswordResetError } from './pages/PasswordResetError';
 import FragranceRegistration from './pages/FragranceRegistration';
+import FragranceCollection from './pages/FragranceCollection';
 import { Test } from './Test';
 
 const AppContent: React.FC = () => {
@@ -56,12 +57,15 @@ const AppContent: React.FC = () => {
           path="/collection"
           element={
             <ProtectedRoute>
-              <div className="p-8">
-                <h1 className="text-2xl font-bold">Collection (Coming Soon)</h1>
-                <p className="mt-4 text-gray-600">
-                  Your fragrance collection will be displayed here.
-                </p>
-              </div>
+              <FragranceCollection />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <ProtectedRoute>
+              <FragranceRegistration />
             </ProtectedRoute>
           }
         />
