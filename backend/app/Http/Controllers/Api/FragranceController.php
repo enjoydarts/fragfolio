@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\StoreFragranceRequest;
+use App\UseCases\Fragrance\DeleteFragranceUseCase;
 use App\UseCases\Fragrance\RegisterFragranceUseCase;
 use App\UseCases\Fragrance\UpdateFragranceUseCase;
-use App\UseCases\Fragrance\DeleteFragranceUseCase;
 use Illuminate\Http\JsonResponse;
 
 class FragranceController extends Controller
