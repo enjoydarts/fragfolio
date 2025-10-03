@@ -252,8 +252,8 @@ const FragranceCollection: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span className="text-gray-400">⏱️</span>
                         <span>
-                          {t('fragrance.duration')}: {userFragrance.duration_hours}{' '}
-                          {t('fragrance.hours')}
+                          {t('fragrance.duration')}:{' '}
+                          {userFragrance.duration_hours} {t('fragrance.hours')}
                         </span>
                       </div>
                     )}
