@@ -24,7 +24,7 @@
     "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/postcss": "^4.1.14",
     "@tailwindcss/typography": "^0.5.19",
-    "i18next": "^25.4.1",
+    "i18next": "^25.5.3",
     "i18next-browser-languagedetector": "^8.0.0",
     "react": "^19.1.1",
     "react-dom": "^19.2.0",
